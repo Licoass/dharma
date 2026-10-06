@@ -31,11 +31,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   const {
     tasks,
-    agendaEvents,
+    calendarActivities,
     metrics,
     dharmaMood,
     toggleTaskComplete,
     setFilters,
+    googleSyncStatus,
+    googleEvents,
+    setSelectedGoogleEvent,
   } = useTaskContext();
 
   // 1. Tarea prioritaria destacada (primera vital o de alta prioridad no completada)
@@ -49,6 +52,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const todayTasks = tasks
     .filter((t) => t.id !== priorityTask?.id && t.statusId !== 'completado')
     .slice(0, 3);
+
+  // 3. Próximos eventos (incluye eventos locales y Google Calendar unificados)
+  const upcomingEvents = calendarActivities
+    .filter((a) => a.type === 'evento')
+    .slice(0, 4);
 
   return (
     <div className="flex flex-col space-y-6 sm:space-y-8 select-none">
@@ -358,41 +366,81 @@ export const Dashboard: React.FC<DashboardProps> = ({
             <h3 className="text-xs font-bold uppercase tracking-[0.06em] text-[#697282] flex items-center gap-1.5">
               <CalendarIcon className="w-3.5 h-3.5 text-[#177468]" />
               <span>Agenda</span>
+              {googleSyncStatus === 'connected' && (
+                <span className="text-[10px] font-bold text-[#1A73E8] bg-[#E8F0FE] px-2 py-0.5 rounded-full border border-[#4285F4]/20">
+                  Google Sync
+                </span>
+              )}
             </h3>
-            <span className="text-[11px] font-medium text-[#9DA6B5]">
-              Próximos eventos
-            </span>
+            <button
+              type="button"
+              onClick={() => onNavigateTab('calendario')}
+              className="text-xs font-semibold text-[#177468] hover:underline flex items-center gap-1 cursor-pointer"
+            >
+              <span>Ver calendario</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
           <div className="space-y-2.5">
-            {agendaEvents.map((evt) => (
-              <div
-                key={evt.id}
-                className="p-3.5 sm:p-4 rounded-[22px] bg-white shadow-[0_2px_12px_rgba(36,41,47,0.02)] flex items-start gap-3.5 hover:shadow-[0_6px_20px_rgba(36,41,47,0.04)] transition-all"
-              >
-                <div className="p-2 sm:p-2.5 rounded-[14px] bg-[#FAF8F5] text-[#177468] font-mono text-[11px] font-bold text-center shrink-0 min-w-[70px]">
-                  {evt.time.split(' - ')[0]}
-                </div>
+            {upcomingEvents.length === 0 ? (
+              <Card padding="md" className="text-center py-6 text-xs text-[#9DA6B5]">
+                No hay eventos programados en la agenda.
+              </Card>
+            ) : (
+              upcomingEvents.map((evt) => {
+                const isGoogle = evt.source === 'google';
+                return (
+                  <div
+                    key={evt.id}
+                    onClick={() => {
+                      if (isGoogle && evt.googleEventId) {
+                        const gEvt = googleEvents.find((e) => e.id === evt.googleEventId);
+                        if (gEvt) setSelectedGoogleEvent(gEvt);
+                      }
+                      onNavigateTab('calendario');
+                    }}
+                    className={`p-3.5 sm:p-4 rounded-[22px] bg-white shadow-[0_2px_12px_rgba(36,41,47,0.02)] flex items-start gap-3.5 hover:shadow-[0_6px_20px_rgba(36,41,47,0.04)] transition-all cursor-pointer ${
+                      isGoogle ? 'border border-[#4285F4]/15' : ''
+                    }`}
+                  >
+                    <div className={`p-2 sm:p-2.5 rounded-[14px] font-mono text-[11px] font-bold text-center shrink-0 min-w-[70px] ${
+                      isGoogle ? 'bg-[#E8F0FE] text-[#1A73E8]' : 'bg-[#FAF8F5] text-[#177468]'
+                    }`}>
+                      {evt.time ? evt.time.split(' - ')[0] : 'Hoy'}
+                    </div>
 
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-bold text-[#24292F] truncate">
-                    {evt.title}
-                  </p>
-                  <div className="flex items-center gap-3 mt-1 text-[11px] text-[#697282]">
-                    <span className="font-semibold text-[#9DA6B5]">{evt.time}</span>
-                    {evt.location && (
-                      <span className="inline-flex items-center gap-1">
-                        <MapPin className="w-3 h-3 text-[#9DA6B5]" />
-                        <span>{evt.location}</span>
-                      </span>
-                    )}
-                    <div className="ml-auto">
-                      <CategoryBadge categoryId={evt.categoryId} size="sm" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs sm:text-sm font-bold text-[#24292F] truncate">
+                          {evt.title}
+                        </p>
+                        {isGoogle && (
+                          <span className="text-[9px] font-bold text-[#1A73E8] bg-[#E8F0FE] px-1.5 py-0.5 rounded shrink-0">
+                            G-Cal
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-3 mt-1 text-[11px] text-[#697282]">
+                        <span className="font-semibold text-[#9DA6B5]">
+                          {evt.time || evt.date}
+                        </span>
+                        {evt.location && (
+                          <span className="inline-flex items-center gap-1 truncate max-w-[120px]">
+                            <MapPin className="w-3 h-3 text-[#9DA6B5]" />
+                            <span className="truncate">{evt.location}</span>
+                          </span>
+                        )}
+                        <div className="ml-auto">
+                          <CategoryBadge categoryId={evt.categoryId} size="sm" />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                );
+              })
+            )}
           </div>
         </div>
       </section>

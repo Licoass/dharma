@@ -71,7 +71,15 @@ export interface CalendarActivity {
   priority?: TaskPriority;
   taskId?: string;
   eventId?: string;
+  // Integración Google Calendar (FASE 10)
+  source?: 'local' | 'google';
+  isReadOnly?: boolean;
+  googleEventId?: string;
+  googleHtmlLink?: string;
+  googleMeetLink?: string;
 }
+
+export * from './googleCalendar';
 
 export interface NoteChecklistItem {
   id: string;

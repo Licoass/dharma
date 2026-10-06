@@ -7,7 +7,9 @@ import {
   MapPin, 
   Check, 
   Trash2, 
-  Flame
+  Flame,
+  Lock,
+  Video
 } from 'lucide-react';
 import type { CalendarActivity } from '../../types';
 import { useTaskContext } from '../../context/TaskContext';
@@ -31,7 +33,9 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
     getCategoryById, 
     toggleTaskComplete, 
     toggleEventComplete, 
-    deleteEvent 
+    deleteEvent,
+    googleEvents,
+    setSelectedGoogleEvent
   } = useTaskContext();
 
   const category = getCategoryById(activity.categoryId);
@@ -54,6 +58,13 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
   };
 
   const handleCardClick = () => {
+    if (activity.source === 'google' && activity.googleEventId) {
+      const gEvent = googleEvents.find((e) => e.id === activity.googleEventId);
+      if (gEvent) {
+        setSelectedGoogleEvent(gEvent);
+        return;
+      }
+    }
     if (activity.type === 'tarea' && activity.taskId && onEditTask) {
       onEditTask(activity.taskId);
     } else if (activity.eventId && onEditEvent) {
@@ -84,6 +95,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
 
   // Si es compacto (para celdas del mes o semana reducida)
   if (compact) {
+    const isGoogle = activity.source === 'google';
     return (
       <div
         onClick={handleCardClick}
@@ -91,17 +103,22 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
           flex items-center gap-1.5 px-2 py-1 rounded-[10px] text-[11px] font-semibold
           truncate cursor-pointer transition-all hover:scale-[1.01] select-none
           ${activity.isCompleted ? 'line-through opacity-60' : ''}
+          ${isGoogle ? 'bg-[#E8F0FE] text-[#1A73E8] border border-[#4285F4]/20' : ''}
           ${className}
         `}
-        style={{
-          backgroundColor: category?.bgSoft || '#F5F2EB',
-          color: category?.textColor || '#24292F',
-        }}
-        title={`${activity.time ? activity.time + ' · ' : ''}${activity.title}`}
+        style={
+          isGoogle
+            ? undefined
+            : {
+                backgroundColor: category?.bgSoft || '#F5F2EB',
+                color: category?.textColor || '#24292F',
+              }
+        }
+        title={`${isGoogle ? 'Google Calendar: ' : ''}${activity.time ? activity.time + ' · ' : ''}${activity.title}`}
       >
         <span
-          className="w-1.5 h-1.5 rounded-full shrink-0"
-          style={{ backgroundColor: category?.color || '#9DA6B5' }}
+          className={`w-1.5 h-1.5 rounded-full shrink-0 ${isGoogle ? 'bg-[#4285F4]' : ''}`}
+          style={isGoogle ? undefined : { backgroundColor: category?.color || '#9DA6B5' }}
         />
         {activity.time && (
           <span className="font-mono text-[10px] opacity-80 shrink-0">
@@ -123,6 +140,8 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
         ${
           activity.isCompleted
             ? 'bg-white/60 opacity-70 shadow-2xs'
+            : activity.source === 'google'
+            ? 'bg-gradient-to-br from-white via-white to-[#F8FAFF] border border-[#4285F4]/15'
             : 'bg-white'
         }
         ${className}
@@ -131,17 +150,24 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
       {/* Barra superior de tipo y categoría */}
       <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-1.5 flex-wrap">
-          {/* Badge de tipo de actividad */}
-          <span
-            className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase"
-            style={{
-              backgroundColor: typeConfig.badgeBg,
-              color: typeConfig.badgeText,
-            }}
-          >
-            {typeConfig.icon}
-            <span>{typeConfig.label}</span>
-          </span>
+          {/* Badge de tipo de actividad / Google Calendar */}
+          {activity.source === 'google' ? (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-[#E8F0FE] text-[#1A73E8] border border-[#4285F4]/20">
+              <CalendarIcon className="w-3 h-3 text-[#1A73E8]" />
+              <span>Google Calendar</span>
+            </span>
+          ) : (
+            <span
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase"
+              style={{
+                backgroundColor: typeConfig.badgeBg,
+                color: typeConfig.badgeText,
+              }}
+            >
+              {typeConfig.icon}
+              <span>{typeConfig.label}</span>
+            </span>
+          )}
 
           {/* Badge de categoría con color pastel */}
           {category && (
@@ -168,16 +194,25 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
           )}
         </div>
 
-        {/* Acciones directas */}
-        {activity.eventId && (
-          <button
-            onClick={handleDelete}
-            className="opacity-0 group-hover:opacity-100 p-1 text-[#9DA6B5] hover:text-[#EB6B6B] transition-opacity cursor-pointer rounded-full hover:bg-[#FAF8F5]"
-            title="Eliminar de la agenda"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        )}
+        {/* Acciones directas y Badge de Solo Lectura */}
+        <div className="flex items-center gap-1.5">
+          {activity.isReadOnly && (
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#5F6368] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-black/[0.03]">
+              <Lock className="w-2.5 h-2.5" />
+              <span>Solo lectura</span>
+            </span>
+          )}
+
+          {activity.eventId && !activity.isReadOnly && (
+            <button
+              onClick={handleDelete}
+              className="opacity-0 group-hover:opacity-100 p-1 text-[#9DA6B5] hover:text-[#EB6B6B] transition-opacity cursor-pointer rounded-full hover:bg-[#FAF8F5]"
+              title="Eliminar de la agenda"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Contenido principal: Checkbox (si tarea o recordatorio) + Título + Descripción */}
@@ -234,6 +269,20 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
                 <MapPin className="w-3 h-3 text-[#9DA6B5]" />
                 <span className="truncate max-w-[150px]">{activity.location}</span>
               </span>
+            )}
+
+            {activity.googleMeetLink && (
+              <a
+                href={activity.googleMeetLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 text-[#1A73E8] bg-[#E8F0FE] hover:bg-[#D2E3FC] px-2 py-0.5 rounded-full transition-colors"
+                title="Unirse a Google Meet"
+              >
+                <Video className="w-3 h-3 text-[#1A73E8]" />
+                <span>Meet</span>
+              </a>
             )}
           </div>
         </div>

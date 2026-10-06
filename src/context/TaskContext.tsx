@@ -15,8 +15,12 @@ import type {
   Book,
   BookStatus,
   Transmission,
-  TransmissionStatus
+  TransmissionStatus,
+  GoogleCalendarEvent,
+  GoogleUser,
+  GoogleSyncStatus
 } from '../types';
+import { googleCalendarService } from '../services/googleCalendarService';
 import { INITIAL_TASKS } from '../data/initialTasks';
 import { INITIAL_CATEGORIES } from '../data/initialCategories';
 import { INITIAL_STATUSES } from '../data/initialStatuses';
@@ -111,6 +115,20 @@ interface TaskContextType {
   resetToDefaults: () => void;
   getCategoryById: (id: string) => Category | undefined;
   getStatusById: (id: string) => TaskStatusItem | undefined;
+
+  // Google Calendar Integration (FASE 10)
+  googleSyncStatus: GoogleSyncStatus;
+  googleUser: GoogleUser | null;
+  googleEvents: GoogleCalendarEvent[];
+  lastGoogleSync: string | null;
+  isGoogleCalendarModalOpen: boolean;
+  selectedGoogleEvent: GoogleCalendarEvent | null;
+  connectGoogleCalendar: () => Promise<void>;
+  disconnectGoogleCalendar: () => void;
+  syncGoogleCalendar: () => Promise<void>;
+  openGoogleCalendarModal: () => void;
+  closeGoogleCalendarModal: () => void;
+  setSelectedGoogleEvent: (event: GoogleCalendarEvent | null) => void;
   
   metrics: {
     total: number;
@@ -264,6 +282,81 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const closeAudioCapture = () => {
     setIsAudioCaptureOpen(false);
   };
+
+  // Google Calendar Integration (FASE 10)
+  const [googleSyncStatus, setGoogleSyncStatus] = useState<GoogleSyncStatus>(() => {
+    return googleCalendarService.isAuthenticated() ? 'connected' : 'disconnected';
+  });
+  const [googleUser, setGoogleUser] = useState<GoogleUser | null>(() => {
+    return googleCalendarService.getCurrentUser();
+  });
+  const [googleEvents, setGoogleEvents] = useState<GoogleCalendarEvent[]>(() => {
+    try {
+      const saved = localStorage.getItem('dharma_google_synced_events');
+      if (saved) return JSON.parse(saved);
+    } catch (_) {}
+    return [];
+  });
+  const [lastGoogleSync, setLastGoogleSync] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem('dharma_google_last_sync');
+    } catch (_) {
+      return null;
+    }
+  });
+  const [isGoogleCalendarModalOpen, setIsGoogleCalendarModalOpen] = useState(false);
+  const [selectedGoogleEvent, setSelectedGoogleEvent] = useState<GoogleCalendarEvent | null>(null);
+
+  const syncGoogleCalendar = async () => {
+    if (!googleCalendarService.isAuthenticated()) return;
+    setGoogleSyncStatus('syncing');
+    try {
+      const events = await googleCalendarService.fetchEvents();
+      setGoogleEvents(events);
+      const now = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      setLastGoogleSync(now);
+      localStorage.setItem('dharma_google_last_sync', now);
+      setGoogleSyncStatus('connected');
+    } catch (err) {
+      console.warn('Error sincronizando Google Calendar', err);
+      setGoogleSyncStatus('error');
+    }
+  };
+
+  const connectGoogleCalendar = async () => {
+    setGoogleSyncStatus('connecting');
+    try {
+      const { user } = await googleCalendarService.loginWithGoogle();
+      setGoogleUser(user);
+      setGoogleSyncStatus('connected');
+      await syncGoogleCalendar();
+    } catch (err) {
+      console.error('Error conectando Google Calendar', err);
+      setGoogleSyncStatus('error');
+    }
+  };
+
+  const disconnectGoogleCalendar = () => {
+    googleCalendarService.disconnect();
+    setGoogleSyncStatus('disconnected');
+    setGoogleUser(null);
+    setGoogleEvents([]);
+    setLastGoogleSync(null);
+    try {
+      localStorage.removeItem('dharma_google_last_sync');
+      localStorage.removeItem('dharma_google_synced_events');
+    } catch (_) {}
+  };
+
+  const openGoogleCalendarModal = () => setIsGoogleCalendarModalOpen(true);
+  const closeGoogleCalendarModal = () => setIsGoogleCalendarModalOpen(false);
+
+  // Auto-sincronizar al inicio si ya está autenticado pero no hay eventos cargados
+  useEffect(() => {
+    if (googleCalendarService.isAuthenticated() && googleEvents.length === 0) {
+      syncGoogleCalendar();
+    }
+  }, []);
 
   // Sync to localStorage
   useEffect(() => {
@@ -668,13 +761,17 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       eventId: e.id,
     }));
 
-    return [...taskActivities, ...eventActivities].sort((a, b) => {
+    const googleActivities: CalendarActivity[] = googleEvents.map((gEvent) =>
+      googleCalendarService.convertGoogleEventToCalendarActivity(gEvent, categories)
+    );
+
+    return [...taskActivities, ...eventActivities, ...googleActivities].sort((a, b) => {
       if (a.date !== b.date) return a.date.localeCompare(b.date);
       const timeA = a.time || '23:59';
       const timeB = b.time || '23:59';
       return timeA.localeCompare(timeB);
     });
-  }, [tasks, agendaEvents]);
+  }, [tasks, agendaEvents, googleEvents, categories]);
 
   // Filter tasks based on search, categoryId, statusId, priority
   const filteredTasks = tasks.filter((t) => {
@@ -753,6 +850,18 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         closeDharmaCore,
         openAudioCapture,
         closeAudioCapture,
+        googleSyncStatus,
+        googleUser,
+        googleEvents,
+        lastGoogleSync,
+        isGoogleCalendarModalOpen,
+        selectedGoogleEvent,
+        connectGoogleCalendar,
+        disconnectGoogleCalendar,
+        syncGoogleCalendar,
+        openGoogleCalendarModal,
+        closeGoogleCalendarModal,
+        setSelectedGoogleEvent,
         addTask,
         updateTask,
         deleteTask,
