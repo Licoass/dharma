@@ -11,13 +11,16 @@ import {
   Radio,
   Calendar,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  Smartphone,
+  CheckCircle2
 } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { useTaskContext } from '../../context/TaskContext';
 import { DharmaCore } from '../common/DharmaCore';
 import { GmailModal } from '../gmail/GmailModal';
+import { usePwaInstall } from '../../hooks/usePwaInstall';
 import type { NavTab } from '../../types';
 
 export interface MoreViewProps {
@@ -35,6 +38,7 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
     googleEvents,
     googleUser
   } = useTaskContext();
+  const { isInstallable, isStandalone, installPwa } = usePwaInstall();
   const [isGmailModalOpen, setIsGmailModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -226,15 +230,29 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
       ],
     },
     {
-      phase: 'FASE 13+',
-      title: 'Sincronización en la Nube & Automatizaciones',
+      phase: 'FASE 13',
+      title: 'Experiencia Móvil (Android PWA)',
+      status: 'completada',
+      badge: 'VERIFICADO',
+      items: [
+        'Web App Manifest con iconos adaptativos maskable (192px y 512px)',
+        'Service Worker con precache de App Shell y soporte offline resiliente',
+        'Navegación inferior táctil con objetivos mínimos de 48px y botón FAB centrado de 56px',
+        'Grabación de audio táctil optimizada con halos reactivos y prevención de scroll',
+        'Eliminación de dependencias de hover y prevención de auto-zoom en inputs',
+        'Arquitectura preparada para empaquetado nativo a APK/AAB mediante Capacitor',
+      ],
+    },
+    {
+      phase: 'FASE 14+',
+      title: 'Empaquetado APK/AAB (Capacitor) & Nube',
       status: 'pendiente',
       badge: 'SIGUIENTES FASES',
       items: [
+        'Empaquetado directo de la PWA como APK y AAB mediante Capacitor para Google Play Store',
         'Persistencia en tiempo real en Supabase Database multidispositivo',
-        'Operaciones de escritura en Google Calendar (crear, editar, eliminar eventos)',
-        'Sincronización bidireccional automática en segundo plano',
-        'Automatizaciones y análisis de hábitos inteligentes con DHARMA CORE',
+        'Operaciones de escritura en Google Calendar (crear, editar, eliminar)',
+        'Notificaciones push nativas en Android con recordatorios de tareas',
       ],
     },
   ];
@@ -540,7 +558,80 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
         </div>
       </div>
 
-      {/* 2. PLAN DE DESARROLLO POR FASES (ROADMAP) */}
+      {/* 2. EXPERIENCIA MÓVIL & ANDROID PWA */}
+      <Card padding="lg" className="border border-[#177468]/20 bg-gradient-to-br from-white via-[#FAF8F5] to-[#E8F6F4]/30">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-[#E8F6F4] text-[#177468] flex items-center justify-center shrink-0 border border-[#177468]/20">
+              <Smartphone className="w-6 h-6 stroke-[2.2]" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-bold text-[#24292F]">
+                  EXPERIENCIA MÓVIL ANDROID (PWA)
+                </h3>
+                <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
+                  isStandalone
+                    ? 'bg-[#E6F4EA] text-[#137333]'
+                    : isInstallable
+                    ? 'bg-[#FEF7E0] text-[#B06000]'
+                    : 'bg-[#F1F3F4] text-[#5F6368]'
+                }`}>
+                  {isStandalone ? 'APP INSTALADA (STANDALONE)' : isInstallable ? 'LISTA PARA INSTALAR' : 'PWA ACTIVA'}
+                </span>
+              </div>
+              <p className="text-xs text-[#697282] mt-0.5">
+                Optimizada con sensación nativa, navegación inferior por gestos, soporte offline y sin menús diminutos.
+              </p>
+            </div>
+          </div>
+
+          {isInstallable && !isStandalone && (
+            <Button
+              variant="primary"
+              size="md"
+              onClick={installPwa}
+              icon={<Download className="w-4 h-4 stroke-[2.5]" />}
+            >
+              Instalar en Android
+            </Button>
+          )}
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs text-[#484F58]">
+          <div className="p-3 rounded-2xl bg-white/80 border border-[#EBE8E1] space-y-1">
+            <div className="font-bold text-[#24292F] flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#177468]" />
+              <span>Navegación Táctil 48px+</span>
+            </div>
+            <p className="text-[11px] text-[#697282]">
+              Objetivos táctiles confortables, botón de captura FAB de 56px y zonas seguras de barra de gestos.
+            </p>
+          </div>
+
+          <div className="p-3 rounded-2xl bg-white/80 border border-[#EBE8E1] space-y-1">
+            <div className="font-bold text-[#24292F] flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#177468]" />
+              <span>Sin Dependencia de Hover</span>
+            </div>
+            <p className="text-[11px] text-[#697282]">
+              Todas las acciones accesibles por toque directo, sin menús inaccesibles en pantallas táctiles.
+            </p>
+          </div>
+
+          <div className="p-3 rounded-2xl bg-white/80 border border-[#EBE8E1] space-y-1">
+            <div className="font-bold text-[#24292F] flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#177468]" />
+              <span>Preparado para Capacitor</span>
+            </div>
+            <p className="text-[11px] text-[#697282]">
+              Estructura lista para compilar directamente a APK o AAB para Google Play Store en fases posteriores.
+            </p>
+          </div>
+        </div>
+      </Card>
+
+      {/* 3. PLAN DE DESARROLLO POR FASES (ROADMAP) */}
       <Card padding="lg">
         <div className="flex items-center justify-between mb-6 pb-2">
           <div>

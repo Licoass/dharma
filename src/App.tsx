@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TaskProvider, useTaskContext } from './context/TaskContext';
 import { AppShell } from './components/layout/AppShell';
 import { Dashboard } from './components/dashboard/Dashboard';
@@ -13,6 +13,7 @@ import { QuickCaptureModal } from './components/capture/QuickCaptureModal';
 import { TaskFormModal } from './components/tasks/TaskFormModal';
 import { DharmaCoreModal } from './components/dharmaCore/DharmaCoreModal';
 import { AudioCaptureModal } from './components/audio/AudioCaptureModal';
+import { PwaInstallBanner } from './components/common/PwaInstallBanner';
 import type { NavTab, Task } from './types';
 
 const MainLayout: React.FC = () => {
@@ -25,12 +26,29 @@ const MainLayout: React.FC = () => {
     addTask, 
     updateTask, 
     setIsQuickCaptureOpen, 
+    openDharmaCore,
     isDharmaCoreModalOpen, 
     closeDharmaCore, 
     dharmaCoreInitialText,
+    openAudioCapture,
     isAudioCaptureOpen,
     closeAudioCapture
   } = useTaskContext();
+
+  // Soporte para accesos directos nativos de Android (PWA Shortcuts en pantalla de inicio)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const action = params.get('action');
+      const tabParam = params.get('tab') as NavTab | null;
+
+      if (tabParam) setCurrentTab(tabParam);
+      if (action === 'capture') setIsQuickCaptureOpen(true);
+      if (action === 'audio') openAudioCapture();
+      if (action === 'core') openDharmaCore();
+      if (action === 'new') handleOpenCreateTask('por_hacer');
+    } catch (_) {}
+  }, []);
 
   const handleOpenCreateTask = (statusId: string = 'por_hacer') => {
     setEditingTask(null);
@@ -66,6 +84,9 @@ const MainLayout: React.FC = () => {
       }}
       onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
     >
+      {/* Banner de instalación Android PWA */}
+      <PwaInstallBanner />
+
       {/* Dynamic View Content */}
       {currentTab === 'inicio' && (
         <Dashboard

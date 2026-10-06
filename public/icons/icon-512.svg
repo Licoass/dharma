@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="dharmaGrad512" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14B8A6"/>
+      <stop offset="100%" stop-color="#0F766E"/>
+    </linearGradient>
+    <filter id="shadow512" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#0F766E" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <!-- Background with smooth rounded corners -->
+  <rect width="512" height="512" rx="124" fill="url(#dharmaGrad512)"/>
+  
+  <!-- Outer aura ring -->
+  <circle cx="256" cy="256" r="144" fill="none" stroke="#5EEAD4" stroke-width="8" opacity="0.45"/>
+  
+  <!-- Dharma Core circular glyph -->
+  <circle cx="256" cy="256" r="112" fill="#F0FDFA" filter="url(#shadow512)"/>
+  <circle cx="256" cy="256" r="58" fill="#0D9488"/>
+  <circle cx="256" cy="256" r="26" fill="#F0FDFA"/>
+  
+  <!-- Spark accent -->
+  <circle cx="324" cy="188" r="18" fill="#5EEAD4"/>
+</svg>
