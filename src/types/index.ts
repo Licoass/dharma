@@ -3,7 +3,7 @@ export type StationId = 'personal' | 'trabajo' | 'enfoque' | 'bienestar' | 'prot
 export interface Station {
   id: StationId;
   name: string;
-  code: string; // e.g. "EST-01", subtle station identifier
+  code: string;
   iconName: string;
   color: string;
   bgSoft: string;
@@ -12,7 +12,7 @@ export interface Station {
   description: string;
 }
 
-export type TaskStatus = 'pendiente' | 'en_curso' | 'completada' | 'archivada';
+export type TaskStatus = 'pendiente' | 'en_curso' | 'en_espera' | 'completada' | 'archivada';
 
 export type TaskPriority = 'baja' | 'media' | 'alta' | 'vital';
 
@@ -24,11 +24,21 @@ export interface Task {
   status: TaskStatus;
   priority: TaskPriority;
   dueDate?: string;
+  dueTime?: string;
   createdAt: string;
   completedAt?: string;
   estimatedMinutes?: number;
   tags?: string[];
-  protocolCode?: string; // e.g. "DHR-108", "PRT-42"
+  protocolCode?: string;
+}
+
+export interface AgendaEvent {
+  id: string;
+  title: string;
+  time: string;
+  date: string;
+  location?: string;
+  stationId: StationId;
 }
 
 export type NavTab = 'inicio' | 'tareas' | 'capturar' | 'calendario' | 'mas';

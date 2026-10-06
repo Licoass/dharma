@@ -60,7 +60,8 @@ export const StatusBadge: React.FC<{ status: TaskStatus; size?: 'sm' | 'md' }> =
 }) => {
   const config = {
     pendiente: { label: 'Pendiente', bg: '#F8FAFC', text: '#64748B', border: '#E2E8F0' },
-    en_curso: { label: 'En curso', bg: '#F0FDFA', text: '#0F766E', border: '#CCFBF1' },
+    en_curso: { label: 'En proceso', bg: '#F0FDFA', text: '#0F766E', border: '#CCFBF1' },
+    en_espera: { label: 'En espera', bg: '#FFFBEB', text: '#B45309', border: '#FEF3C7' },
     completada: { label: 'Completada', bg: '#F0FDF4', text: '#15803D', border: '#DCFCE7' },
     archivada: { label: 'Archivada', bg: '#F1F5F9', text: '#94A3B8', border: '#E2E8F0' },
   }[status];
@@ -86,6 +87,8 @@ export const StatusBadge: React.FC<{ status: TaskStatus; size?: 'sm' | 'md' }> =
               ? '#94A3B8'
               : status === 'en_curso'
               ? '#0D9488'
+              : status === 'en_espera'
+              ? '#D97706'
               : status === 'completada'
               ? '#16A34A'
               : '#CBD5E1',

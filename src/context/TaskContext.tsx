@@ -1,11 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import type { Task, TaskFilters, TaskStatus, ViewMode, DharmaCoreMood } from '../types';
+import type { Task, TaskFilters, TaskStatus, ViewMode, DharmaCoreMood, AgendaEvent } from '../types';
 import { INITIAL_TASKS } from '../data/initialTasks';
+import { INITIAL_AGENDA_EVENTS } from '../data/agendaEvents';
 
 interface TaskContextType {
   tasks: Task[];
   filteredTasks: Task[];
+  agendaEvents: AgendaEvent[];
   filters: TaskFilters;
   viewMode: ViewMode;
   dharmaMood: DharmaCoreMood;
@@ -25,6 +27,7 @@ interface TaskContextType {
     completed: number;
     pending: number;
     inProgress: number;
+    waiting: number;
     vital: number;
     completionPercentage: number;
   };
@@ -46,6 +49,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     return INITIAL_TASKS;
   });
+
+  const [agendaEvents] = useState<AgendaEvent[]>(INITIAL_AGENDA_EVENTS);
 
   const [filters, setFilters] = useState<TaskFilters>({
     search: '',
@@ -190,6 +195,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const completed = tasks.filter((t) => t.status === 'completada').length;
   const pending = tasks.filter((t) => t.status === 'pendiente').length;
   const inProgress = tasks.filter((t) => t.status === 'en_curso').length;
+  const waiting = tasks.filter((t) => t.status === 'en_espera').length;
   const vital = tasks.filter((t) => t.priority === 'vital' && t.status !== 'completada').length;
   const completionPercentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
@@ -198,6 +204,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         tasks,
         filteredTasks,
+        agendaEvents,
         filters,
         viewMode,
         dharmaMood,
@@ -217,6 +224,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           completed,
           pending,
           inProgress,
+          waiting,
           vital,
           completionPercentage,
         },

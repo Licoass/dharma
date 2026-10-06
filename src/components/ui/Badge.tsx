@@ -76,7 +76,8 @@ export const StatusBadge: React.FC<{
 }> = ({ status, size = 'md' }) => {
   const config = {
     pendiente: { label: 'Pendiente', variant: 'neutral' as const },
-    en_curso: { label: 'En curso', variant: 'teal' as const },
+    en_curso: { label: 'En proceso', variant: 'teal' as const },
+    en_espera: { label: 'En espera', variant: 'honey' as const },
     completada: { label: 'Completada', variant: 'sage' as const },
     archivada: { label: 'Archivada', variant: 'neutral' as const },
   }[status];
@@ -85,7 +86,13 @@ export const StatusBadge: React.FC<{
     <Badge variant={config.variant} size={size}>
       <span
         className={`w-1.5 h-1.5 rounded-full ${
-          status === 'en_curso' ? 'animate-pulse bg-[#177468]' : status === 'completada' ? 'bg-[#5CA16B]' : 'bg-[#9DA6B5]'
+          status === 'en_curso'
+            ? 'animate-pulse bg-[#177468]'
+            : status === 'en_espera'
+            ? 'bg-[#E8A743]'
+            : status === 'completada'
+            ? 'bg-[#5CA16B]'
+            : 'bg-[#9DA6B5]'
         }`}
       />
       <span>{config.label}</span>
