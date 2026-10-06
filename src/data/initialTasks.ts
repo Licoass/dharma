@@ -1,4 +1,12 @@
 import type { Task } from '../types';
+import { toISODate } from '../utils/dateUtils';
+
+const today = new Date();
+const getRelativeDate = (offsetDays: number): string => {
+  const d = new Date(today);
+  d.setDate(d.getDate() + offsetDays);
+  return toISODate(d);
+};
 
 export const INITIAL_TASKS: Task[] = [
   {
@@ -105,7 +113,7 @@ export const INITIAL_TASKS: Task[] = [
     categoryId: 'cat-team-nox',
     statusId: 'por_hacer',
     priority: 'vital',
-    dueDate: 'Viernes',
+    dueDate: getRelativeDate(3),
     dueTime: '10:00',
     createdAt: new Date().toISOString(),
     tags: ['Estrategia', 'Sprint'],
@@ -124,7 +132,7 @@ export const INITIAL_TASKS: Task[] = [
     categoryId: 'cat-ocio',
     statusId: 'por_hacer',
     priority: 'baja',
-    dueDate: 'Fin de semana',
+    dueDate: getRelativeDate(5),
     dueTime: '17:00',
     createdAt: new Date().toISOString(),
     tags: ['Lectura', 'Descanso'],

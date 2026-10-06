@@ -44,18 +44,40 @@ export interface Task {
   protocolCode?: string;
 }
 
+export type ActivityType = 'tarea' | 'evento' | 'recordatorio';
+
 export interface AgendaEvent {
   id: string;
   title: string;
+  description?: string;
   time: string;
   date: string;
   location?: string;
   categoryId?: string;
+  type?: 'evento' | 'recordatorio';
+  isCompleted?: boolean;
+}
+
+export interface CalendarActivity {
+  id: string;
+  title: string;
+  description?: string;
+  date: string; // ISO YYYY-MM-DD
+  time?: string;
+  type: ActivityType;
+  categoryId: string;
+  location?: string;
+  isCompleted?: boolean;
+  priority?: TaskPriority;
+  taskId?: string;
+  eventId?: string;
 }
 
 export type NavTab = 'inicio' | 'tareas' | 'capturar' | 'calendario' | 'mas';
 
 export type ViewMode = 'lista' | 'kanban';
+
+export type CalendarViewMode = 'mes' | 'semana' | 'agenda';
 
 export type DharmaCoreMood = 'calm' | 'focus' | 'celebrate' | 'syncing' | 'idle';
 

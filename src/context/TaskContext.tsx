@@ -1,10 +1,21 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import confetti from 'canvas-confetti';
-import type { Task, TaskFilters, ViewMode, DharmaCoreMood, AgendaEvent, Category, TaskStatusItem } from '../types';
+import type { 
+  Task, 
+  TaskFilters, 
+  ViewMode, 
+  CalendarViewMode, 
+  DharmaCoreMood, 
+  AgendaEvent, 
+  CalendarActivity,
+  Category, 
+  TaskStatusItem 
+} from '../types';
 import { INITIAL_TASKS } from '../data/initialTasks';
 import { INITIAL_CATEGORIES } from '../data/initialCategories';
 import { INITIAL_STATUSES } from '../data/initialStatuses';
 import { INITIAL_AGENDA_EVENTS } from '../data/agendaEvents';
+import { normalizeDateToISO, getTodayISO } from '../utils/dateUtils';
 
 interface TaskContextType {
   tasks: Task[];
@@ -12,12 +23,17 @@ interface TaskContextType {
   categories: Category[];
   statuses: TaskStatusItem[];
   agendaEvents: AgendaEvent[];
+  calendarActivities: CalendarActivity[];
   filters: TaskFilters;
   viewMode: ViewMode;
+  calendarViewMode: CalendarViewMode;
+  selectedCalendarDate: string;
   dharmaMood: DharmaCoreMood;
   isQuickCaptureOpen: boolean;
   setFilters: React.Dispatch<React.SetStateAction<TaskFilters>>;
   setViewMode: (mode: ViewMode) => void;
+  setCalendarViewMode: (mode: CalendarViewMode) => void;
+  setSelectedCalendarDate: (date: string) => void;
   setDharmaMood: (mood: DharmaCoreMood) => void;
   setIsQuickCaptureOpen: (open: boolean) => void;
   
@@ -29,6 +45,12 @@ interface TaskContextType {
   changeTaskStatus: (id: string, newStatusId: string) => void;
   toggleSubtask: (taskId: string, subtaskId: string) => void;
   
+  // Event & Reminder operations
+  addEvent: (eventData: Omit<AgendaEvent, 'id'>) => AgendaEvent;
+  updateEvent: (id: string, updates: Partial<AgendaEvent>) => void;
+  deleteEvent: (id: string) => void;
+  toggleEventComplete: (id: string) => void;
+
   // Configurable Category operations
   addCategory: (category: Omit<Category, 'id'>) => Category;
   updateCategory: (id: string, updates: Partial<Category>) => void;
@@ -58,6 +80,7 @@ interface TaskContextType {
 const STORAGE_KEY_TASKS = 'dharma_tasks_v3';
 const STORAGE_KEY_CATEGORIES = 'dharma_categories_v3';
 const STORAGE_KEY_STATUSES = 'dharma_statuses_v3';
+const STORAGE_KEY_EVENTS = 'dharma_events_v3';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
@@ -95,7 +118,16 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return INITIAL_TASKS;
   });
 
-  const [agendaEvents] = useState<AgendaEvent[]>(INITIAL_AGENDA_EVENTS);
+  // 4. Agenda Events & Reminders
+  const [agendaEvents, setAgendaEvents] = useState<AgendaEvent[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_EVENTS);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to load events', e);
+    }
+    return INITIAL_AGENDA_EVENTS;
+  });
 
   const [filters, setFilters] = useState<TaskFilters>({
     search: '',
@@ -105,6 +137,15 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   const [viewMode, setViewMode] = useState<ViewMode>('lista');
+  const [calendarViewMode, setCalendarViewMode] = useState<CalendarViewMode>(() => {
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 768) return 'agenda';
+      if (window.innerWidth < 1024) return 'semana';
+    }
+    return 'mes';
+  });
+  const [selectedCalendarDate, setSelectedCalendarDate] = useState<string>(getTodayISO);
+
   const [dharmaMood, setDharmaMood] = useState<DharmaCoreMood>('calm');
   const [isQuickCaptureOpen, setIsQuickCaptureOpen] = useState(false);
 
@@ -114,10 +155,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
       localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
       localStorage.setItem(STORAGE_KEY_STATUSES, JSON.stringify(statuses));
+      localStorage.setItem(STORAGE_KEY_EVENTS, JSON.stringify(agendaEvents));
     } catch (e) {
       console.warn('Failed to save to localStorage', e);
     }
-  }, [tasks, categories, statuses]);
+  }, [tasks, categories, statuses, agendaEvents]);
 
   const fireCelebration = () => {
     confetti({
@@ -262,10 +304,50 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setStatuses((prev) => prev.filter((s) => s.id !== id));
   };
 
+  // Event and Reminder operations
+  const addEvent = (eventData: Omit<AgendaEvent, 'id'>): AgendaEvent => {
+    const newEvent: AgendaEvent = {
+      ...eventData,
+      id: `evt-${Date.now()}-${Math.random().toString(36).substr(2, 3)}`,
+      type: eventData.type || 'evento',
+    };
+    setAgendaEvents((prev) => [newEvent, ...prev]);
+    return newEvent;
+  };
+
+  const updateEvent = (id: string, updates: Partial<AgendaEvent>) => {
+    setAgendaEvents((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
+    );
+  };
+
+  const deleteEvent = (id: string) => {
+    setAgendaEvents((prev) => prev.filter((e) => e.id !== id));
+  };
+
+  const toggleEventComplete = (id: string) => {
+    setAgendaEvents((prev) =>
+      prev.map((e) => {
+        if (e.id === id) {
+          const isNowDone = !e.isCompleted;
+          if (isNowDone) {
+            fireCelebration();
+            setDharmaMood('celebrate');
+            setTimeout(() => setDharmaMood('calm'), 2500);
+          }
+          return { ...e, isCompleted: isNowDone };
+        }
+        return e;
+      })
+    );
+  };
+
   const resetToDefaults = () => {
     setTasks(INITIAL_TASKS);
     setCategories(INITIAL_CATEGORIES);
     setStatuses(INITIAL_STATUSES);
+    setAgendaEvents(INITIAL_AGENDA_EVENTS);
+    setSelectedCalendarDate(getTodayISO());
     setFilters({
       search: '',
       categoryId: 'todas',
@@ -274,6 +356,44 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     setDharmaMood('calm');
   };
+
+  // Unified Calendar Activities (Tasks with date + Agenda Events + Reminders)
+  const calendarActivities: CalendarActivity[] = useMemo(() => {
+    const taskActivities: CalendarActivity[] = tasks
+      .filter((t) => !!t.dueDate)
+      .map((t) => ({
+        id: `act-task-${t.id}`,
+        title: t.title,
+        description: t.description,
+        date: normalizeDateToISO(t.dueDate),
+        time: t.dueTime,
+        type: 'tarea' as const,
+        categoryId: t.categoryId,
+        isCompleted: t.statusId === 'completado',
+        priority: t.priority,
+        taskId: t.id,
+      }));
+
+    const eventActivities: CalendarActivity[] = agendaEvents.map((e) => ({
+      id: `act-evt-${e.id}`,
+      title: e.title,
+      description: e.description,
+      date: normalizeDateToISO(e.date),
+      time: e.time,
+      type: e.type || 'evento',
+      categoryId: e.categoryId || 'cat-personal',
+      location: e.location,
+      isCompleted: !!e.isCompleted,
+      eventId: e.id,
+    }));
+
+    return [...taskActivities, ...eventActivities].sort((a, b) => {
+      if (a.date !== b.date) return a.date.localeCompare(b.date);
+      const timeA = a.time || '23:59';
+      const timeB = b.time || '23:59';
+      return timeA.localeCompare(timeB);
+    });
+  }, [tasks, agendaEvents]);
 
   // Filter tasks based on search, categoryId, statusId, priority
   const filteredTasks = tasks.filter((t) => {
@@ -328,12 +448,17 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         categories,
         statuses,
         agendaEvents,
+        calendarActivities,
         filters,
         viewMode,
+        calendarViewMode,
+        selectedCalendarDate,
         dharmaMood,
         isQuickCaptureOpen,
         setFilters,
         setViewMode,
+        setCalendarViewMode,
+        setSelectedCalendarDate,
         setDharmaMood,
         setIsQuickCaptureOpen,
         addTask,
@@ -342,6 +467,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         toggleTaskComplete,
         changeTaskStatus,
         toggleSubtask,
+        addEvent,
+        updateEvent,
+        deleteEvent,
+        toggleEventComplete,
         addCategory,
         updateCategory,
         deleteCategory,

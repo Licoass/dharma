@@ -3,7 +3,7 @@ import { TaskProvider, useTaskContext } from './context/TaskContext';
 import { AppShell } from './components/layout/AppShell';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { TasksView } from './components/tasks/TasksView';
-import { CalendarPlaceholderView } from './components/calendar/CalendarPlaceholderView';
+import { CalendarView } from './components/calendar/CalendarView';
 import { MoreView } from './components/more/MoreView';
 import { QuickCaptureModal } from './components/capture/QuickCaptureModal';
 import { TaskFormModal } from './components/tasks/TaskFormModal';
@@ -67,7 +67,7 @@ const MainLayout: React.FC = () => {
         />
       )}
 
-      {currentTab === 'calendario' && <CalendarPlaceholderView />}
+      {currentTab === 'calendario' && <CalendarView onEditTask={handleEditTask} />}
 
       {currentTab === 'mas' && <MoreView />}
 

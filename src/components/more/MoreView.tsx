@@ -76,7 +76,7 @@ export const MoreView: React.FC = () => {
       phase: 'FASE 3',
       title: 'Sistema de Tareas Completo',
       status: 'completada',
-      badge: 'ACTUAL',
+      badge: 'VERIFICADO',
       items: [
         'Modelo completo: título, descripción, categoría, estado, prioridad, fecha, hora, etiquetas, subtareas, notas, origen',
         'Categorías y Estados como entidades 100% configurables',
@@ -86,14 +86,27 @@ export const MoreView: React.FC = () => {
       ],
     },
     {
-      phase: 'FASE 4+',
-      title: 'Persistencia & Integraciones Avanzadas',
+      phase: 'FASE 4',
+      title: 'Calendario Visual Unificado',
+      status: 'completada',
+      badge: 'ACTUAL',
+      items: [
+        'Visualización unificada: tareas con fecha/hora, eventos y recordatorios locales',
+        'Vistas: Mes (cuadrícula orgánica), Semana (columnas fluidas) y Agenda',
+        'Layout adaptativo: Móvil (Agenda), Tablet (Semana), Desktop (Mes + panel lateral)',
+        'Tarjetas suaves y coloridas respetando el lenguaje visual DHARMA',
+        'Sin líneas rígidas empresariales; datos locales listos para futura sincronización',
+      ],
+    },
+    {
+      phase: 'FASE 5+',
+      title: 'Sincronización en la Nube & Google Calendar',
       status: 'pendiente',
       badge: 'SIGUIENTES FASES',
       items: [
-        'Sincronización de base de datos en nube',
-        'Integración con Google Calendar bidireccional',
-        'Automatizaciones y resúmenes inteligentes',
+        'Persistencia y sincronización en tiempo real multidispositivo',
+        'Integración bidireccional con Google Calendar',
+        'Automatizaciones y análisis de hábitos inteligentes',
       ],
     },
   ];
