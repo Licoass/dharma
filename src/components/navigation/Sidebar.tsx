@@ -7,6 +7,7 @@ import {
   FileText,
   Bookmark,
   BookOpen,
+  Radio,
   MoreHorizontal
 } from 'lucide-react';
 import type { NavTab } from '../../types';
@@ -20,10 +21,13 @@ export interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => {
-  const { metrics, setIsQuickCaptureOpen, dharmaMood, filters, setFilters, categories } = useTaskContext();
+  const { metrics, setIsQuickCaptureOpen, dharmaMood, filters, setFilters, categories, transmissions } = useTaskContext();
+
+  const newTransmissionsCount = transmissions.filter((t) => t.status === 'nueva').length;
 
   const navItems = [
     { id: 'inicio' as NavTab, label: 'Inicio', icon: Home, badge: null },
+    { id: 'transmisiones' as NavTab, label: 'Transmisiones', icon: Radio, badge: newTransmissionsCount > 0 ? newTransmissionsCount : null },
     { id: 'tareas' as NavTab, label: 'Tareas', icon: CheckSquare, badge: metrics.pending + metrics.inProgress },
     { id: 'calendario' as NavTab, label: 'Calendario', icon: Calendar, badge: null },
     { id: 'registros' as NavTab, label: 'Registros', icon: FileText, badge: null },

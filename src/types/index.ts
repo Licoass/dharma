@@ -131,7 +131,25 @@ export interface Book {
   updatedAt: string;
 }
 
-export type NavTab = 'inicio' | 'tareas' | 'capturar' | 'calendario' | 'registros' | 'archivo' | 'biblioteca' | 'mas';
+export type TransmissionType = 'texto' | 'audio' | 'enlace' | 'imagen';
+
+export type TransmissionStatus = 'nueva' | 'procesando' | 'procesada' | 'archivada';
+
+export interface Transmission {
+  id: string;
+  type: TransmissionType;
+  title?: string;
+  content: string;
+  url?: string;
+  durationSeconds?: number;
+  status: TransmissionStatus;
+  frequencyCode?: string;
+  signalStrength?: number;
+  createdAt: string;
+  processedAt?: string;
+}
+
+export type NavTab = 'inicio' | 'transmisiones' | 'tareas' | 'capturar' | 'calendario' | 'registros' | 'archivo' | 'biblioteca' | 'mas';
 
 export type ViewMode = 'lista' | 'kanban';
 

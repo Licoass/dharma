@@ -8,6 +8,7 @@ import {
   FileText,
   Bookmark,
   BookOpen,
+  Radio,
   ArrowRight
 } from 'lucide-react';
 import { Card } from '../ui/Card';
@@ -123,7 +124,7 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
       phase: 'FASE 6',
       title: 'Biblioteca de Libros',
       status: 'completada',
-      badge: 'ACTUAL',
+      badge: 'VERIFICADO',
       items: [
         'Módulo Biblioteca con estados: Quiero leer, Leyendo, Terminado y Abandonado',
         'Tarjetas suaves con portada, título, autor, insignia de estado y etiquetas',
@@ -132,7 +133,20 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
       ],
     },
     {
-      phase: 'FASE 7+',
+      phase: 'FASE 7',
+      title: 'Transmisiones (Inbox)',
+      status: 'completada',
+      badge: 'ACTUAL',
+      items: [
+        'Módulo Inbox para material crudo con tipos: Texto, Audio, Enlace e Imagen',
+        'Opciones funcionales para Texto y Enlace; interfaz preparada para Audio con visualizador de ondas',
+        'Estados de procesamiento: Nueva, Procesando, Procesada y Archivada',
+        'Estética de estación de comunicaciones moderna y pastel (sin pantalla terminal ni estética militar)',
+        'Acción rápida para convertir transmisiones directamente en tareas o notas',
+      ],
+    },
+    {
+      phase: 'FASE 8+',
       title: 'Sincronización en la Nube & Google Calendar',
       status: 'pendiente',
       badge: 'SIGUIENTES FASES',
@@ -148,61 +162,80 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
     <div className="space-y-7 pb-12 max-w-5xl mx-auto select-none">
       {/* 0. ACCESO RÁPIDO A MÓDULOS ACTIVOS */}
       {onNavigateTab && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
           <Card 
-            padding="lg" 
+            padding="md" 
+            className="group cursor-pointer hover:shadow-[0_8px_24px_rgba(23,116,104,0.10)] transition-all bg-gradient-to-br from-white to-[#F9FAF8] border border-[#EBE8E1]"
+            onClick={() => onNavigateTab('transmisiones')}
+          >
+            <div className="flex items-start justify-between">
+              <div className="w-9 h-9 rounded-xl bg-[#E8F6F4] text-[#177468] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                <Radio className="w-4 h-4" />
+              </div>
+              <span className="text-[11px] font-bold text-[#177468] flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                Abrir <ArrowRight className="w-3 h-3" />
+              </span>
+            </div>
+            <h3 className="text-xs sm:text-sm font-bold text-[#24292F] mb-0.5">Transmisiones</h3>
+            <p className="text-[11px] text-[#697282] leading-snug line-clamp-2">
+              Buzón Inbox para notas crudas, audios y enlaces.
+            </p>
+          </Card>
+
+          <Card 
+            padding="md" 
             className="group cursor-pointer hover:shadow-[0_8px_24px_rgba(23,116,104,0.10)] transition-all bg-gradient-to-br from-white to-[#F9FAF8] border border-[#EBE8E1]"
             onClick={() => onNavigateTab('registros')}
           >
             <div className="flex items-start justify-between">
-              <div className="w-10 h-10 rounded-2xl bg-[#E8F6F4] text-[#177468] flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
-                <FileText className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-[#E8F6F4] text-[#177468] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                <FileText className="w-4 h-4" />
               </div>
-              <span className="text-xs font-bold text-[#177468] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                Abrir <ArrowRight className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-bold text-[#177468] flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                Abrir <ArrowRight className="w-3 h-3" />
               </span>
             </div>
-            <h3 className="text-sm sm:text-base font-bold text-[#24292F] mb-1">Registros</h3>
-            <p className="text-xs text-[#697282] leading-relaxed line-clamp-2">
-              Bitácora y notas personales con checklist interactivo y etiquetas.
+            <h3 className="text-xs sm:text-sm font-bold text-[#24292F] mb-0.5">Registros</h3>
+            <p className="text-[11px] text-[#697282] leading-snug line-clamp-2">
+              Bitácora y notas personales con checklist y etiquetas.
             </p>
           </Card>
 
           <Card 
-            padding="lg" 
+            padding="md" 
             className="group cursor-pointer hover:shadow-[0_8px_24px_rgba(23,116,104,0.10)] transition-all bg-gradient-to-br from-white to-[#F9FAF8] border border-[#EBE8E1]"
             onClick={() => onNavigateTab('archivo')}
           >
             <div className="flex items-start justify-between">
-              <div className="w-10 h-10 rounded-2xl bg-[#FEF6EC] text-[#D48B38] flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
-                <Bookmark className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-[#FEF6EC] text-[#D48B38] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                <Bookmark className="w-4 h-4" />
               </div>
-              <span className="text-xs font-bold text-[#D48B38] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                Abrir <ArrowRight className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-bold text-[#D48B38] flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                Abrir <ArrowRight className="w-3 h-3" />
               </span>
             </div>
-            <h3 className="text-sm sm:text-base font-bold text-[#24292F] mb-1">Archivo</h3>
-            <p className="text-xs text-[#697282] leading-relaxed line-clamp-2">
-              Colección visual de enlaces guardados con miniaturas y dominio.
+            <h3 className="text-xs sm:text-sm font-bold text-[#24292F] mb-0.5">Archivo</h3>
+            <p className="text-[11px] text-[#697282] leading-snug line-clamp-2">
+              Colección visual de enlaces con miniaturas y dominio.
             </p>
           </Card>
 
           <Card 
-            padding="lg" 
+            padding="md" 
             className="group cursor-pointer hover:shadow-[0_8px_24px_rgba(23,116,104,0.10)] transition-all bg-gradient-to-br from-white to-[#F9FAF8] border border-[#EBE8E1]"
             onClick={() => onNavigateTab('biblioteca')}
           >
             <div className="flex items-start justify-between">
-              <div className="w-10 h-10 rounded-2xl bg-[#EAF5EA] text-[#2E7D32] flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
-                <BookOpen className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-xl bg-[#EAF5EA] text-[#2E7D32] flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+                <BookOpen className="w-4 h-4" />
               </div>
-              <span className="text-xs font-bold text-[#2E7D32] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                Abrir <ArrowRight className="w-3.5 h-3.5" />
+              <span className="text-[11px] font-bold text-[#2E7D32] flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                Abrir <ArrowRight className="w-3 h-3" />
               </span>
             </div>
-            <h3 className="text-sm sm:text-base font-bold text-[#24292F] mb-1">Biblioteca</h3>
-            <p className="text-xs text-[#697282] leading-relaxed line-clamp-2">
-              Estación de lecturas personales, progreso y libros guardados.
+            <h3 className="text-xs sm:text-sm font-bold text-[#24292F] mb-0.5">Biblioteca</h3>
+            <p className="text-[11px] text-[#697282] leading-snug line-clamp-2">
+              Estación de lecturas, progreso y libros guardados.
             </p>
           </Card>
         </div>

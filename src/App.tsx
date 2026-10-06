@@ -4,6 +4,7 @@ import { AppShell } from './components/layout/AppShell';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { TasksView } from './components/tasks/TasksView';
 import { CalendarView } from './components/calendar/CalendarView';
+import { TransmissionsView } from './components/transmissions/TransmissionsView';
 import { RecordsView } from './components/records/RecordsView';
 import { ArchiveView } from './components/archive/ArchiveView';
 import { LibraryView } from './components/books/LibraryView';
@@ -62,6 +63,8 @@ const MainLayout: React.FC = () => {
           onEditTask={handleEditTask}
         />
       )}
+
+      {currentTab === 'transmisiones' && <TransmissionsView onNavigateTab={setCurrentTab} />}
 
       {currentTab === 'tareas' && (
         <TasksView

@@ -23,6 +23,10 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, onOpenQuickCapture }
       title: 'CENTRO DE MANDO',
       subtitle: 'Visión general de estaciones y protocolos',
     },
+    transmisiones: {
+      title: 'ESTACIÓN DE TRANSMISIONES (INBOX)',
+      subtitle: 'Recepción de señales crudas, audios, notas y enlaces por clasificar',
+    },
     tareas: {
       title: 'REGISTRO DE TAREAS',
       subtitle: `${metrics.pending} pendientes · ${metrics.inProgress} en curso · ${metrics.completed} completadas`,

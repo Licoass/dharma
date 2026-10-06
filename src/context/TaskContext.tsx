@@ -13,7 +13,9 @@ import type {
   Note,
   ArchiveItem,
   Book,
-  BookStatus
+  BookStatus,
+  Transmission,
+  TransmissionStatus
 } from '../types';
 import { INITIAL_TASKS } from '../data/initialTasks';
 import { INITIAL_CATEGORIES } from '../data/initialCategories';
@@ -22,6 +24,7 @@ import { INITIAL_AGENDA_EVENTS } from '../data/agendaEvents';
 import { INITIAL_NOTES } from '../data/initialNotes';
 import { INITIAL_ARCHIVE_ITEMS } from '../data/initialArchive';
 import { INITIAL_BOOKS } from '../data/initialBooks';
+import { INITIAL_TRANSMISSIONS } from '../data/initialTransmissions';
 import { normalizeDateToISO, getTodayISO } from '../utils/dateUtils';
 
 interface TaskContextType {
@@ -34,6 +37,7 @@ interface TaskContextType {
   notes: Note[];
   archiveItems: ArchiveItem[];
   books: Book[];
+  transmissions: Transmission[];
   filters: TaskFilters;
   viewMode: ViewMode;
   calendarViewMode: CalendarViewMode;
@@ -81,6 +85,12 @@ interface TaskContextType {
   changeBookStatus: (id: string, status: BookStatus) => void;
   toggleBookFavorite: (id: string) => void;
 
+  // Transmission operations (TRANSMISIONES / INBOX)
+  addTransmission: (data: Omit<Transmission, 'id' | 'createdAt'>) => Transmission;
+  updateTransmission: (id: string, updates: Partial<Transmission>) => void;
+  deleteTransmission: (id: string) => void;
+  changeTransmissionStatus: (id: string, status: TransmissionStatus) => void;
+
   // Configurable Category operations
   addCategory: (category: Omit<Category, 'id'>) => Category;
   updateCategory: (id: string, updates: Partial<Category>) => void;
@@ -114,6 +124,7 @@ const STORAGE_KEY_EVENTS = 'dharma_events_v3';
 const STORAGE_KEY_NOTES = 'dharma_notes_v3';
 const STORAGE_KEY_ARCHIVE = 'dharma_archive_v3';
 const STORAGE_KEY_BOOKS = 'dharma_books_v3';
+const STORAGE_KEY_TRANSMISSIONS = 'dharma_transmissions_v3';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
@@ -195,6 +206,17 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return INITIAL_BOOKS;
   });
 
+  // 8. Transmisiones (Inbox)
+  const [transmissions, setTransmissions] = useState<Transmission[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_TRANSMISSIONS);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to load transmissions', e);
+    }
+    return INITIAL_TRANSMISSIONS;
+  });
+
   const [filters, setFilters] = useState<TaskFilters>({
     search: '',
     categoryId: 'todas',
@@ -225,10 +247,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(notes));
       localStorage.setItem(STORAGE_KEY_ARCHIVE, JSON.stringify(archiveItems));
       localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(books));
+      localStorage.setItem(STORAGE_KEY_TRANSMISSIONS, JSON.stringify(transmissions));
     } catch (e) {
       console.warn('Failed to save to localStorage', e);
     }
-  }, [tasks, categories, statuses, agendaEvents, notes, archiveItems, books]);
+  }, [tasks, categories, statuses, agendaEvents, notes, archiveItems, books, transmissions]);
 
   const fireCelebration = () => {
     confetti({
@@ -527,6 +550,47 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  // -------------------------------------------------------------
+  // OPERACIONES DE TRANSMISIONES (INBOX)
+  // -------------------------------------------------------------
+  const addTransmission = (data: Omit<Transmission, 'id' | 'createdAt'>): Transmission => {
+    const randomFreq = `FRQ-${(100 + Math.random() * 10).toFixed(1)}`;
+    const newTx: Transmission = {
+      ...data,
+      id: `tx-${Date.now()}-${Math.random().toString(36).substr(2, 3)}`,
+      frequencyCode: data.frequencyCode || randomFreq,
+      signalStrength: data.signalStrength || Math.floor(92 + Math.random() * 8),
+      createdAt: new Date().toISOString(),
+    };
+    setTransmissions((prev) => [newTx, ...prev]);
+    setDharmaMood('syncing');
+    setTimeout(() => setDharmaMood('calm'), 1200);
+    return newTx;
+  };
+
+  const updateTransmission = (id: string, updates: Partial<Transmission>) => {
+    setTransmissions((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, ...updates } : t))
+    );
+  };
+
+  const deleteTransmission = (id: string) => {
+    setTransmissions((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  const changeTransmissionStatus = (id: string, status: TransmissionStatus) => {
+    setTransmissions((prev) =>
+      prev.map((t) => {
+        if (t.id !== id) return t;
+        const updates: Partial<Transmission> = { status };
+        if (status === 'procesada' && !t.processedAt) {
+          updates.processedAt = new Date().toISOString();
+        }
+        return { ...t, ...updates };
+      })
+    );
+  };
+
   const resetToDefaults = () => {
     setTasks(INITIAL_TASKS);
     setCategories(INITIAL_CATEGORIES);
@@ -535,6 +599,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setNotes(INITIAL_NOTES);
     setArchiveItems(INITIAL_ARCHIVE_ITEMS);
     setBooks(INITIAL_BOOKS);
+    setTransmissions(INITIAL_TRANSMISSIONS);
     setSelectedCalendarDate(getTodayISO());
     setFilters({
       search: '',
@@ -640,6 +705,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         notes,
         archiveItems,
         books,
+        transmissions,
         filters,
         viewMode,
         calendarViewMode,
@@ -676,6 +742,10 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteBook,
         changeBookStatus,
         toggleBookFavorite,
+        addTransmission,
+        updateTransmission,
+        deleteTransmission,
+        changeTransmissionStatus,
         addCategory,
         updateCategory,
         deleteCategory,
