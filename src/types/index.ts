@@ -180,3 +180,28 @@ export interface TaskFilters {
   priority: TaskPriority | 'todas';
 }
 
+export type CloudSyncStatus = 'synced' | 'syncing' | 'offline' | 'error' | 'local_only';
+
+export interface DharmaRhythmData {
+  score: number; // e.g. 8.8
+  taskRate: number; // 0 - 100
+  priorityDone: boolean;
+  transmissionsProcessedRate: number; // 0 - 100
+  readingActive: boolean;
+  message: string;
+}
+
+export interface UnifiedSearchResult {
+  id: string;
+  type: 'tarea' | 'evento' | 'nota' | 'enlace' | 'libro' | 'transmision';
+  title: string;
+  snippet?: string;
+  targetTab: NavTab;
+  categoryId?: string;
+  categoryName?: string;
+  categoryColor?: string;
+  badge?: string;
+  date?: string;
+  originalItem: any;
+}
+

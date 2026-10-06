@@ -30,7 +30,8 @@ export const AudioCaptureModal: React.FC<AudioCaptureModalProps> = ({
   const handleProcessAudio = async (
     audioBlob: Blob,
     audioUrl: string,
-    durationSeconds: number
+    durationSeconds: number,
+    liveTranscript?: string
   ) => {
     setIsProcessing(true);
     setErrorMessage(null);
@@ -42,7 +43,7 @@ export const AudioCaptureModal: React.FC<AudioCaptureModalProps> = ({
         addTransmission({
           type: 'audio',
           title: `Captura de voz (${durationSeconds}s)`,
-          content: `Nota de audio capturada el ${new Date().toLocaleDateString('es-ES')}`,
+          content: liveTranscript ? `Transcripción: "${liveTranscript}"` : `Nota de audio capturada el ${new Date().toLocaleDateString('es-ES')}`,
           url: audioUrl,
           durationSeconds,
           status: 'procesando',
@@ -53,7 +54,7 @@ export const AudioCaptureModal: React.FC<AudioCaptureModalProps> = ({
       }
 
       // Procesar audio con DHARMA CORE (Supabase Storage + Gemini Multimodal / Local Fallback)
-      const result = await processAudioWithDharmaCore(audioBlob, categories);
+      const result = await processAudioWithDharmaCore(audioBlob, categories, liveTranscript);
       setExtractionResult(result);
       setDharmaMood('focus');
     } catch (err: any) {

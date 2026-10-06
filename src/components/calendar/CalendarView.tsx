@@ -3,7 +3,8 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Plus, 
-  Lock
+  Lock,
+  Clock
 } from 'lucide-react';
 import { useTaskContext } from '../../context/TaskContext';
 import type { Task, AgendaEvent } from '../../types';
@@ -15,6 +16,7 @@ import { SideAgendaPanel } from './SideAgendaPanel';
 import { EventFormModal } from './EventFormModal';
 import { GoogleCalendarModal } from './GoogleCalendarModal';
 import { GoogleEventDetailModal } from './GoogleEventDetailModal';
+import { TimeBlockingModal } from './TimeBlockingModal';
 import { googleCalendarService } from '../../services/googleCalendarService';
 import { Button } from '../ui/Button';
 
@@ -45,6 +47,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
   const [isEventModalOpen, setIsEventModalOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<AgendaEvent | null>(null);
   const [targetDateForNew, setTargetDateForNew] = useState<string>(selectedCalendarDate);
+  const [isTimeBlockingOpen, setIsTimeBlockingOpen] = useState(false);
 
   // Responsive device default: móvil -> agenda, tablet -> semana, desktop -> mes
   useEffect(() => {
@@ -144,23 +147,23 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
 
   return (
     <div className="space-y-6 pb-12 select-none">
-      {/* 1. Aviso de Modo Local (Sin conectar Google Calendar todavía) */}
-      <div className="flex items-center justify-between p-3.5 sm:p-4 rounded-[22px] bg-[#FEF6E9]/60 border border-[#FEF6E9]">
+      {/* 1. Aviso de Modo Local */}
+      <div className="flex items-center justify-between p-3.5 sm:p-4 rounded-[24px] bg-[#FFFBEA] border border-[#FFD84D]/40 shadow-2xs">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-[12px] bg-[#FEF6E9] flex items-center justify-center text-[#8E5B18] shrink-0">
+          <div className="w-8 h-8 rounded-[12px] bg-white border border-[#FFD84D]/60 flex items-center justify-center text-[#171717] shrink-0 font-bold">
             <Lock className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-xs font-bold text-[#8E5B18]">
-              CALENDARIO LOCAL · FASE 4 OPERATIVA
+            <p className="text-xs font-extrabold text-[#171717] tracking-wider uppercase">
+              Calendario Local · Fase 4 Operativa
             </p>
-            <p className="text-[11px] text-[#8E5B18]/85 mt-0.5">
-              Visualización unificada de tareas con fecha/hora, eventos y recordatorios locales. Google Calendar se sincronizará en fases posteriores.
+            <p className="text-[11px] text-[#525252] mt-0.5 font-medium">
+              Visualización unificada de tareas con fecha/hora, eventos y recordatorios locales con sincronización en fases posteriores.
             </p>
           </div>
         </div>
 
-        <span className="hidden sm:inline-block text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-white text-[#8E5B18] shadow-2xs">
+        <span className="hidden sm:inline-block text-[10px] font-extrabold tracking-dharma px-3 py-1 rounded-full bg-white border border-black/[0.05] text-[#171717] shadow-2xs">
           DATOS LOCALES
         </span>
       </div>
@@ -172,16 +175,16 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
           <button
             type="button"
             onClick={handleGoToday}
-            className="px-3.5 py-2 rounded-[16px] bg-white hover:bg-[#F5F2EB] text-xs font-bold text-[#24292F] shadow-2xs transition-colors cursor-pointer"
+            className="px-3.5 py-2 rounded-[16px] bg-white hover:bg-[#F8F4E8] text-xs font-extrabold text-[#171717] border border-black/[0.04] shadow-2xs transition-colors cursor-pointer"
           >
             Hoy
           </button>
 
-          <div className="flex items-center bg-white rounded-[16px] p-0.5 shadow-2xs">
+          <div className="flex items-center bg-white border border-black/[0.04] rounded-[16px] p-0.5 shadow-2xs">
             <button
               type="button"
               onClick={handlePrevPeriod}
-              className="p-1.5 text-[#697282] hover:text-[#24292F] hover:bg-[#F5F2EB] rounded-[12px] transition-colors cursor-pointer"
+              className="p-1.5 text-[#8C8578] hover:text-[#171717] hover:bg-[#F8F4E8] rounded-[12px] transition-colors cursor-pointer"
               title="Periodo anterior"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -189,14 +192,14 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
             <button
               type="button"
               onClick={handleNextPeriod}
-              className="p-1.5 text-[#697282] hover:text-[#24292F] hover:bg-[#F5F2EB] rounded-[12px] transition-colors cursor-pointer"
+              className="p-1.5 text-[#8C8578] hover:text-[#171717] hover:bg-[#F8F4E8] rounded-[12px] transition-colors cursor-pointer"
               title="Periodo siguiente"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
-          <h2 className="text-base sm:text-lg font-extrabold text-[#24292F] tracking-wide ml-1">
+          <h2 className="text-lg sm:text-xl font-bold font-serif-display text-[#171717] tracking-tight ml-1">
             {periodTitle}
           </h2>
         </div>
@@ -204,14 +207,14 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
         {/* Lado derecho: Selector de Vistas [Mes | Semana | Agenda] + Botón Añadir */}
         <div className="flex items-center gap-2.5 self-end sm:self-auto">
           {/* Toggle de Vistas */}
-          <div className="bg-[#F5F2EB]/80 p-1 rounded-[18px] flex items-center">
+          <div className="bg-[#EFEAE0]/70 p-1 rounded-[20px] flex items-center border border-black/[0.03]">
             <button
               type="button"
               onClick={() => setCalendarViewMode('mes')}
-              className={`px-3 py-1.5 rounded-[14px] text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-[16px] text-xs font-bold transition-all cursor-pointer ${
                 calendarViewMode === 'mes'
-                  ? 'bg-white text-[#24292F] shadow-xs'
-                  : 'text-[#697282] hover:text-[#24292F]'
+                  ? 'bg-[#171717] text-white shadow-2xs'
+                  : 'text-[#8C8578] hover:text-[#171717]'
               }`}
             >
               Mes
@@ -220,10 +223,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
             <button
               type="button"
               onClick={() => setCalendarViewMode('semana')}
-              className={`px-3 py-1.5 rounded-[14px] text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-[16px] text-xs font-bold transition-all cursor-pointer ${
                 calendarViewMode === 'semana'
-                  ? 'bg-white text-[#24292F] shadow-xs'
-                  : 'text-[#697282] hover:text-[#24292F]'
+                  ? 'bg-[#171717] text-white shadow-2xs'
+                  : 'text-[#8C8578] hover:text-[#171717]'
               }`}
             >
               Semana
@@ -232,10 +235,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
             <button
               type="button"
               onClick={() => setCalendarViewMode('agenda')}
-              className={`px-3 py-1.5 rounded-[14px] text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3.5 py-1.5 rounded-[16px] text-xs font-bold transition-all cursor-pointer ${
                 calendarViewMode === 'agenda'
-                  ? 'bg-white text-[#24292F] shadow-xs'
-                  : 'text-[#697282] hover:text-[#24292F]'
+                  ? 'bg-[#171717] text-white shadow-2xs'
+                  : 'text-[#8C8578] hover:text-[#171717]'
               }`}
             >
               Agenda
@@ -278,6 +281,17 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
             <span className="hidden sm:inline">
               {googleSyncStatus === 'connected' ? `Google (${googleEvents.length})` : 'Google Calendar'}
             </span>
+          </button>
+
+          {/* Botón Time Blocking (Prioridad Media) */}
+          <button
+            type="button"
+            onClick={() => setIsTimeBlockingOpen(true)}
+            className="px-3.5 py-2 rounded-[16px] bg-white hover:bg-[#F8F4E8] text-xs font-extrabold text-[#171717] border border-black/[0.06] shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+            title="Asignar tareas pendientes a bloques de tiempo"
+          >
+            <Clock className="w-3.5 h-3.5 text-[#E65100]" />
+            <span className="hidden sm:inline">Time Blocking</span>
           </button>
 
           {/* Botón Añadir */}
@@ -381,6 +395,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
             : null
         }
         onClose={() => setSelectedGoogleEvent(null)}
+      />
+
+      {/* 6. Modal de Time Blocking (Prioridad Media) */}
+      <TimeBlockingModal
+        isOpen={isTimeBlockingOpen}
+        onClose={() => setIsTimeBlockingOpen(false)}
+        defaultDate={selectedCalendarDate}
       />
     </div>
   );

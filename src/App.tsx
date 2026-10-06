@@ -13,6 +13,7 @@ import { QuickCaptureModal } from './components/capture/QuickCaptureModal';
 import { TaskFormModal } from './components/tasks/TaskFormModal';
 import { DharmaCoreModal } from './components/dharmaCore/DharmaCoreModal';
 import { AudioCaptureModal } from './components/audio/AudioCaptureModal';
+import { OmniSearchModal } from './components/search/OmniSearchModal';
 import { PwaInstallBanner } from './components/common/PwaInstallBanner';
 import type { NavTab, Task } from './types';
 
@@ -32,7 +33,9 @@ const MainLayout: React.FC = () => {
     dharmaCoreInitialText,
     openAudioCapture,
     isAudioCaptureOpen,
-    closeAudioCapture
+    closeAudioCapture,
+    isOmniSearchOpen,
+    closeOmniSearch
   } = useTaskContext();
 
   // Soporte para accesos directos nativos de Android (PWA Shortcuts en pantalla de inicio)
@@ -138,6 +141,12 @@ const MainLayout: React.FC = () => {
       <AudioCaptureModal
         isOpen={isAudioCaptureOpen}
         onClose={closeAudioCapture}
+      />
+
+      <OmniSearchModal
+        isOpen={isOmniSearchOpen}
+        onClose={closeOmniSearch}
+        onNavigateTab={setCurrentTab}
       />
     </AppShell>
   );

@@ -36,7 +36,7 @@ export interface GoogleCalendarEvent {
   attendees?: GoogleCalendarAttendee[];
   created?: string;
   updated?: string;
-  isReadOnly: true; // En Fase 10 siempre es solo lectura
+  isReadOnly?: boolean; // Booleano: true para solo lectura en Fase 10, false para eventos creados/modificables
 }
 
 /**

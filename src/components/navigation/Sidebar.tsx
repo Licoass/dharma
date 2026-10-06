@@ -37,31 +37,33 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
   ];
 
   return (
-    <aside className="hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-40 bg-[#FAF8F5]/90 backdrop-blur-md w-20 desktop:w-64 transition-all duration-300 select-none border-r border-black/[0.03]">
+    <aside className="hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-40 bg-[#F8F4E8] w-20 desktop:w-64 transition-all duration-300 select-none border-r border-[#EAE3D2]">
       {/* Brand Header */}
       <div className="p-4 desktop:p-6 flex items-center justify-center desktop:justify-between">
         <div className="flex items-center gap-3.5">
           <DharmaCore mood={dharmaMood} size="sm" />
           <div className="hidden desktop:block">
-            <h1 className="text-xl font-bold tracking-[0.06em] text-[#24292F] leading-none">
-              DHARMA
+            <h1 className="text-lg font-extrabold tracking-[0.18em] text-[#171717] leading-none uppercase">
+              D H A R M A
             </h1>
-            <p className="text-[11px] font-medium text-[#9DA6B5] tracking-[0.03em] mt-1">
+            <p className="text-[10px] font-bold text-[#8C8578] tracking-[0.16em] uppercase mt-1">
               Centro de Mando
             </p>
           </div>
         </div>
       </div>
 
-      {/* Quick Action Button (Compact FAB in Tablet, Full Button in Desktop) */}
+      {/* Quick Action Button (Prominent High-Contrast Capture Button) */}
       <div className="px-3 desktop:px-5 py-1 flex justify-center">
         <button
           onClick={() => setIsQuickCaptureOpen(true)}
-          className="w-12 h-12 desktop:w-full desktop:h-auto desktop:min-h-[46px] rounded-[18px] bg-[#177468] hover:bg-[#126157] text-white font-medium text-sm flex items-center justify-center gap-2 shadow-[0_4px_14px_rgba(23,116,104,0.18)] active:scale-[0.98] transition-all cursor-pointer"
+          className="w-12 h-12 desktop:w-full desktop:h-auto desktop:min-h-[46px] rounded-[20px] bg-[#171717] hover:bg-[#2B2B2B] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(23,23,23,0.22)] active:scale-[0.98] transition-all cursor-pointer"
           title="Captura rápida"
         >
-          <Plus className="w-5 h-5 desktop:w-4 desktop:h-4 stroke-[2.5]" />
-          <span className="hidden desktop:inline">Capturar</span>
+          <div className="w-5 h-5 rounded-full bg-[#F6A6C8] flex items-center justify-center text-[#171717] shrink-0">
+            <Plus className="w-3.5 h-3.5 stroke-[3]" />
+          </div>
+          <span className="hidden desktop:inline tracking-wide font-extrabold text-xs uppercase">Capturar</span>
         </button>
       </div>
 
@@ -77,11 +79,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
               key={item.id}
               onClick={() => onTabChange(item.id)}
               className={`
-                w-full min-h-[48px] flex items-center justify-center desktop:justify-start gap-3.5 px-3 desktop:px-4 py-2.5 rounded-[18px] font-semibold text-sm transition-all cursor-pointer group relative
+                w-full min-h-[48px] flex items-center justify-center desktop:justify-start gap-3.5 px-3 desktop:px-4 py-2.5 rounded-[18px] font-bold text-sm transition-all cursor-pointer group relative
                 ${
                   isActive
-                    ? 'bg-white text-[#177468] shadow-[0_4px_16px_-2px_rgba(36,41,47,0.04)]'
-                    : 'text-[#697282] hover:text-[#24292F] hover:bg-[#F5F2EB]/60'
+                    ? 'bg-white text-[#171717] shadow-[0_4px_16px_rgba(23,23,23,0.04)] border border-black/[0.04]'
+                    : 'text-[#737373] hover:text-[#171717] hover:bg-black/[0.03]'
                 }
               `}
               title={item.label}
@@ -90,12 +92,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
               <div className="relative flex items-center justify-center shrink-0">
                 <Icon
                   className={`w-5 h-5 transition-colors ${
-                    isActive ? 'text-[#177468]' : 'text-[#9DA6B5] group-hover:text-[#24292F]'
+                    isActive ? 'text-[#171717] stroke-[2.4]' : 'text-[#8C8578] group-hover:text-[#171717] stroke-[1.9]'
                   }`}
                 />
                 {/* Badge flotante compacto para modo Tablet */}
                 {hasBadge && (
-                  <span className="desktop:hidden absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[#177468] text-white text-[10px] font-bold flex items-center justify-center shadow-xs">
+                  <span className="desktop:hidden absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 rounded-full bg-[#FFD84D] text-[#171717] text-[10px] font-extrabold flex items-center justify-center shadow-xs">
                     {item.badge}
                   </span>
                 )}
@@ -103,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
               <span className="hidden desktop:inline truncate">{item.label}</span>
               {/* Badge completo para modo Desktop */}
               {hasBadge && (
-                <span className="hidden desktop:inline-flex ml-auto text-[11px] px-2 py-0.5 rounded-full bg-[#E8F6F4] text-[#177468] font-bold">
+                <span className="hidden desktop:inline-flex ml-auto text-[10px] px-2 py-0.5 rounded-full bg-[#FFD84D] text-[#171717] font-extrabold tracking-wide">
                   {item.badge}
                 </span>
               )}
@@ -113,7 +115,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
 
         {/* Categorías Dinámicas (Exclusivas de Desktop 1200px+) */}
         <div className="hidden desktop:block pt-6 pb-2">
-          <p className="px-4 mb-2.5 text-[11px] font-bold text-[#9DA6B5] uppercase tracking-[0.06em]">
+          <p className="px-4 mb-2.5 text-[10px] font-bold text-[#8C8578] uppercase tracking-[0.16em]">
             Categorías
           </p>
 
@@ -125,11 +127,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
               }}
               className={`w-full flex items-center gap-2.5 px-4 py-2 text-xs rounded-[14px] transition-colors cursor-pointer ${
                 filters.categoryId === 'todas'
-                  ? 'bg-white text-[#24292F] font-bold shadow-[0_2px_8px_rgba(0,0,0,0.02)]'
-                  : 'text-[#697282] hover:bg-[#F5F2EB]/60'
+                  ? 'bg-white text-[#171717] font-bold shadow-[0_2px_8px_rgba(0,0,0,0.02)]'
+                  : 'text-[#737373] hover:bg-black/[0.03]'
               }`}
             >
-              <span className="w-2 h-2 rounded-full bg-[#9DA6B5] shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-[#171717] shrink-0" />
               <span>Todas las categorías</span>
             </button>
 
@@ -144,13 +146,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
                   }}
                   className={`w-full flex items-center justify-between px-4 py-2 text-xs rounded-[14px] transition-colors cursor-pointer ${
                     isSelected
-                      ? 'bg-white font-bold text-[#24292F] shadow-[0_2px_8px_rgba(0,0,0,0.02)]'
-                      : 'text-[#697282] hover:bg-[#F5F2EB]/60'
+                      ? 'bg-white font-bold text-[#171717] shadow-[0_2px_8px_rgba(0,0,0,0.02)]'
+                      : 'text-[#737373] hover:bg-black/[0.03]'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <span
-                      className="w-2 h-2 rounded-full shrink-0"
+                      className="w-2.5 h-2.5 rounded-full shrink-0 border border-black/10"
                       style={{ backgroundColor: category.color }}
                     />
                     <span className="truncate">{category.name}</span>
@@ -163,11 +165,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
       </nav>
 
       {/* Footer Profile / Core Status */}
-      <div className="p-3.5 desktop:p-5 bg-white/40 flex items-center justify-center desktop:justify-start gap-3">
+      <div className="p-3.5 desktop:p-5 bg-white/50 border-t border-[#EAE3D2] flex items-center justify-center desktop:justify-start gap-3">
         <Avatar name="Dharma User" variant="teal" statusDot="online" size="sm" />
         <div className="hidden desktop:block text-left truncate">
-          <p className="text-xs font-bold text-[#24292F] truncate">Centro Activo</p>
-          <p className="text-[11px] text-[#9DA6B5] truncate">Fase 14 · Experiencia Tablet</p>
+          <p className="text-xs font-bold text-[#171717] truncate">Centro Activo</p>
+          <p className="text-[10px] text-[#8C8578] uppercase tracking-[0.1em] truncate">DHARMA // CORE</p>
         </div>
       </div>
     </aside>

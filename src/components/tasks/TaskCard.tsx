@@ -37,17 +37,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   onDragStart,
 }) => {
   const [showSubtasks, setShowSubtasks] = useState(false);
-  const { statuses, toggleSubtask } = useTaskContext();
+  const { statuses, categories, toggleSubtask } = useTaskContext();
 
   const isCompleted = task.statusId === 'completado';
   const subtasks = task.subtasks || [];
   const completedSubtasks = subtasks.filter((s) => s.completed).length;
+  const taskCategory = categories.find((c) => c.id === task.categoryId);
 
   const menuItems = [
     {
       id: 'edit',
       label: 'Editar tarea',
-      icon: <Edit2 className="w-3.5 h-3.5 text-[#9DA6B5]" />,
+      icon: <Edit2 className="w-3.5 h-3.5 text-[#8C8578]" />,
       onClick: () => onEdit(task),
     },
     ...(onChangeStatus
@@ -56,14 +57,14 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           .map((st) => ({
             id: `status-${st.id}`,
             label: `Mover a "${st.name}"`,
-            icon: <Check className="w-3.5 h-3.5 text-[#177468]" />,
+            icon: <Check className="w-3.5 h-3.5 text-[#171717]" />,
             onClick: () => onChangeStatus(task.id, st.id),
           }))
       : []),
     {
       id: 'delete',
       label: 'Eliminar registro',
-      icon: <Trash2 className="w-3.5 h-3.5 text-[#EB6B6B]" />,
+      icon: <Trash2 className="w-3.5 h-3.5 text-[#F59A8B]" />,
       destructive: true,
       onClick: () => {
         if (window.confirm('¿Deseas eliminar esta tarea?')) {
@@ -78,17 +79,21 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       draggable={draggable}
       onDragStart={onDragStart}
       className={`
-        rounded-[22px] transition-all duration-200 select-none p-3.5 sm:p-4
+        group relative rounded-[24px] transition-all duration-200 select-none p-4 sm:p-4.5
         ${draggable ? 'cursor-grab active:cursor-grabbing active:scale-[0.99]' : ''}
         ${
           isCompleted
-            ? 'bg-white/60 opacity-75 shadow-xs'
-            : 'bg-white shadow-[0_4px_20px_-2px_rgba(36,41,47,0.03),0_2px_8px_-1px_rgba(36,41,47,0.02)] hover:shadow-[0_8px_24px_-4px_rgba(36,41,47,0.05)]'
+            ? 'bg-white/60 opacity-70 border border-black/[0.04]'
+            : 'bg-white border border-black/[0.04] shadow-[0_2px_14px_rgba(23,23,23,0.02)] hover:shadow-[0_8px_24px_rgba(23,23,23,0.06)] hover:-translate-y-0.5'
         }
       `}
+      style={{
+        borderLeftColor: taskCategory ? taskCategory.color : undefined,
+        borderLeftWidth: taskCategory ? '4px' : undefined,
+      }}
     >
       {/* 1. Barra de metadatos superior: Categoría, Prioridad, Estado y Menú */}
-      <div className="flex items-center justify-between gap-1.5 mb-2.5">
+      <div className="flex items-center justify-between gap-2 mb-2.5">
         <div className="flex items-center gap-1.5 flex-wrap">
           <CategoryBadge categoryId={task.categoryId} size="sm" />
           <PriorityBadge priority={task.priority} size="sm" />
@@ -98,7 +103,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         <DropdownMenu
           trigger={
             <button
-              className="w-7 h-7 flex items-center justify-center rounded-[10px] text-[#9DA6B5] hover:text-[#24292F] hover:bg-[#F5F2EB] transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-[10px] text-[#8C8578] hover:text-[#171717] hover:bg-[#F8F4E8] transition-colors"
               aria-label="Opciones"
             >
               <MoreVertical className="w-3.5 h-3.5" />
@@ -109,15 +114,15 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       </div>
 
       {/* 2. Cuerpo principal: Checkbox + Título + Descripción */}
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3.5">
         <button
           onClick={() => onToggleComplete(task.id)}
           className={`
-            shrink-0 w-6 h-6 rounded-[9px] border-2 flex items-center justify-center transition-all cursor-pointer mt-0.5
+            shrink-0 w-6 h-6 rounded-[10px] border-2 flex items-center justify-center transition-all cursor-pointer mt-0.5
             ${
               isCompleted
-                ? 'bg-[#177468] border-[#177468] text-white shadow-xs'
-                : 'border-[#D0D6E0] hover:border-[#177468] bg-white hover:bg-[#E8F6F4]/40'
+                ? 'bg-[#171717] border-[#171717] text-white shadow-xs'
+                : 'border-black/15 hover:border-[#171717] bg-white hover:bg-[#F8F4E8]'
             }
           `}
           aria-label={isCompleted ? 'Desmarcar tarea' : 'Completar tarea'}
@@ -128,7 +133,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         <div className="flex-1 min-w-0">
           <h4
             className={`text-sm sm:text-[15px] font-bold leading-snug transition-colors ${
-              isCompleted ? 'line-through text-[#9DA6B5] font-normal' : 'text-[#24292F]'
+              isCompleted ? 'line-through text-[#8C8578] font-normal' : 'text-[#171717]'
             }`}
           >
             {task.title}
@@ -137,7 +142,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           {task.description && (
             <p
               className={`text-xs mt-1 leading-relaxed ${
-                isCompleted ? 'text-[#9DA6B5]' : 'text-[#697282]'
+                isCompleted ? 'text-[#8C8578]' : 'text-[#525252]'
               }`}
             >
               {task.description}
@@ -150,40 +155,40 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               <button
                 type="button"
                 onClick={() => setShowSubtasks(!showSubtasks)}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FAF8F5] hover:bg-[#F5F2EB] text-[11px] font-semibold text-[#697282] transition-colors cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F8F4E8] hover:bg-[#F2ECE0] text-[11px] font-bold text-[#171717] transition-colors cursor-pointer"
               >
-                <CheckSquare className="w-3 h-3 text-[#177468]" />
+                <CheckSquare className="w-3 h-3 text-[#171717]" />
                 <span>
                   {completedSubtasks}/{subtasks.length} subtareas
                 </span>
                 {showSubtasks ? (
-                  <ChevronUp className="w-3 h-3 text-[#9DA6B5]" />
+                  <ChevronUp className="w-3 h-3 text-[#8C8578]" />
                 ) : (
-                  <ChevronDown className="w-3 h-3 text-[#9DA6B5]" />
+                  <ChevronDown className="w-3 h-3 text-[#8C8578]" />
                 )}
               </button>
 
               {/* Lista desplegable de subtareas interactivas */}
               {showSubtasks && (
-                <div className="mt-2 pl-1 space-y-1.5 pt-1 border-t border-black/[0.04]">
+                <div className="mt-2.5 pl-1 space-y-1.5 pt-2 border-t border-black/[0.04]">
                   {subtasks.map((st) => (
                     <div
                       key={st.id}
                       onClick={() => toggleSubtask(task.id, st.id)}
-                      className="flex items-center gap-2 text-xs cursor-pointer group py-0.5"
+                      className="flex items-center gap-2.5 text-xs cursor-pointer group py-0.5"
                     >
                       <span
-                        className={`w-3.5 h-3.5 rounded-[4px] border flex items-center justify-center transition-colors ${
+                        className={`w-4 h-4 rounded-[5px] border flex items-center justify-center transition-colors ${
                           st.completed
-                            ? 'bg-[#177468] border-[#177468] text-white'
-                            : 'border-[#CBD5E1] bg-white group-hover:border-[#177468]'
+                            ? 'bg-[#171717] border-[#171717] text-white'
+                            : 'border-black/20 bg-white group-hover:border-[#171717]'
                         }`}
                       >
                         {st.completed && <Check className="w-2.5 h-2.5 stroke-[3]" />}
                       </span>
                       <span
-                        className={`truncate ${
-                          st.completed ? 'line-through text-[#9DA6B5]' : 'text-[#24292F]'
+                        className={`truncate font-medium ${
+                          st.completed ? 'line-through text-[#8C8578]' : 'text-[#171717]'
                         }`}
                       >
                         {st.title}
@@ -197,13 +202,13 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
           {/* Etiquetas */}
           {task.tags && task.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2.5">
+            <div className="flex flex-wrap gap-1.5 mt-2.5">
               {task.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="px-2 py-0.5 text-[10px] font-semibold rounded-md bg-[#FAF8F5] text-[#697282] flex items-center gap-1"
+                  className="px-2.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-[#F8F4E8] text-[#171717] border border-black/[0.04] flex items-center gap-1"
                 >
-                  <TagIcon className="w-2.5 h-2.5 opacity-60" />
+                  <TagIcon className="w-2.5 h-2.5 text-[#8C8578]" />
                   <span>{tag}</span>
                 </span>
               ))}
@@ -211,30 +216,30 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           )}
 
           {/* Pie de metadatos: Fecha, Hora, Origen, Notas */}
-          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 mt-3 text-[11px] text-[#9DA6B5]">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 mt-3 pt-2.5 border-t border-black/[0.04] text-[11px] text-[#8C8578]">
             {task.dueDate && (
-              <span className="inline-flex items-center gap-1 text-[#697282] font-semibold">
-                <CalendarIcon className="w-3 h-3 text-[#177468]" />
+              <span className="inline-flex items-center gap-1.5 text-[#171717] font-bold bg-[#F8F4E8]/60 px-2.5 py-0.5 rounded-full border border-black/[0.03]">
+                <CalendarIcon className="w-3 h-3 text-[#171717]" />
                 <span>{task.dueDate}</span>
               </span>
             )}
 
             {task.dueTime && (
-              <span className="inline-flex items-center gap-1">
-                <Clock className="w-3 h-3" />
+              <span className="inline-flex items-center gap-1 font-semibold text-[#525252]">
+                <Clock className="w-3 h-3 text-[#8C8578]" />
                 <span>{task.dueTime}</span>
               </span>
             )}
 
             {task.notes && (
-              <span className="inline-flex items-center gap-1 text-[#8E5B18]" title="Tiene notas">
-                <FileText className="w-3 h-3" />
+              <span className="inline-flex items-center gap-1 text-[#171717] font-semibold bg-[#FFFBEA] px-2 py-0.5 rounded-md border border-[#FFD84D]/40" title="Tiene notas">
+                <FileText className="w-3 h-3 text-[#FFD84D]" />
                 <span>Notas</span>
               </span>
             )}
 
             {task.origin && (
-              <span className="ml-auto text-[10px] font-medium text-[#9DA6B5]">
+              <span className="ml-auto text-[10px] font-semibold tracking-wider text-[#8C8578] uppercase">
                 {task.origin}
               </span>
             )}

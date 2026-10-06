@@ -28,37 +28,37 @@ export interface TransmissionCardProps {
   onDelete: (id: string) => void;
 }
 
-// Configuración de Estados de Procesamiento
+// Configuración de Estados de Procesamiento (Editorial Cálido DHARMA)
 export const TRANSMISSION_STATUS_CONFIG: Record<
   TransmissionStatus,
   { label: string; bg: string; text: string; border: string; icon: React.ReactNode }
 > = {
   nueva: {
-    label: 'Nueva',
-    bg: 'bg-[#FEF6EC]',
-    text: 'text-[#D48B38]',
-    border: 'border-[#FCE1C2]',
-    icon: <span className="w-2 h-2 rounded-full bg-[#D48B38] animate-pulse" />,
+    label: 'NUEVA',
+    bg: 'bg-[#FFFBEA]',
+    text: 'text-[#171717]',
+    border: 'border-[#FFD84D]/50',
+    icon: <span className="w-2 h-2 rounded-full bg-[#FFD84D] animate-pulse" />,
   },
   procesando: {
-    label: 'Procesando',
-    bg: 'bg-[#E8F4FD]',
-    text: 'text-[#1E88E5]',
-    border: 'border-[#BBDEFB]',
-    icon: <RotateCw className="w-3 h-3 animate-spin stroke-[2.2]" />,
+    label: 'PROCESANDO',
+    bg: 'bg-[#F0F9FE]',
+    text: 'text-[#171717]',
+    border: 'border-[#9DD7F5]/50',
+    icon: <RotateCw className="w-3 h-3 animate-spin stroke-[2.2] text-[#171717]" />,
   },
   procesada: {
-    label: 'Procesada',
-    bg: 'bg-[#EAF5EA]',
-    text: 'text-[#2E7D32]',
-    border: 'border-[#CDE7CD]',
-    icon: <CheckCircle2 className="w-3 h-3 stroke-[2.2]" />,
+    label: 'PROCESADA',
+    bg: 'bg-[#F2F9F1]',
+    text: 'text-[#171717]',
+    border: 'border-[#A8D8A0]/50',
+    icon: <CheckCircle2 className="w-3 h-3 stroke-[2.2] text-[#171717]" />,
   },
   archivada: {
-    label: 'Archivada',
-    bg: 'bg-[#F0EFF4]',
-    text: 'text-[#716E85]',
-    border: 'border-[#DEDCE5]',
+    label: 'ARCHIVADA',
+    bg: 'bg-[#F8F4E8]',
+    text: 'text-[#8C8578]',
+    border: 'border-black/10',
     icon: <Archive className="w-3 h-3 stroke-[2.2]" />,
   },
 };
@@ -69,28 +69,28 @@ export const TRANSMISSION_TYPE_CONFIG: Record<
   { label: string; bg: string; text: string; icon: React.ReactNode }
 > = {
   texto: {
-    label: 'Texto',
-    bg: 'bg-[#FAF8F5]',
-    text: 'text-[#697282]',
+    label: 'TEXTO',
+    bg: 'bg-[#F8F4E8]',
+    text: 'text-[#171717]',
     icon: <FileText className="w-3.5 h-3.5" />,
   },
   audio: {
-    label: 'Audio',
-    bg: 'bg-[#F3E8FF]',
-    text: 'text-[#8B5CF6]',
-    icon: <Mic className="w-3.5 h-3.5" />,
+    label: 'AUDIO',
+    bg: 'bg-[#F5F2FE]',
+    text: 'text-[#171717]',
+    icon: <Mic className="w-3.5 h-3.5 text-[#B9A7F7]" />,
   },
   enlace: {
-    label: 'Enlace',
-    bg: 'bg-[#E8F6F4]',
-    text: 'text-[#177468]',
-    icon: <Link2 className="w-3.5 h-3.5" />,
+    label: 'ENLACE',
+    bg: 'bg-[#F0F9FE]',
+    text: 'text-[#171717]',
+    icon: <Link2 className="w-3.5 h-3.5 text-[#9DD7F5]" />,
   },
   imagen: {
-    label: 'Imagen',
-    bg: 'bg-[#FEF3C7]',
-    text: 'text-[#D97706]',
-    icon: <ImageIcon className="w-3.5 h-3.5" />,
+    label: 'IMAGEN',
+    bg: 'bg-[#FFFBEA]',
+    text: 'text-[#171717]',
+    icon: <ImageIcon className="w-3.5 h-3.5 text-[#FFD84D]" />,
   },
 };
 
@@ -199,10 +199,10 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
   ];
 
   return (
-    <div className="group rounded-[22px] bg-white border border-black/[0.04] p-4 sm:p-5 shadow-[0_2px_12px_rgba(36,41,47,0.02)] hover:shadow-[0_10px_26px_rgba(36,41,47,0.06)] hover:-translate-y-0.5 transition-all select-none flex flex-col justify-between space-y-4">
+    <div className="group rounded-[28px] bg-white border border-black/[0.04] p-5 shadow-[0_2px_14px_rgba(23,23,23,0.02)] hover:shadow-[0_8px_24px_rgba(23,23,23,0.06)] hover:-translate-y-0.5 transition-all select-none flex flex-col justify-between space-y-4">
       {/* 
         =========================================================
-        1. CABECERA TELEMÉTRICA DE LA SEÑAL (Estación de Comunicaciones Pastel)
+        1. CABECERA TELEMÉTRICA DE LA SEÑAL (Estación de Comunicaciones)
         =========================================================
       */}
       <div className="flex items-center justify-between gap-2">
@@ -210,7 +210,7 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
           {/* Tipo de Transmisión */}
           <span
             className={`
-              inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold
+              inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-extrabold tracking-dharma uppercase
               ${typeCfg.bg} ${typeCfg.text} border border-black/[0.03]
             `}
           >
@@ -220,7 +220,7 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
 
           {/* Código de Frecuencia Telemetría */}
           {transmission.frequencyCode && (
-            <span className="text-[10px] font-mono font-bold tracking-wider text-[#9DA6B5] bg-[#FAF8F5] px-2 py-0.5 rounded-md border border-black/[0.02]">
+            <span className="text-[10px] font-mono font-bold tracking-wider text-[#8C8578] bg-[#F8F4E8] px-2 py-0.5 rounded-full border border-black/[0.02]">
               {transmission.frequencyCode}
             </span>
           )}
@@ -230,7 +230,7 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
           {/* Estado de Procesamiento */}
           <span
             className={`
-              inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border shadow-2xs
+              inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-extrabold tracking-dharma uppercase border shadow-2xs
               ${statusCfg.bg} ${statusCfg.text} ${statusCfg.border}
             `}
           >
@@ -242,7 +242,7 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
           <DropdownMenu
             trigger={
               <button
-                className="w-7 h-7 flex items-center justify-center rounded-lg text-[#9DA6B5] hover:text-[#24292F] hover:bg-[#FAF8F5] transition-colors"
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-[#8C8578] hover:text-[#171717] hover:bg-[#F8F4E8] transition-colors"
                 aria-label="Opciones de transmisión"
               >
                 <MoreVertical className="w-3.5 h-3.5" />
@@ -261,22 +261,22 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
       <div className="space-y-2.5 flex-1">
         {/* Título (si existe) */}
         {transmission.title && (
-          <h4 className="text-sm sm:text-base font-bold text-[#24292F] leading-snug">
+          <h4 className="text-base font-bold font-serif-display text-[#171717] leading-snug">
             {transmission.title}
           </h4>
         )}
 
         {/* Contenido en texto */}
-        <p className="text-xs sm:text-sm text-[#4A5568] leading-relaxed whitespace-pre-line">
+        <p className="text-xs sm:text-sm text-[#525252] leading-relaxed whitespace-pre-line font-medium">
           {transmission.content}
         </p>
 
         {/* Vista específica: Enlace */}
         {transmission.type === 'enlace' && transmission.url && (
-          <div className="p-3 rounded-[16px] bg-[#FAF8F5] border border-black/[0.03] flex items-center justify-between gap-3">
+          <div className="p-3.5 rounded-[20px] bg-[#F8F4E8] border border-black/[0.03] flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
-              <Link2 className="w-4 h-4 text-[#177468] shrink-0" />
-              <span className="text-xs font-mono font-medium text-[#177468] truncate">
+              <Link2 className="w-4 h-4 text-[#171717] shrink-0" />
+              <span className="text-xs font-mono font-bold text-[#171717] truncate">
                 {transmission.url}
               </span>
             </div>
@@ -284,7 +284,7 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
               href={transmission.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white text-[11px] font-bold text-[#177468] hover:bg-[#E8F6F4] border border-black/[0.04] transition-colors shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white text-[11px] font-bold text-[#171717] hover:bg-[#FAF8F5] border border-black/[0.05] transition-colors shrink-0 shadow-2xs"
             >
               <span>Abrir</span>
               <ArrowUpRight className="w-3 h-3 stroke-[2.5]" />
@@ -294,12 +294,12 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
 
         {/* Vista específica: Audio (Interfaz de Reproducción / Onda Sonora) */}
         {transmission.type === 'audio' && (
-          <div className="p-3.5 rounded-[18px] bg-gradient-to-r from-[#F9F5FF] via-[#FAF8F5] to-[#F9F5FF] border border-[#8B5CF6]/15 space-y-2">
+          <div className="p-3.5 rounded-[22px] bg-[#F5F2FE] border border-[#B9A7F7]/30 space-y-2">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setIsPlayingAudio(!isPlayingAudio)}
-                className="w-8 h-8 rounded-full bg-[#8B5CF6] hover:bg-[#7C3AED] text-white flex items-center justify-center shadow-xs transition-transform active:scale-95 cursor-pointer"
+                className="w-8.5 h-8.5 rounded-full bg-[#171717] hover:bg-black text-white flex items-center justify-center shadow-xs transition-transform active:scale-95 cursor-pointer"
                 title={isPlayingAudio ? 'Pausar nota de voz' : 'Escuchar audio'}
               >
                 {isPlayingAudio ? (
@@ -319,8 +319,8 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
                         w-1 rounded-full transition-all duration-300
                         ${
                           isPlayingAudio
-                            ? 'bg-[#8B5CF6] animate-pulse'
-                            : 'bg-[#8B5CF6]/30'
+                            ? 'bg-[#171717] animate-pulse'
+                            : 'bg-[#171717]/30'
                         }
                       `}
                       style={{
@@ -331,12 +331,12 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
                 )}
               </div>
 
-              <span className="text-xs font-mono font-bold text-[#8B5CF6]">
+              <span className="text-xs font-mono font-bold text-[#171717]">
                 {transmission.durationSeconds ? `0:${transmission.durationSeconds}` : '0:42'}
               </span>
             </div>
 
-            <p className="text-[10px] text-[#716E85] font-medium italic">
+            <p className="text-[10px] text-[#8C8578] font-medium italic">
               Audio capturado · Transcripción y análisis por IA disponible en siguiente fase
             </p>
           </div>
@@ -344,7 +344,7 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
 
         {/* Vista específica: Imagen */}
         {transmission.type === 'imagen' && transmission.url && (
-          <div className="relative rounded-[16px] overflow-hidden bg-[#FAF8F5] aspect-[16/9] border border-black/[0.04]">
+          <div className="relative rounded-[20px] overflow-hidden bg-[#F8F4E8] aspect-[16/9] border border-black/[0.04]">
             <img
               src={transmission.url}
               alt={transmission.title || 'Imagen capturada'}
@@ -360,13 +360,13 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
         3. PIE DE LA TARJETA: Fecha, Indicador de Señal y Acciones Rápidas
         =========================================================
       */}
-      <div className="pt-3 border-t border-black/[0.03] flex items-center justify-between text-xs text-[#9DA6B5]">
+      <div className="pt-3 border-t border-black/[0.04] flex items-center justify-between text-xs text-[#8C8578]">
         {/* Fecha y Frecuencia */}
         <div className="flex items-center gap-2">
           <Clock className="w-3.5 h-3.5 opacity-60" />
-          <span>{formatTime(transmission.createdAt)}</span>
+          <span className="font-medium">{formatTime(transmission.createdAt)}</span>
           {transmission.signalStrength && (
-            <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono text-[#177468] bg-[#E8F6F4] px-1.5 py-0.2 rounded-md">
+            <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-mono text-[#171717] bg-[#F8F4E8] px-2 py-0.5 rounded-full border border-black/[0.03]">
               📶 {transmission.signalStrength}%
             </span>
           )}
@@ -379,17 +379,17 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
               <button
                 type="button"
                 onClick={() => openDharmaCore(transmission.content)}
-                className="px-2 py-1 rounded-lg bg-[#E8F6F4] hover:bg-[#D5EFEA] text-[#177468] font-bold text-[11px] transition-colors cursor-pointer flex items-center gap-1 border border-[#177468]/15"
+                className="px-3 py-1.5 rounded-full bg-[#171717] hover:bg-black text-white font-bold text-[11px] transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
                 title="Extraer tareas automáticamente con Dharma Core (Gemini)"
               >
-                <Sparkles className="w-3 h-3 stroke-[2.5]" />
+                <Sparkles className="w-3 h-3 text-[#FFD84D]" />
                 <span className="hidden sm:inline">Dharma Core</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleConvertToTask}
-                className="px-2.5 py-1 rounded-lg bg-[#FAF8F5] hover:bg-[#E8F6F4] text-[#177468] font-bold text-[11px] transition-colors cursor-pointer border border-black/[0.03]"
+                className="px-3 py-1.5 rounded-full bg-[#F8F4E8] hover:bg-[#F2ECE0] text-[#171717] font-bold text-[11px] transition-colors cursor-pointer border border-black/[0.04]"
                 title="Convertir rápidamente en tarea de Dharma"
               >
                 A Tarea
@@ -401,7 +401,7 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
             <button
               type="button"
               onClick={() => onChangeStatus(transmission.id, 'archivada')}
-              className="px-2 py-1 rounded-lg text-[#9DA6B5] hover:text-[#716E85] hover:bg-[#FAF8F5] transition-colors cursor-pointer text-[11px]"
+              className="px-2.5 py-1 rounded-full text-[#8C8578] hover:text-[#171717] hover:bg-[#F8F4E8] transition-colors cursor-pointer text-[11px] font-medium"
               title="Archivar transmisión"
             >
               Archivar

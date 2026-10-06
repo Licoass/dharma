@@ -12,9 +12,10 @@ import {
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { AudioCaptureManager, type AudioRecordingResult } from '../../services/audioCaptureService';
+import { triggerHaptic } from '../../utils/haptics';
 
 export interface AudioRecorderProps {
-  onProcessWithDharmaCore: (audioBlob: Blob, audioUrl: string, durationSeconds: number) => void;
+  onProcessWithDharmaCore: (audioBlob: Blob, audioUrl: string, durationSeconds: number, liveTranscript?: string) => void;
   onDiscard?: () => void;
   isProcessing?: boolean;
 }
@@ -30,6 +31,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   const [recordingResult, setRecordingResult] = useState<AudioRecordingResult | null>(null);
   const [volumeLevel, setVolumeLevel] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [liveTranscript, setLiveTranscript] = useState('');
 
   // Estados de reproducción
   const [isPlaying, setIsPlaying] = useState(false);
@@ -41,6 +43,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   const timerIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isPointerHoldingRef = useRef(false);
   const holdStartTimeRef = useRef(0);
+  const speechRecognitionRef = useRef<any>(null);
 
   // Limpieza al desmontar
   useEffect(() => {
@@ -64,6 +67,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
   // Iniciar grabación real
   const handleStartRecording = async () => {
     setErrorMessage(null);
+    setLiveTranscript('');
     if (!captureManagerRef.current) {
       captureManagerRef.current = new AudioCaptureManager();
     }
@@ -76,16 +80,34 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
       setRecordingState('recording');
 
+      // Iniciar reconocimiento de voz Web Speech si el navegador lo soporta
+      const SpeechRecognition = typeof window !== 'undefined' && ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition);
+      if (SpeechRecognition) {
+        try {
+          const recognition = new SpeechRecognition();
+          recognition.continuous = true;
+          recognition.interimResults = true;
+          recognition.lang = 'es-ES';
+          recognition.onresult = (event: any) => {
+            let text = '';
+            for (let i = 0; i < event.results.length; i++) {
+              text += event.results[i][0].transcript + ' ';
+            }
+            setLiveTranscript(text.trim());
+          };
+          recognition.start();
+          speechRecognitionRef.current = recognition;
+        } catch (_) {}
+      }
+
       // Iniciar cronómetro de segundos
       if (timerIntervalRef.current) clearInterval(timerIntervalRef.current);
       timerIntervalRef.current = setInterval(() => {
         setElapsedSeconds((prev) => prev + 1);
       }, 1000);
 
-      // Feedback táctil suave si el dispositivo lo soporta
-      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        try { navigator.vibrate(40); } catch (_) {}
-      }
+      // Feedback háptico
+      triggerHaptic(25);
     } catch (err: any) {
       console.warn('Error accediendo al micrófono:', err);
       setRecordingState('idle');
@@ -105,6 +127,11 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
       timerIntervalRef.current = null;
     }
 
+    if (speechRecognitionRef.current) {
+      try { speechRecognitionRef.current.stop(); } catch (_) {}
+      speechRecognitionRef.current = null;
+    }
+
     if (!captureManagerRef.current) return;
 
     try {
@@ -114,12 +141,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
       setVolumeLevel(0);
 
       // Feedback háptico
-      if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-        try { navigator.vibrate([30, 50, 30]); } catch (_) {}
-      }
+      triggerHaptic([30, 40, 30]);
     } catch (err: any) {
       console.warn('Error deteniendo la grabación:', err);
-      // Fallback demo blob si fue muy breve o error de buffer
       setRecordingState('idle');
       setErrorMessage('La grabación fue demasiado corta. Mantén presionado durante al menos 1 segundo.');
     }
@@ -130,6 +154,10 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     if (timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current);
       timerIntervalRef.current = null;
+    }
+    if (speechRecognitionRef.current) {
+      try { speechRecognitionRef.current.abort(); } catch (_) {}
+      speechRecognitionRef.current = null;
     }
     if (captureManagerRef.current) {
       captureManagerRef.current.cancelRecording();
@@ -145,6 +173,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     setRecordingState('idle');
     setElapsedSeconds(0);
     setRecordingResult(null);
+    setLiveTranscript('');
     setIsPlaying(false);
     setPlaybackTime(0);
     setErrorMessage(null);
@@ -183,7 +212,6 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
   // Handlers para MÓVIL: "Mantén presionado para hablar"
   const handleMobilePointerDown = (e: React.PointerEvent) => {
-    // Solo clic primario / touch
     if (e.button !== 0 && e.pointerType === 'mouse') return;
     isPointerHoldingRef.current = true;
     holdStartTimeRef.current = Date.now();
@@ -195,9 +223,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     isPointerHoldingRef.current = false;
     const holdDuration = Date.now() - holdStartTimeRef.current;
 
-    // Si se mantuvo presionado menos de 400ms, mantener grabando en modo toggle para accesibilidad
     if (holdDuration < 400) {
-      // Toggle mode: sigue grabando hasta siguiente tap
       return;
     }
 
@@ -210,7 +236,8 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
     onProcessWithDharmaCore(
       recordingResult.blob,
       recordingResult.url,
-      recordingResult.durationSeconds
+      recordingResult.durationSeconds,
+      liveTranscript.trim() || undefined
     );
   };
 
@@ -264,6 +291,19 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
             })}
           </div>
 
+          {/* Transcripción en vivo en tiempo real */}
+          {liveTranscript && (
+            <div className="w-full max-w-sm p-3.5 rounded-[20px] bg-white border border-black/[0.05] shadow-xs text-left space-y-1 animate-fadeIn">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#171717] uppercase tracking-dharma">
+                <span className="w-2 h-2 rounded-full bg-[#171717] animate-pulse" />
+                <span>Voz en tiempo real</span>
+              </div>
+              <p className="text-xs text-[#525252] font-medium leading-relaxed italic">
+                "{liveTranscript}"
+              </p>
+            </div>
+          )}
+
           {/* 
             --------------------------------------------------------------------
             A) MÓVIL: Botón grande 🎙 "Mantén presionado para hablar"
@@ -275,7 +315,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
               {recordingState === 'recording' && (
                 <>
                   <div className="absolute w-32 h-32 rounded-full bg-[#EB6B6B]/20 animate-ping" />
-                  <div className="absolute w-36 h-36 rounded-full bg-[#177468]/15 animate-pulse" />
+                  <div className="absolute w-36 h-36 rounded-full bg-[#171717]/10 animate-pulse" />
                 </>
               )}
 
@@ -285,7 +325,6 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                 onPointerUp={handleMobilePointerUp}
                 onPointerLeave={handleMobilePointerUp}
                 onClick={() => {
-                  // Fallback para toggle tap si no se usó hold
                   if (recordingState === 'recording') {
                     handleStopRecording();
                   }
@@ -295,7 +334,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                   ${
                     recordingState === 'recording'
                       ? 'bg-[#EB6B6B] text-white shadow-[#EB6B6B]/30 scale-105'
-                      : 'bg-gradient-to-br from-[#177468] to-[#12584F] text-white shadow-[#177468]/25 hover:shadow-xl'
+                      : 'bg-[#171717] text-white shadow-[0_12px_28px_rgba(23,23,23,0.25)] hover:scale-102'
                   }
                 `}
                 aria-label="Mantén presionado para hablar"
@@ -303,16 +342,16 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                 {recordingState === 'recording' ? (
                   <Square className="w-10 h-10 fill-white" />
                 ) : (
-                  <Mic className="w-11 h-11 stroke-[2.2]" />
+                  <Mic className="w-11 h-11 stroke-[2.2] text-[#FFD84D]" />
                 )}
               </button>
             </div>
 
             <div className="text-center space-y-0.5">
-              <p className="text-xs font-bold text-[#24292F]">
+              <p className="text-xs font-bold text-[#171717]">
                 {recordingState === 'recording' ? 'Suelta para finalizar' : 'Mantén presionado para hablar'}
               </p>
-              <p className="text-[11px] text-[#9DA6B5]">
+              <p className="text-[11px] text-[#8C827A]">
                 {recordingState === 'recording' ? 'o toca para detener' : 'o presiona una vez para iniciar'}
               </p>
             </div>
@@ -339,13 +378,13 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                 variant="primary"
                 size="lg"
                 onClick={handleStartRecording}
-                icon={<Mic className="w-5 h-5 stroke-[2.2]" />}
+                icon={<Mic className="w-5 h-5 stroke-[2.2] text-[#FFD84D]" />}
                 className="px-8 py-3.5 text-sm font-bold shadow-md hover:scale-[1.02] active:scale-98 transition-transform"
               >
                 Iniciar grabación
               </Button>
             )}
-            <span className="text-[11px] text-[#9DA6B5]">
+            <span className="text-[11px] text-[#8C827A]">
               {recordingState === 'recording'
                 ? 'Pulsa «Detener grabación» para revisar el audio'
                 : 'Haz clic para comenzar a hablar'}
@@ -374,15 +413,15 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
       {recordingState === 'recorded' && recordingResult && (
         <div className="w-full max-w-md space-y-6 animate-fadeIn">
           {/* Tarjeta de Audio Capturado */}
-          <div className="p-5 rounded-[24px] bg-gradient-to-br from-[#FAF8F5] via-white to-[#E8F6F4]/50 border border-[#177468]/15 shadow-sm space-y-4">
+          <div className="p-5 rounded-[24px] bg-[#FAF8F5] border border-black/[0.05] shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#177468]" />
-                <span className="text-xs font-bold text-[#177468] uppercase tracking-wider">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#171717]" />
+                <span className="text-xs font-bold text-[#171717] uppercase tracking-dharma">
                   Audio Capturado
                 </span>
               </div>
-              <span className="text-xs font-mono font-bold text-[#697282] bg-white px-2.5 py-1 rounded-full border border-black/[0.04]">
+              <span className="text-xs font-mono font-bold text-[#171717] bg-white px-2.5 py-1 rounded-full border border-black/[0.04]">
                 {formatTime(playbackTime || recordingResult.durationSeconds)} / {formatTime(recordingResult.durationSeconds)}
               </span>
             </div>
@@ -396,7 +435,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
                   <span
                     key={idx}
                     className={`w-1.5 rounded-full transition-colors duration-150 ${
-                      isPlayed ? 'bg-[#177468]' : 'bg-[#177468]/20'
+                      isPlayed ? 'bg-[#171717]' : 'bg-[#171717]/15'
                     }`}
                     style={{ height: `${h * 0.8}px` }}
                   />
@@ -404,9 +443,26 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
               })}
             </div>
 
-            <div className="flex items-center justify-between text-xs text-[#697282] px-1">
+            {/* Transcripción de voz en vivo si fue capturada */}
+            {liveTranscript && (
+              <div className="p-3.5 rounded-[18px] bg-white border border-black/[0.04] space-y-1 text-left">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-[#171717] uppercase tracking-dharma">
+                    Voz detectada
+                  </span>
+                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#FFD84D]/40 text-[#171717]">
+                    GEMINI READY
+                  </span>
+                </div>
+                <p className="text-xs text-[#525252] font-medium leading-relaxed italic">
+                  "{liveTranscript}"
+                </p>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between text-xs text-[#8C827A] px-1">
               <span className="flex items-center gap-1">
-                <Volume2 className="w-3.5 h-3.5 text-[#177468]" />
+                <Volume2 className="w-3.5 h-3.5 text-[#171717]" />
                 <span>Formato: {recordingResult.mimeType.split(';')[0]}</span>
               </span>
               <span>Duración: {recordingResult.durationSeconds}s</span>
@@ -415,13 +471,13 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
 
           {/* 
             --------------------------------------------------------------------
-            ACCIONES AL TERMINAR (Exacto al requerimiento):
+            ACCIONES AL TERMINAR:
             1. Reproducir
             2. Descartar
             3. Procesar con DHARMA CORE
             --------------------------------------------------------------------
           */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1 border-t border-black/[0.04]">
             {/* 1. Reproducir */}
             <Button
               variant="secondary"
@@ -429,9 +485,9 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
               onClick={handleTogglePlayback}
               icon={
                 isPlaying ? (
-                  <Pause className="w-4 h-4 text-[#177468]" />
+                  <Pause className="w-4 h-4 text-[#171717]" />
                 ) : (
-                  <Play className="w-4 h-4 text-[#177468] fill-[#177468]" />
+                  <Play className="w-4 h-4 text-[#171717] fill-[#171717]" />
                 )
               }
               className="flex-1 justify-center"
@@ -445,7 +501,7 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
               size="md"
               onClick={handleDiscard}
               icon={<Trash2 className="w-4 h-4 text-[#EB6B6B]" />}
-              className="text-[#697282] hover:text-[#EB6B6B] justify-center"
+              className="text-[#8C827A] hover:text-[#EB6B6B] justify-center"
             >
               Descartar
             </Button>
@@ -458,14 +514,14 @@ export const AudioRecorder: React.FC<AudioRecorderProps> = ({
               disabled={isProcessing}
               icon={
                 isProcessing ? (
-                  <RotateCw className="w-4 h-4 animate-spin" />
+                  <RotateCw className="w-4 h-4 animate-spin text-[#FFD84D]" />
                 ) : (
-                  <Sparkles className="w-4 h-4 stroke-[2.2]" />
+                  <Sparkles className="w-4 h-4 text-[#FFD84D] stroke-[2.2]" />
                 )
               }
-              className="flex-1 justify-center bg-gradient-to-r from-[#177468] to-[#12584F] shadow-sm hover:shadow-md"
+              className="flex-1 justify-center shadow-xs"
             >
-              {isProcessing ? 'Procesando con Core...' : 'Procesar con DHARMA CORE'}
+              {isProcessing ? 'Procesando...' : 'Procesar con Core'}
             </Button>
           </div>
         </div>

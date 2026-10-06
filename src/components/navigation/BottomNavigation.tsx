@@ -43,32 +43,28 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
   };
 
   return (
-    <nav
+    <div
       aria-label="Navegación móvil"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl shadow-[0_-8px_32px_rgba(36,41,47,0.06)] border-t border-black/[0.04]"
-      style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 6px)' }}
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 px-3.5 pb-safe pt-2 pointer-events-none"
     >
-      <div className="flex items-center justify-around h-16 px-2 max-w-md mx-auto relative select-none">
+      <nav className="pointer-events-auto bg-[#171717] text-white rounded-full px-2 sm:px-3 h-[68px] shadow-[0_18px_45px_rgba(23,23,23,0.35)] border border-white/10 flex items-center justify-around max-w-md mx-auto relative select-none">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentTab === item.id;
           const hasBadge = typeof item.badge === 'number' && item.badge > 0;
 
-          // Botón central elevado (Android Material FAB)
+          // Botón central Capturar (FAB destacado circular en rosa con icono negro)
           if (item.isFab) {
             return (
-              <div key={item.id} className="relative -top-5 flex flex-col items-center">
+              <div key={item.id} className="flex flex-col items-center px-1">
                 <button
                   type="button"
                   onClick={handleFabClick}
-                  className="w-14 h-14 min-w-[56px] min-h-[56px] rounded-full bg-gradient-to-tr from-[#0F766E] to-[#14B8A6] hover:bg-[#126157] text-white shadow-[0_10px_26px_rgba(20,184,166,0.40)] flex items-center justify-center active:scale-90 transition-all cursor-pointer border-4 border-[#FAF8F5]"
+                  className="w-13 h-13 min-w-[52px] min-h-[52px] rounded-full bg-[#F6A6C8] hover:bg-[#E996B9] text-[#171717] shadow-[0_6px_20px_rgba(246,166,200,0.45)] flex items-center justify-center active:scale-90 transition-all cursor-pointer border-2 border-[#171717]"
                   aria-label="Captura rápida"
                 >
-                  <Plus className="w-6 h-6 stroke-[2.6]" />
+                  <Plus className="w-6 h-6 stroke-[3]" />
                 </button>
-                <span className="text-[10px] font-bold text-[#484F58] mt-0.5 tracking-tight">
-                  Capturar
-                </span>
               </div>
             );
           }
@@ -79,27 +75,29 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
               type="button"
               onClick={() => handleTabClick(item.id)}
               className={`
-                flex-1 min-h-[48px] min-w-[48px] flex flex-col items-center justify-center gap-1 transition-all cursor-pointer py-1 px-1 rounded-2xl active:scale-95 active:bg-black/[0.03]
-                ${isActive ? 'text-[#177468] font-bold' : 'text-[#8C95A6] hover:text-[#484F58]'}
+                flex-1 min-h-[48px] flex flex-col items-center justify-center gap-1 transition-all cursor-pointer py-1 px-1 rounded-2xl active:scale-95
+                ${isActive ? 'text-white font-bold' : 'text-[#8A8A8A] hover:text-[#D4D4D4]'}
               `}
             >
-              <div className={`relative px-3 py-1 rounded-full transition-all ${
-                isActive ? 'bg-[#E8F6F4]' : ''
-              }`}>
-                <Icon className={`w-5 h-5 ${isActive ? 'stroke-[2.4] text-[#177468]' : 'stroke-[1.8]'}`} />
+              <div className="relative flex items-center justify-center">
+                <Icon
+                  className={`w-5 h-5 transition-transform ${
+                    isActive ? 'scale-110 text-white stroke-[2.5]' : 'stroke-[1.9]'
+                  }`}
+                />
                 {hasBadge && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#177468] text-white text-[9px] font-bold flex items-center justify-center shadow-xs">
+                  <span className="absolute -top-1 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-[#FFD84D] text-[#171717] text-[9px] font-extrabold flex items-center justify-center">
                     {item.badge! > 9 ? '9+' : item.badge}
                   </span>
                 )}
               </div>
-              <span className="text-[10px] tracking-tight leading-none">
+              <span className={`text-[10px] tracking-tight leading-none ${isActive ? 'text-white' : 'text-[#8A8A8A]'}`}>
                 {item.label}
               </span>
             </button>
           );
         })}
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 };

@@ -15,6 +15,7 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { CategoryBadge, PriorityBadge, StatusBadge } from '../ui/Badge';
 import { DharmaCore } from '../common/DharmaCore';
+import { DharmaRhythmWidget } from './DharmaRhythmWidget';
 import { useTaskContext } from '../../context/TaskContext';
 import type { NavTab, Task } from '../../types';
 
@@ -64,52 +65,56 @@ export const Dashboard: React.FC<DashboardProps> = ({
     .slice(0, 5);
 
   return (
-    <div className="flex flex-col space-y-6 sm:space-y-8 select-none">
+    <div className="flex flex-col space-y-7 sm:space-y-9 select-none">
       {/* ============================================================ */}
-      {/* 1. HEADER (Móvil: Prioridad 1 | Desktop: Encabezado superior)   */}
+      {/* 1. HEADER EDITORIAL (Saludo grande + Mascota + Botón Capturar) */}
       {/* ============================================================ */}
-      <section className="order-1 flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1 sm:pt-2">
-        <div className="flex items-center gap-3.5 sm:gap-4">
-          {/* Pequeña ilustración/mascota Dharma discreta que acompaña el saludo */}
-          <div className="p-2 sm:p-2.5 rounded-[18px] bg-white shadow-[0_4px_16px_rgba(36,41,47,0.03)] shrink-0">
+      <section className="order-1 flex flex-col sm:flex-row sm:items-center justify-between gap-5 pt-2 sm:pt-3">
+        <div className="flex items-start sm:items-center gap-4">
+          {/* Mascota DHARMA Core con sutil halo orgánico */}
+          <div className="relative p-2.5 rounded-[22px] bg-white border border-black/[0.04] shadow-[0_4px_16px_rgba(23,23,23,0.03)] shrink-0">
+            <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#FFD84D]" />
             <DharmaCore mood={dharmaMood} size="sm" />
           </div>
 
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-bold tracking-[0.06em] text-[#177468] uppercase">
-                DHARMA
+              <span className="text-[10px] font-extrabold tracking-dharma text-[#8C8578] uppercase">
+                D H A R M A
               </span>
-              <span className="w-1 h-1 rounded-full bg-[#9DA6B5]/60" />
-              <span className="text-xs text-[#697282] font-medium">
+              <span className="w-1 h-1 rounded-full bg-[#171717]/30" />
+              <span className="text-xs text-[#737373] font-semibold">
                 Centro de Mando Personal
               </span>
             </div>
 
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#24292F] tracking-[0.03em] mt-0.5">
-              Buenos días
+            <h1 className="text-3xl sm:text-4xl desktop:text-5xl font-bold font-serif-display text-[#171717] tracking-tight mt-1 leading-tight">
+              Buenos días.
             </h1>
-            <p className="text-xs sm:text-sm text-[#697282] mt-0.5 font-medium">
+            <p className="text-sm sm:text-base text-[#737373] mt-0.5 font-medium">
               ¿Qué necesitas resolver hoy?
             </p>
           </div>
         </div>
 
-        {/* Botón principal CAPTURAR (visible en desktop como acción de cabecera) */}
+        {/* Botón principal CAPTURAR (alto contraste, desktop & tablet) */}
         <div className="hidden sm:block shrink-0">
           <Button
             variant="primary"
-            size="md"
+            size="lg"
             onClick={onOpenCreateTask}
-            icon={<Plus className="w-4 h-4 stroke-[2.5]" />}
+            className="shadow-[0_6px_22px_rgba(23,23,23,0.22)] gap-2.5 px-6"
           >
-            CAPTURAR
+            <div className="w-5 h-5 rounded-full bg-[#FFD84D] flex items-center justify-center text-[#171717] shrink-0">
+              <Plus className="w-3.5 h-3.5 stroke-[3]" />
+            </div>
+            <span className="font-extrabold tracking-wider text-xs uppercase">Capturar</span>
           </Button>
         </div>
       </section>
 
       {/* ============================================================ */}
-      {/* 2. BOTÓN PRINCIPAL CAPTURAR (Móvil: Prioridad 2)             */}
+      {/* 2. BOTÓN PRINCIPAL CAPTURAR MÓVIL (Alto contraste)           */}
       {/* ============================================================ */}
       <section className="order-2 sm:hidden w-full">
         <Button
@@ -117,40 +122,43 @@ export const Dashboard: React.FC<DashboardProps> = ({
           size="lg"
           fullWidth
           onClick={onOpenCreateTask}
-          icon={<Plus className="w-5 h-5 stroke-[2.5]" />}
-          className="shadow-[0_8px_24px_rgba(23,116,104,0.22)]"
+          className="shadow-[0_8px_24px_rgba(23,23,23,0.22)] py-3.5 rounded-[22px]"
         >
-          CAPTURAR
+          <div className="w-6 h-6 rounded-full bg-[#FFD84D] flex items-center justify-center text-[#171717] mr-2 shrink-0">
+            <Plus className="w-4 h-4 stroke-[3]" />
+          </div>
+          <span className="font-extrabold tracking-wider text-sm uppercase">Capturar Entrada</span>
         </Button>
       </section>
 
       {/* ============================================================ */}
       {/* 3. COMPOSICIÓN ADAPTABLE TABLET / DESKTOP / MÓVIL             */}
-      {/* Móvil (<768px): Columna única vertical                       */}
-      {/* Tablet (768px–1199px): Contenido principal 7 / Panel 5        */}
-      {/* Desktop (1200px+): Contenido principal 8 / Panel 4            */}
       {/* ============================================================ */}
       <div className="order-3 grid grid-cols-1 md:grid-cols-12 gap-6 sm:gap-7 items-start">
         {/* COLUMNA DE CONTENIDO PRINCIPAL */}
         <div className="md:col-span-7 desktop:col-span-8 space-y-6 sm:space-y-7">
-          {/* 3.1 TAREA PRIORITARIA (Hero) */}
+          {/* 3.1 TAREA PRIORITARIA (Hero — Objeto visual con forma orgánica sutil) */}
           <section className="space-y-2.5">
             <div className="flex items-center justify-between px-1">
-              <h3 className="text-xs font-bold uppercase tracking-[0.06em] text-[#697282] flex items-center gap-1.5">
-                <Flame className="w-3.5 h-3.5 text-[#EB6B6B]" />
-                <span>Tarea Prioritaria</span>
+              <h3 className="text-[11px] font-extrabold tracking-dharma text-[#8C8578] flex items-center gap-1.5 uppercase">
+                <Flame className="w-3.5 h-3.5 text-[#F59A8B]" />
+                <span>Tu prioridad de hoy</span>
               </h3>
-              <span className="text-[11px] font-semibold text-[#177468]">
+              <span className="text-[10px] font-extrabold tracking-dharma text-[#171717] uppercase bg-[#FFFBEA] border border-[#FFD84D]/50 px-2.5 py-0.5 rounded-full">
                 Foco Principal
               </span>
             </div>
 
             {priorityTask ? (
               <div
-                className="p-5 sm:p-7 rounded-[28px] bg-gradient-to-br from-white via-white to-[#F5F2EB]/50 shadow-[0_8px_30px_-4px_rgba(36,41,47,0.04)] transition-all hover:shadow-[0_14px_36px_-4px_rgba(36,41,47,0.07)]"
+                className="relative overflow-hidden p-6 sm:p-7 rounded-[30px] bg-[#FFFBEA] border border-[#FFD84D]/40 shadow-[0_8px_28px_-6px_rgba(255,216,77,0.18)] transition-all hover:shadow-[0_12px_36px_-6px_rgba(255,216,77,0.25)]"
               >
+                {/* Forma orgánica suave decorativa de fondo (blob sutil) */}
+                <div className="absolute -right-10 -bottom-10 w-44 h-44 rounded-full bg-[#FFD84D]/25 blur-xl pointer-events-none" />
+                <div className="absolute -left-6 -top-6 w-28 h-28 rounded-full bg-[#F6A6C8]/15 blur-lg pointer-events-none" />
+
                 {/* Fila superior: Categoría, Prioridad y Estado */}
-                <div className="flex items-center justify-between gap-2 flex-wrap mb-3.5">
+                <div className="relative z-10 flex items-center justify-between gap-2 flex-wrap mb-3.5">
                   <div className="flex items-center gap-2">
                     <CategoryBadge categoryId={priorityTask.categoryId} size="md" />
                     <PriorityBadge priority={priorityTask.priority} size="md" />
@@ -159,26 +167,26 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </div>
 
                 {/* Título y descripción */}
-                <h4 className="text-lg sm:text-xl font-bold text-[#24292F] leading-snug tracking-wide">
+                <h4 className="relative z-10 text-xl sm:text-2xl font-bold font-serif-display text-[#171717] leading-snug tracking-tight">
                   {priorityTask.title}
                 </h4>
 
                 {priorityTask.description && (
-                  <p className="text-xs sm:text-sm text-[#697282] mt-1.5 leading-relaxed max-w-2xl">
+                  <p className="relative z-10 text-xs sm:text-sm text-[#525252] mt-2 leading-relaxed max-w-2xl font-medium">
                     {priorityTask.description}
                   </p>
                 )}
 
                 {/* Fila inferior: Fecha, Hora, y Acción de completado */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-5 mt-4 border-t border-black/[0.04]">
-                  <div className="flex items-center gap-3 sm:gap-4 text-xs text-[#697282] font-semibold">
-                    <span className="inline-flex items-center gap-1.5 bg-[#FAF8F5] px-3 py-1.5 rounded-full">
-                      <CalendarIcon className="w-3.5 h-3.5 text-[#177468]" />
+                <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 pt-5 mt-4 border-t border-black/[0.06]">
+                  <div className="flex items-center gap-2.5 sm:gap-3 text-xs font-bold text-[#171717]">
+                    <span className="inline-flex items-center gap-1.5 bg-white border border-black/[0.05] px-3 py-1.5 rounded-full shadow-2xs">
+                      <CalendarIcon className="w-3.5 h-3.5 text-[#171717]" />
                       <span>{priorityTask.dueDate || 'Hoy'}</span>
                     </span>
 
-                    <span className="inline-flex items-center gap-1.5 bg-[#FAF8F5] px-3 py-1.5 rounded-full">
-                      <Clock className="w-3.5 h-3.5 text-[#177468]" />
+                    <span className="inline-flex items-center gap-1.5 bg-white border border-black/[0.05] px-3 py-1.5 rounded-full shadow-2xs">
+                      <Clock className="w-3.5 h-3.5 text-[#171717]" />
                       <span>{priorityTask.dueTime || '18:00'}</span>
                     </span>
                   </div>
@@ -186,16 +194,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => onEditTask(priorityTask)}
-                      className="text-xs font-bold text-[#697282] hover:text-[#24292F] px-3 py-1.5 rounded-full hover:bg-[#F5F2EB] transition-colors cursor-pointer"
+                      className="text-xs font-bold text-[#737373] hover:text-[#171717] px-3 py-1.5 rounded-full hover:bg-black/[0.04] transition-colors cursor-pointer"
                     >
                       Editar
                     </button>
                     <Button
-                      variant="pastel"
-                      pastelColor="teal"
+                      variant="primary"
                       size="sm"
                       onClick={() => toggleTaskComplete(priorityTask.id)}
-                      icon={<CheckCircle2 className="w-4 h-4" />}
+                      icon={<CheckCircle2 className="w-4 h-4 text-[#A8D8A0]" />}
+                      className="rounded-full px-4"
                     >
                       Completar
                     </Button>
@@ -203,110 +211,115 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 </div>
               </div>
             ) : (
-              <Card padding="md" className="text-center py-8">
-                <p className="text-sm font-bold text-[#24292F]">Sin tareas prioritarias pendientes</p>
-                <p className="text-xs text-[#697282] mt-1">Todas las tareas vitales han sido resueltas.</p>
+              <Card padding="md" className="text-center py-8 bg-[#FAF6ED] border border-[#EAE3D2]">
+                <p className="text-base font-bold font-serif-display text-[#171717]">Sin tareas prioritarias pendientes</p>
+                <p className="text-xs text-[#737373] mt-1 font-medium">Todas las tareas vitales han sido resueltas con calma.</p>
               </Card>
             )}
           </section>
 
-          {/* 3.2 ESTADO DEL SISTEMA (Grid 2 columnas en Tablet, 4 en Desktop) */}
+          {/* 3.1.1 DHARMA RHYTHM & HEALTH SCORE (Inspirado en la dirección visual) */}
+          <section className="space-y-2">
+            <DharmaRhythmWidget />
+          </section>
+
+          {/* 3.2 ESTADO DEL SISTEMA (Tu día: 4 Bloques coloridos y vivos) */}
           <section className="space-y-2.5">
             <div className="flex items-center justify-between px-1">
-              <h3 className="text-xs font-bold uppercase tracking-[0.06em] text-[#697282]">
-                Estado del Sistema
+              <h3 className="text-[11px] font-extrabold tracking-dharma text-[#8C8578] uppercase">
+                Tu Día // Estado del Sistema
               </h3>
-              <span className="text-[11px] font-medium text-[#9DA6B5]">
-                {metrics.total} totales
+              <span className="text-[10px] font-bold text-[#737373] font-mono">
+                {metrics.total} TOTALES
               </span>
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
-              {/* Pendientes */}
+              {/* Pendientes — Amarillo */}
               <div
                 onClick={() => {
                   setFilters((prev) => ({ ...prev, statusId: 'por_hacer' }));
                   onNavigateTab('tareas');
                 }}
-                className="p-4 rounded-[22px] bg-white shadow-[0_4px_20px_-2px_rgba(36,41,47,0.03)] hover:shadow-[0_8px_24px_-2px_rgba(36,41,47,0.06)] hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
+                className="p-4 sm:p-5 rounded-[26px] bg-[#FFFBEA] border border-[#FFD84D]/45 shadow-[0_4px_16px_-2px_rgba(255,216,77,0.12)] hover:shadow-[0_8px_24px_-2px_rgba(255,216,77,0.22)] hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#697282]">Pendientes</span>
-                  <div className="w-7 h-7 rounded-[10px] bg-[#F5F2EB] flex items-center justify-center text-[#9DA6B5]">
-                    <Circle className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-extrabold tracking-dharma text-[#171717] uppercase">Pendientes</span>
+                  <div className="w-7 h-7 rounded-full bg-[#FFD84D] flex items-center justify-center text-[#171717]">
+                    <Circle className="w-3.5 h-3.5 stroke-[2.5]" />
                   </div>
                 </div>
-                <div className="mt-2.5">
-                  <span className="text-2xl sm:text-3xl font-extrabold text-[#24292F]">
-                    {metrics.pending}
+                <div className="mt-3">
+                  <span className="text-3xl sm:text-4xl font-extrabold font-serif-display text-[#171717]">
+                    {String(metrics.pending).padStart(2, '0')}
                   </span>
-                  <p className="text-[10px] sm:text-[11px] text-[#9DA6B5] mt-0.5">En espera</p>
+                  <p className="text-[10px] text-[#737373] font-bold uppercase tracking-wider mt-0.5">En espera</p>
                 </div>
               </div>
 
-              {/* En proceso */}
+              {/* En proceso — Lavanda / Rosa */}
               <div
                 onClick={() => {
                   setFilters((prev) => ({ ...prev, statusId: 'en_proceso' }));
                   onNavigateTab('tareas');
                 }}
-                className="p-4 rounded-[22px] bg-[#E8F6F4]/50 shadow-[0_4px_20px_-2px_rgba(36,41,47,0.03)] hover:shadow-[0_8px_24px_-2px_rgba(36,41,47,0.06)] hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
+                className="p-4 sm:p-5 rounded-[26px] bg-[#F5F2FE] border border-[#B9A7F7]/45 shadow-[0_4px_16px_-2px_rgba(185,167,247,0.12)] hover:shadow-[0_8px_24px_-2px_rgba(185,167,247,0.22)] hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#177468]">En proceso</span>
-                  <div className="w-7 h-7 rounded-[10px] bg-[#E8F6F4] flex items-center justify-center text-[#177468]">
-                    <PlayCircle className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-extrabold tracking-dharma text-[#171717] uppercase">En proceso</span>
+                  <div className="w-7 h-7 rounded-full bg-[#B9A7F7] flex items-center justify-center text-[#171717]">
+                    <PlayCircle className="w-3.5 h-3.5 stroke-[2.5]" />
                   </div>
                 </div>
-                <div className="mt-2.5">
-                  <span className="text-2xl sm:text-3xl font-extrabold text-[#177468]">
-                    {metrics.inProgress}
+                <div className="mt-3">
+                  <span className="text-3xl sm:text-4xl font-extrabold font-serif-display text-[#171717]">
+                    {String(metrics.inProgress).padStart(2, '0')}
                   </span>
-                  <p className="text-[10px] sm:text-[11px] text-[#177468]/80 mt-0.5">Activas</p>
+                  <p className="text-[10px] text-[#737373] font-bold uppercase tracking-wider mt-0.5">Activas</p>
                 </div>
               </div>
 
-              {/* En espera */}
+              {/* En espera — Coral */}
               <div
                 onClick={() => {
                   setFilters((prev) => ({ ...prev, statusId: 'en_espera' }));
                   onNavigateTab('tareas');
                 }}
-                className="p-4 rounded-[22px] bg-[#FEF6E9]/50 shadow-[0_4px_20px_-2px_rgba(36,41,47,0.03)] hover:shadow-[0_8px_24px_-2px_rgba(36,41,47,0.06)] hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
+                className="p-4 sm:p-5 rounded-[26px] bg-[#FEF3F1] border border-[#F59A8B]/45 shadow-[0_4px_16px_-2px_rgba(245,154,139,0.12)] hover:shadow-[0_8px_24px_-2px_rgba(245,154,139,0.22)] hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#8E5B18]">En espera</span>
-                  <div className="w-7 h-7 rounded-[10px] bg-[#FEF6E9] flex items-center justify-center text-[#8E5B18]">
-                    <Hourglass className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-extrabold tracking-dharma text-[#171717] uppercase">En espera</span>
+                  <div className="w-7 h-7 rounded-full bg-[#F59A8B] flex items-center justify-center text-[#171717]">
+                    <Hourglass className="w-3.5 h-3.5 stroke-[2.5]" />
                   </div>
                 </div>
-                <div className="mt-2.5">
-                  <span className="text-2xl sm:text-3xl font-extrabold text-[#8E5B18]">
-                    {metrics.waiting}
+                <div className="mt-3">
+                  <span className="text-3xl sm:text-4xl font-extrabold font-serif-display text-[#171717]">
+                    {String(metrics.waiting).padStart(2, '0')}
                   </span>
-                  <p className="text-[10px] sm:text-[11px] text-[#8E5B18]/80 mt-0.5">Pausadas</p>
+                  <p className="text-[10px] text-[#737373] font-bold uppercase tracking-wider mt-0.5">Pausadas</p>
                 </div>
               </div>
 
-              {/* Completadas */}
+              {/* Completadas — Verde */}
               <div
                 onClick={() => {
                   setFilters((prev) => ({ ...prev, statusId: 'completado' }));
                   onNavigateTab('tareas');
                 }}
-                className="p-4 rounded-[22px] bg-[#EEF6F0]/50 shadow-[0_4px_20px_-2px_rgba(36,41,47,0.03)] hover:shadow-[0_8px_24px_-2px_rgba(36,41,47,0.06)] hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
+                className="p-4 sm:p-5 rounded-[26px] bg-[#F2FAF0] border border-[#A8D8A0]/45 shadow-[0_4px_16px_-2px_rgba(168,216,160,0.12)] hover:shadow-[0_8px_24px_-2px_rgba(168,216,160,0.22)] hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#376841]">Completadas</span>
-                  <div className="w-7 h-7 rounded-[10px] bg-[#EEF6F0] flex items-center justify-center text-[#376841]">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-extrabold tracking-dharma text-[#171717] uppercase">Completadas</span>
+                  <div className="w-7 h-7 rounded-full bg-[#A8D8A0] flex items-center justify-center text-[#171717]">
+                    <CheckCircle2 className="w-3.5 h-3.5 stroke-[2.5]" />
                   </div>
                 </div>
-                <div className="mt-2.5">
-                  <span className="text-2xl sm:text-3xl font-extrabold text-[#376841]">
-                    {metrics.completed}
+                <div className="mt-3">
+                  <span className="text-3xl sm:text-4xl font-extrabold font-serif-display text-[#171717]">
+                    {String(metrics.completed).padStart(2, '0')}
                   </span>
-                  <p className="text-[10px] sm:text-[11px] text-[#376841]/80 mt-0.5">Verificadas</p>
+                  <p className="text-[10px] text-[#737373] font-bold uppercase tracking-wider mt-0.5">Verificadas</p>
                 </div>
               </div>
             </div>
@@ -315,13 +328,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {/* 3.3 HOY (Próximas tareas programadas) */}
           <section className="space-y-2.5">
             <div className="flex items-center justify-between px-1">
-              <h3 className="text-xs font-bold uppercase tracking-[0.06em] text-[#697282] flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-[#177468]" />
-                <span>Hoy</span>
+              <h3 className="text-[11px] font-extrabold tracking-dharma text-[#8C8578] flex items-center gap-1.5 uppercase">
+                <Clock className="w-3.5 h-3.5 text-[#171717]" />
+                <span>Próximas Tareas // Hoy</span>
               </h3>
               <button
                 onClick={() => onNavigateTab('tareas')}
-                className="text-xs font-semibold text-[#177468] hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-xs font-bold text-[#171717] hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <span>Ver registro completo</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -330,28 +343,28 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
             <div className="space-y-2.5">
               {todayTasks.length === 0 ? (
-                <Card padding="md" className="text-center py-6 text-xs text-[#9DA6B5]">
+                <Card padding="md" className="text-center py-6 text-xs text-[#737373] bg-white border border-black/[0.04]">
                   No hay más tareas programadas para hoy.
                 </Card>
               ) : (
                 todayTasks.map((task) => (
                   <div
                     key={task.id}
-                    className="p-3.5 sm:p-4 rounded-[22px] bg-white shadow-[0_2px_12px_rgba(36,41,47,0.02)] flex items-center justify-between gap-3 hover:shadow-[0_6px_20px_rgba(36,41,47,0.04)] transition-all"
+                    className="p-4 rounded-[24px] bg-white border border-black/[0.04] shadow-[0_2px_12px_rgba(23,23,23,0.02)] flex items-center justify-between gap-3.5 hover:shadow-[0_6px_20px_rgba(23,23,23,0.05)] hover:-translate-y-0.5 transition-all"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-3.5 min-w-0">
                       <button
                         onClick={() => toggleTaskComplete(task.id)}
-                        className="w-5 h-5 rounded-[8px] border-2 border-[#D0D6E0] hover:border-[#177468] flex items-center justify-center shrink-0 cursor-pointer"
+                        className="w-5.5 h-5.5 rounded-full border-2 border-black/20 hover:border-[#171717] flex items-center justify-center shrink-0 cursor-pointer transition-colors"
                         aria-label="Completar"
                       />
 
                       <div className="min-w-0 truncate">
-                        <p className="text-xs sm:text-sm font-bold text-[#24292F] truncate">
+                        <p className="text-sm font-bold text-[#171717] truncate">
                           {task.title}
                         </p>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[11px] text-[#9DA6B5] font-semibold">
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[11px] text-[#8C8578] font-bold">
                             {task.dueTime || 'Hoy'}
                           </span>
                           <CategoryBadge categoryId={task.categoryId} size="sm" showDot={false} />
@@ -374,11 +387,11 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {/* Subsección: AGENDA (Próximos eventos) */}
           <div className="space-y-2.5">
             <div className="flex items-center justify-between px-1">
-              <h3 className="text-xs font-bold uppercase tracking-[0.06em] text-[#697282] flex items-center gap-1.5">
-                <CalendarIcon className="w-3.5 h-3.5 text-[#177468]" />
+              <h3 className="text-[11px] font-extrabold tracking-dharma text-[#8C8578] flex items-center gap-1.5 uppercase">
+                <CalendarIcon className="w-3.5 h-3.5 text-[#171717]" />
                 <span>Agenda</span>
                 {googleSyncStatus === 'connected' && (
-                  <span className="text-[10px] font-bold text-[#1A73E8] bg-[#E8F0FE] px-2 py-0.5 rounded-full border border-[#4285F4]/20">
+                  <span className="text-[9px] font-extrabold text-[#171717] bg-[#F0F9FE] border border-[#9DD7F5] px-2 py-0.5 rounded-full">
                     Google Sync
                   </span>
                 )}
@@ -386,7 +399,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
               <button
                 type="button"
                 onClick={() => onNavigateTab('calendario')}
-                className="text-xs font-semibold text-[#177468] hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-xs font-bold text-[#171717] hover:underline flex items-center gap-1 cursor-pointer"
               >
                 <span>Ver calendario</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -395,7 +408,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
             <div className="space-y-2.5">
               {upcomingEvents.length === 0 ? (
-                <Card padding="md" className="text-center py-6 text-xs text-[#9DA6B5]">
+                <Card padding="md" className="text-center py-6 text-xs text-[#737373] bg-white border border-black/[0.04]">
                   No hay eventos programados en la agenda.
                 </Card>
               ) : (
@@ -411,35 +424,35 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         }
                         onNavigateTab('calendario');
                       }}
-                      className={`p-3.5 sm:p-4 rounded-[22px] bg-white shadow-[0_2px_12px_rgba(36,41,47,0.02)] flex items-start gap-3.5 hover:shadow-[0_6px_20px_rgba(36,41,47,0.04)] transition-all cursor-pointer ${
-                        isGoogle ? 'border border-[#4285F4]/15' : ''
+                      className={`p-3.5 sm:p-4 rounded-[24px] bg-white border border-black/[0.04] shadow-[0_2px_12px_rgba(23,23,23,0.02)] flex items-start gap-3.5 hover:shadow-[0_6px_20px_rgba(23,23,23,0.05)] transition-all cursor-pointer ${
+                        isGoogle ? 'border-[#9DD7F5]/50' : ''
                       }`}
                     >
-                      <div className={`p-2 rounded-[14px] font-mono text-[11px] font-bold text-center shrink-0 min-w-[65px] ${
-                        isGoogle ? 'bg-[#E8F0FE] text-[#1A73E8]' : 'bg-[#FAF8F5] text-[#177468]'
+                      <div className={`p-2 rounded-[16px] font-mono text-[11px] font-bold text-center shrink-0 min-w-[65px] ${
+                        isGoogle ? 'bg-[#F0F9FE] text-[#171717] border border-[#9DD7F5]/40' : 'bg-[#FAF6ED] text-[#171717] border border-[#EAE3D2]'
                       }`}>
                         {evt.time ? evt.time.split(' - ')[0] : 'Hoy'}
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <p className="text-xs sm:text-sm font-bold text-[#24292F] truncate">
+                          <p className="text-xs sm:text-sm font-bold text-[#171717] truncate">
                             {evt.title}
                           </p>
                           {isGoogle && (
-                            <span className="text-[9px] font-bold text-[#1A73E8] bg-[#E8F0FE] px-1.5 py-0.5 rounded shrink-0">
+                            <span className="text-[9px] font-bold text-[#171717] bg-[#F0F9FE] px-1.5 py-0.5 rounded-full shrink-0">
                               G-Cal
                             </span>
                           )}
                         </div>
 
-                        <div className="flex items-center gap-2 mt-1 text-[11px] text-[#697282]">
-                          <span className="font-semibold text-[#9DA6B5]">
+                        <div className="flex items-center gap-2 mt-1.5 text-[11px] text-[#737373]">
+                          <span className="font-semibold text-[#8C8578]">
                             {evt.time || evt.date}
                           </span>
                           {evt.location && (
                             <span className="inline-flex items-center gap-1 truncate max-w-[100px]">
-                              <MapPin className="w-3 h-3 text-[#9DA6B5]" />
+                              <MapPin className="w-3 h-3 text-[#8C8578]" />
                               <span className="truncate">{evt.location}</span>
                             </span>
                           )}
@@ -455,9 +468,9 @@ export const Dashboard: React.FC<DashboardProps> = ({
             </div>
           </div>
 
-          {/* Subsección: ESTACIONES COMPLEMENTARIAS (Tablet Widget) */}
+          {/* Subsección: ESTACIONES EN ÓRBITA (Objetos de diseño) */}
           <div className="space-y-2.5">
-            <h3 className="text-xs font-bold uppercase tracking-[0.06em] text-[#697282] px-1">
+            <h3 className="text-[11px] font-extrabold tracking-dharma text-[#8C8578] uppercase px-1">
               Estaciones en Órbita
             </h3>
 
@@ -465,42 +478,42 @@ export const Dashboard: React.FC<DashboardProps> = ({
               {/* Transmisiones */}
               <div
                 onClick={() => onNavigateTab('transmisiones')}
-                className="p-3.5 rounded-[22px] bg-white shadow-[0_2px_12px_rgba(36,41,47,0.02)] hover:shadow-[0_6px_20px_rgba(36,41,47,0.04)] transition-all cursor-pointer flex items-center justify-between"
+                className="p-3.5 rounded-[24px] bg-white border border-black/[0.04] shadow-[0_2px_12px_rgba(23,23,23,0.02)] hover:shadow-[0_6px_20px_rgba(23,23,23,0.05)] transition-all cursor-pointer flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-[12px] bg-[#E8F6F4] text-[#177468] flex items-center justify-center font-bold text-xs">
+                  <div className="w-9 h-9 rounded-[16px] bg-[#FFFBEA] border border-[#FFD84D]/40 text-[#171717] flex items-center justify-center font-bold text-sm">
                     📻
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-[#24292F]">Transmisiones (Inbox)</p>
-                    <p className="text-[11px] text-[#9DA6B5]">
-                      {newTransmissionsCount > 0 ? `${newTransmissionsCount} por procesar` : 'Todo procesado'}
+                    <p className="text-xs font-bold text-[#171717]">Transmisiones (Inbox)</p>
+                    <p className="text-[11px] text-[#737373]">
+                      {newTransmissionsCount > 0 ? `${newTransmissionsCount} por procesar` : 'Buzón al día'}
                     </p>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 text-[#9DA6B5]" />
+                <ArrowRight className="w-4 h-4 text-[#8C8578]" />
               </div>
 
               {/* Lectura activa en Biblioteca si existe */}
               {currentlyReadingBook && (
                 <div
                   onClick={() => onNavigateTab('biblioteca')}
-                  className="p-3.5 rounded-[22px] bg-gradient-to-r from-[#FAF8F5] to-white border border-black/[0.04] hover:shadow-[0_6px_20px_rgba(36,41,47,0.04)] transition-all cursor-pointer flex items-center justify-between"
+                  className="p-3.5 rounded-[24px] bg-gradient-to-r from-[#FFFBEA]/40 to-white border border-black/[0.04] hover:shadow-[0_6px_20px_rgba(23,23,23,0.05)] transition-all cursor-pointer flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-8 h-8 rounded-[12px] bg-[#FEF6E9] text-[#8E5B18] flex items-center justify-center font-bold text-xs shrink-0">
+                    <div className="w-9 h-9 rounded-[16px] bg-[#FDF0F5] border border-[#F6A6C8]/40 text-[#171717] flex items-center justify-center font-bold text-sm shrink-0">
                       📖
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-[#24292F] truncate">
+                      <p className="text-xs font-bold text-[#171717] truncate">
                         {currentlyReadingBook.title}
                       </p>
-                      <p className="text-[11px] text-[#9DA6B5] truncate">
+                      <p className="text-[11px] text-[#737373] truncate">
                         Leyendo · {currentlyReadingBook.author}
                       </p>
                     </div>
                   </div>
-                  <ArrowRight className="w-4 h-4 text-[#9DA6B5] shrink-0 ml-2" />
+                  <ArrowRight className="w-4 h-4 text-[#8C8578] shrink-0 ml-2" />
                 </div>
               )}
             </div>

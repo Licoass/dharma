@@ -48,26 +48,24 @@ export const QuickCaptureModal: React.FC = () => {
     >
       <form onSubmit={handleSubmit} className="space-y-4 select-none">
         {/* Core Prompt */}
-        <div className="flex items-center gap-3 p-3.5 rounded-[20px] bg-[#E8F6F4]/70 text-[#177468] text-xs">
+        <div className="flex items-center gap-3 p-4 rounded-[22px] bg-[#FAF8F5] border border-black/[0.04] text-xs">
           <DharmaCore mood="focus" size="sm" />
           <div className="flex-1">
-            <p className="leading-snug">
-              Captura ágilmente. El <span className="font-bold">Dharma Core</span> clasificará la tarea en tu categoría seleccionada.
+            <p className="leading-relaxed text-[#525252] font-medium">
+              Captura ágilmente. El <span className="font-bold text-[#171717]">Dharma Core</span> clasificará la tarea en tu categoría seleccionada.
             </p>
-            <div className="mt-1.5 flex flex-wrap items-center gap-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => {
                   setIsQuickCaptureOpen(false);
                   openDharmaCore(title);
                 }}
-                className="text-[11px] font-bold text-[#177468] hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-[11px] font-bold text-[#171717] hover:underline flex items-center gap-1 cursor-pointer bg-white px-2.5 py-1 rounded-full border border-black/[0.04]"
               >
-                <Sparkles className="w-3 h-3 stroke-[2.5]" />
+                <Sparkles className="w-3 h-3 text-[#FFD84D] stroke-[2.5]" />
                 <span>Analizar texto con Core</span>
               </button>
-
-              <span className="text-[#9DA6B5] text-[10px]">·</span>
 
               <button
                 type="button"
@@ -75,9 +73,9 @@ export const QuickCaptureModal: React.FC = () => {
                   setIsQuickCaptureOpen(false);
                   openAudioCapture();
                 }}
-                className="text-[11px] font-bold text-[#8B5CF6] hover:underline flex items-center gap-1 cursor-pointer"
+                className="text-[11px] font-bold text-[#171717] hover:underline flex items-center gap-1 cursor-pointer bg-white px-2.5 py-1 rounded-full border border-black/[0.04]"
               >
-                <Mic className="w-3 h-3" />
+                <Mic className="w-3 h-3 text-[#B9A7F7]" />
                 <span>Grabar nota de voz</span>
               </button>
             </div>
@@ -93,13 +91,13 @@ export const QuickCaptureModal: React.FC = () => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="¿Qué deseas resolver? (ej. Verificar auditoría Eco)"
-            className="w-full px-4 py-3.5 rounded-[20px] bg-[#FAF8F5] text-sm sm:text-base font-semibold text-[#24292F] placeholder:text-[#9DA6B5] focus:ring-2 focus:ring-[#177468]/15 outline-none transition-all shadow-xs"
+            className="w-full px-4.5 py-3.5 rounded-[22px] bg-[#FAF8F5] text-sm sm:text-base font-semibold text-[#171717] placeholder:text-[#A39E93] focus:ring-2 focus:ring-black/10 focus:bg-white outline-none transition-all border border-black/[0.04]"
           />
         </div>
 
         {/* Categorías dinámicas */}
         <div>
-          <span className="block text-[11px] font-bold text-[#697282] uppercase tracking-[0.05em] mb-2">
+          <span className="block text-[11px] font-bold text-[#8C827A] uppercase tracking-dharma mb-2">
             Categoría
           </span>
           <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1">
@@ -111,19 +109,19 @@ export const QuickCaptureModal: React.FC = () => {
                   key={cat.id}
                   onClick={() => setCategoryId(cat.id)}
                   className={`
-                    px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer
+                    px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border
                     ${
                       isSelected
-                        ? 'shadow-xs text-[#24292F] ring-2 ring-[#177468]/30 font-bold'
-                        : 'text-[#697282] hover:bg-[#F5F2EB]'
+                        ? 'text-[#171717] ring-2 ring-black/20 font-bold border-black/10 shadow-xs'
+                        : 'text-[#737373] bg-[#FAF8F5] border-black/[0.04] hover:bg-[#F2ECE0]'
                     }
                   `}
                   style={{
-                    backgroundColor: isSelected ? cat.bgSoft : '#FAF8F5',
+                    backgroundColor: isSelected ? cat.bgSoft : undefined,
                   }}
                 >
                   <span
-                    className="w-2 h-2 rounded-full"
+                    className="w-2.5 h-2.5 rounded-full shadow-2xs"
                     style={{ backgroundColor: cat.color }}
                   />
                   <span>{cat.name}</span>
@@ -136,7 +134,7 @@ export const QuickCaptureModal: React.FC = () => {
         {/* Prioridad */}
         <div className="flex items-center justify-between gap-3 pt-1">
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-bold text-[#697282] uppercase tracking-[0.05em] mr-1">
+            <span className="text-[11px] font-bold text-[#8C827A] uppercase tracking-dharma mr-1">
               Prioridad:
             </span>
             {(['baja', 'media', 'alta', 'vital'] as TaskPriority[]).map((p) => (
@@ -144,10 +142,10 @@ export const QuickCaptureModal: React.FC = () => {
                 type="button"
                 key={p}
                 onClick={() => setPriority(p)}
-                className={`px-2.5 py-1 text-[11px] font-bold rounded-full capitalize transition-all cursor-pointer ${
+                className={`px-3 py-1 text-[11px] font-bold rounded-full capitalize transition-all cursor-pointer ${
                   priority === p
-                    ? 'bg-[#24292F] text-white shadow-xs'
-                    : 'text-[#697282] hover:bg-[#F5F2EB]'
+                    ? 'bg-[#171717] text-white shadow-xs'
+                    : 'text-[#737373] bg-[#FAF8F5] hover:bg-[#F2ECE0]'
                 }`}
               >
                 {p}
@@ -155,14 +153,14 @@ export const QuickCaptureModal: React.FC = () => {
             ))}
           </div>
 
-          <div className="hidden sm:flex items-center gap-1 text-[11px] text-[#9DA6B5]">
+          <div className="hidden sm:flex items-center gap-1 text-[11px] text-[#8C827A]">
             <CornerDownLeft className="w-3.5 h-3.5" />
             <span>Enter para guardar</span>
           </div>
         </div>
 
         {/* Botones de acción */}
-        <div className="pt-3 flex justify-end gap-2.5">
+        <div className="pt-3 flex justify-end gap-2.5 border-t border-black/[0.04]">
           <Button
             type="button"
             variant="ghost"

@@ -62,8 +62,8 @@ export const Modal: React.FC<ModalProps> = ({
             exit={{ opacity: 0, y: 35, scale: 0.98 }}
             transition={{ type: 'spring', damping: 28, stiffness: 360 }}
             className={`
-              relative w-full ${maxWMap[maxWidth]} bg-white
-              rounded-t-[32px] sm:rounded-[30px] shadow-[0_20px_50px_rgba(0,0,0,0.08)]
+              relative w-full ${maxWMap[maxWidth]} bg-white border border-black/[0.06]
+              rounded-t-[36px] sm:rounded-[32px] shadow-[0_24px_60px_-10px_rgba(23,23,23,0.12)]
               p-6 sm:p-7 z-10 max-h-[92vh] overflow-y-auto
             `}
           >
@@ -72,12 +72,12 @@ export const Modal: React.FC<ModalProps> = ({
               <div className="flex items-start justify-between mb-5 pb-2">
                 <div>
                   {title && (
-                    <h3 className="text-xl font-bold text-[#24292F] tracking-[0.03em]">
+                    <h3 className="text-xl sm:text-2xl font-bold text-[#171717] font-serif-display tracking-tight">
                       {title}
                     </h3>
                   )}
                   {subtitle && (
-                    <p className="text-xs sm:text-sm text-[#697282] mt-0.5">
+                    <p className="text-xs sm:text-sm text-[#737373] mt-1 font-medium leading-relaxed">
                       {subtitle}
                     </p>
                   )}
@@ -85,10 +85,10 @@ export const Modal: React.FC<ModalProps> = ({
 
                 <button
                   onClick={onClose}
-                  className="w-10 h-10 min-h-[40px] min-w-[40px] flex items-center justify-center rounded-[14px] text-[#9DA6B5] hover:text-[#24292F] hover:bg-[#F5F2EB] transition-colors cursor-pointer"
+                  className="w-9 h-9 rounded-full bg-[#F2ECE0] hover:bg-[#E5DFD3] text-[#171717] flex items-center justify-center transition-colors cursor-pointer shrink-0 ml-3"
                   aria-label="Cerrar ventana"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4 stroke-[2.2]" />
                 </button>
               </div>
             )}

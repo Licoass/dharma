@@ -18,9 +18,13 @@ import type {
   TransmissionStatus,
   GoogleCalendarEvent,
   GoogleUser,
-  GoogleSyncStatus
+  GoogleSyncStatus,
+  CloudSyncStatus
 } from '../types';
 import { googleCalendarService } from '../services/googleCalendarService';
+import { supabaseSyncService } from '../services/supabaseSyncService';
+import { notificationService } from '../services/notificationService';
+import { triggerHaptic } from '../utils/haptics';
 import { INITIAL_TASKS } from '../data/initialTasks';
 import { INITIAL_CATEGORIES } from '../data/initialCategories';
 import { INITIAL_STATUSES } from '../data/initialStatuses';
@@ -129,6 +133,24 @@ interface TaskContextType {
   openGoogleCalendarModal: () => void;
   closeGoogleCalendarModal: () => void;
   setSelectedGoogleEvent: (event: GoogleCalendarEvent | null) => void;
+
+  // Supabase Cloud Sync (Local-First Realtime)
+  cloudSyncStatus: CloudSyncStatus;
+  lastSyncedAt: string | null;
+  triggerManualSync: () => Promise<void>;
+
+  // Notificaciones & Recordatorios
+  notificationPermission: NotificationPermission;
+  requestNotificationPermission: () => Promise<NotificationPermission>;
+  sendTestNotification: () => boolean;
+
+  // OmniSearch Global (Ctrl+K / Cmd+K)
+  isOmniSearchOpen: boolean;
+  openOmniSearch: () => void;
+  closeOmniSearch: () => void;
+
+  // Time Blocking (Planificar tarea en calendario y exportar a Google)
+  scheduleTaskInCalendar: (taskId: string, date: string, time: string, syncToGoogle?: boolean) => Promise<void>;
   
   metrics: {
     total: number;
@@ -351,6 +373,111 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const openGoogleCalendarModal = () => setIsGoogleCalendarModalOpen(true);
   const closeGoogleCalendarModal = () => setIsGoogleCalendarModalOpen(false);
 
+  // Supabase Cloud Sync (Local-First Realtime)
+  const [cloudSyncStatus, setCloudSyncStatus] = useState<CloudSyncStatus>(() => supabaseSyncService.getStatus());
+  const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(() => supabaseSyncService.getLastSync());
+
+  useEffect(() => {
+    const unsub = supabaseSyncService.subscribe((status, lastSync) => {
+      setCloudSyncStatus(status);
+      setLastSyncedAt(lastSync);
+    });
+    return unsub;
+  }, []);
+
+  const triggerManualSync = async () => {
+    await supabaseSyncService.syncAll({
+      tasks,
+      notes,
+      archive: archiveItems,
+      books,
+      transmissions,
+    });
+    triggerHaptic(15);
+  };
+
+  // Auto-sync en segundo plano con debounce
+  useEffect(() => {
+    supabaseSyncService.queueSync({
+      tasks,
+      notes,
+      archive: archiveItems,
+      books,
+      transmissions,
+    });
+  }, [tasks, notes, archiveItems, books, transmissions]);
+
+  // Notificaciones & Recordatorios Locales
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(() =>
+    notificationService.getPermission()
+  );
+
+  const requestNotificationPermission = async () => {
+    const perm = await notificationService.requestPermission();
+    setNotificationPermission(perm);
+    return perm;
+  };
+
+  const sendTestNotification = () => {
+    return notificationService.sendTestNotification();
+  };
+
+  // Chequeo periódico de tareas próximas a vencer
+  useEffect(() => {
+    notificationService.checkDueTasks(tasks);
+    const interval = setInterval(() => {
+      notificationService.checkDueTasks(tasks);
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [tasks]);
+
+  // OmniSearch Global (Ctrl+K / Cmd+K)
+  const [isOmniSearchOpen, setIsOmniSearchOpen] = useState(false);
+  const openOmniSearch = () => setIsOmniSearchOpen(true);
+  const closeOmniSearch = () => setIsOmniSearchOpen(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsOmniSearchOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Time Blocking (Planificar tarea en calendario y exportar a Google)
+  const scheduleTaskInCalendar = async (
+    taskId: string,
+    date: string,
+    time: string,
+    syncToGoogle: boolean = false
+  ) => {
+    const task = tasks.find((t) => t.id === taskId);
+    if (!task) return;
+
+    updateTask(taskId, { dueDate: date, dueTime: time });
+
+    if (syncToGoogle) {
+      try {
+        const cat = categories.find((c) => c.id === task.categoryId);
+        await googleCalendarService.createEvent({
+          summary: task.title,
+          description: task.description || `Tarea programada en DHARMA (${cat?.name || 'General'})`,
+          start: { dateTime: `${date}T${time}:00`, timeZone: 'America/Guayaquil' },
+          end: { dateTime: `${date}T${time}:45`, timeZone: 'America/Guayaquil' },
+          location: 'DHARMA Time Blocking',
+        });
+        setGoogleEvents(googleCalendarService.getPersistedEvents());
+      } catch (err) {
+        console.warn('Error al exportar a Google Calendar:', err);
+      }
+    }
+
+    triggerHaptic(20);
+  };
+
   // Auto-sincronizar al inicio si ya está autenticado pero no hay eventos cargados
   useEffect(() => {
     if (googleCalendarService.isAuthenticated() && googleEvents.length === 0) {
@@ -426,9 +553,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (t.id === id) {
           const isNowCompleted = t.statusId !== 'completado';
           if (isNowCompleted) {
+            triggerHaptic([25, 45, 25]);
             fireCelebration();
             setDharmaMood('celebrate');
             setTimeout(() => setDharmaMood('calm'), 3000);
+          } else {
+            triggerHaptic(15);
           }
           return {
             ...t,
@@ -442,10 +572,12 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const changeTaskStatus = (id: string, newStatusId: string) => {
+    triggerHaptic(15);
     setTasks((prev) =>
       prev.map((t) => {
         if (t.id === id) {
           if (newStatusId === 'completado' && t.statusId !== 'completado') {
+            triggerHaptic([25, 45, 25]);
             fireCelebration();
             setDharmaMood('celebrate');
             setTimeout(() => setDharmaMood('calm'), 3000);
@@ -862,6 +994,16 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         openGoogleCalendarModal,
         closeGoogleCalendarModal,
         setSelectedGoogleEvent,
+        cloudSyncStatus,
+        lastSyncedAt,
+        triggerManualSync,
+        notificationPermission,
+        requestNotificationPermission,
+        sendTestNotification,
+        isOmniSearchOpen,
+        openOmniSearch,
+        closeOmniSearch,
+        scheduleTaskInCalendar,
         addTask,
         updateTask,
         deleteTask,

@@ -16,7 +16,6 @@ import { BookCard } from './BookCard';
 import { BookFormModal } from './BookFormModal';
 import { Button } from '../ui/Button';
 import { EmptyState } from '../ui/EmptyState';
-import { Card } from '../ui/Card';
 
 export interface LibraryViewProps {
   onNavigateTab?: (tab: NavTab) => void;
@@ -106,17 +105,22 @@ export const LibraryView: React.FC<LibraryViewProps> = () => {
         1. TARJETA RESUMEN / METRICAS DHARMA (Pastel & Orgánico)
         =========================================================
       */}
-      <Card padding="md" className="bg-gradient-to-r from-white via-[#FAF8F5] to-white border border-black/[0.03]">
+      {/* 
+        =========================================================
+        1. TARJETA RESUMEN / METRICAS DHARMA (Editorial & Cálido)
+        =========================================================
+      */}
+      <div className="p-5 sm:p-6 rounded-[28px] bg-white border border-black/[0.04] shadow-[0_2px_14px_rgba(23,23,23,0.02)]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-[18px] bg-[#E8F6F4] text-[#177468] flex items-center justify-center shadow-xs">
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-[18px] bg-[#FFFBEA] text-[#171717] flex items-center justify-center font-bold border border-[#FFD84D]/40 shadow-xs">
               <LibraryIcon className="w-6 h-6 stroke-[1.8]" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-bold text-[#24292F] tracking-[0.02em]">
-                BIBLIOTECA PERSONAL
+              <h2 className="text-base sm:text-lg font-bold font-serif-display text-[#171717] tracking-tight">
+                Biblioteca Personal
               </h2>
-              <p className="text-xs text-[#697282]">
+              <p className="text-xs text-[#8C8578] font-medium">
                 Registro de lecturas, protocolos de aprendizaje y sabiduría acumulada
               </p>
             </div>
@@ -124,21 +128,21 @@ export const LibraryView: React.FC<LibraryViewProps> = () => {
 
           {/* Métricas rápidas */}
           <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-            <div className="px-3 py-1.5 rounded-[14px] bg-[#E8F6F4]/60 border border-[#BDE8E2]/50 text-center">
-              <p className="text-[10px] uppercase font-bold text-[#177468]">Leyendo</p>
-              <p className="text-base font-bold text-[#177468] leading-none mt-0.5">{counts.leyendo}</p>
+            <div className="px-3.5 py-2 rounded-[18px] bg-[#F0F9FE] border border-[#9DD7F5]/40 text-center min-w-[76px]">
+              <p className="text-[9px] uppercase tracking-dharma font-extrabold text-[#171717]">Leyendo</p>
+              <p className="text-lg font-bold font-serif-display text-[#171717] leading-none mt-1">{counts.leyendo}</p>
             </div>
-            <div className="px-3 py-1.5 rounded-[14px] bg-[#FEF6EC]/60 border border-[#FCE1C2]/50 text-center">
-              <p className="text-[10px] uppercase font-bold text-[#D48B38]">Quiero leer</p>
-              <p className="text-base font-bold text-[#D48B38] leading-none mt-0.5">{counts.quiero_leer}</p>
+            <div className="px-3.5 py-2 rounded-[18px] bg-[#FFFBEA] border border-[#FFD84D]/40 text-center min-w-[76px]">
+              <p className="text-[9px] uppercase tracking-dharma font-extrabold text-[#171717]">Quiero leer</p>
+              <p className="text-lg font-bold font-serif-display text-[#171717] leading-none mt-1">{counts.quiero_leer}</p>
             </div>
-            <div className="px-3 py-1.5 rounded-[14px] bg-[#EAF5EA]/60 border border-[#CDE7CD]/50 text-center">
-              <p className="text-[10px] uppercase font-bold text-[#2E7D32]">Terminados</p>
-              <p className="text-base font-bold text-[#2E7D32] leading-none mt-0.5">{counts.terminado}</p>
+            <div className="px-3.5 py-2 rounded-[18px] bg-[#F2F9F1] border border-[#A8D8A0]/40 text-center min-w-[76px]">
+              <p className="text-[9px] uppercase tracking-dharma font-extrabold text-[#171717]">Terminados</p>
+              <p className="text-lg font-bold font-serif-display text-[#171717] leading-none mt-1">{counts.terminado}</p>
             </div>
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* 
         =========================================================
@@ -149,18 +153,18 @@ export const LibraryView: React.FC<LibraryViewProps> = () => {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           {/* Input de Búsqueda */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-[#9DA6B5] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-[#8C8578] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Buscar por título, autor o etiquetas..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 rounded-[18px] bg-white border border-black/[0.04] text-xs sm:text-sm text-[#24292F] placeholder-[#9DA6B5] focus:outline-none focus:border-[#177468]/30 focus:ring-2 focus:ring-[#177468]/10 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all"
+              className="w-full pl-10 pr-9 py-2.5 rounded-[22px] bg-white border border-black/[0.04] text-xs sm:text-sm text-[#171717] placeholder-[#8C8578] focus:outline-none focus:ring-2 focus:ring-[#171717]/10 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all"
             />
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9DA6B5] hover:text-[#24292F] p-0.5"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8578] hover:text-[#171717] p-0.5"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -172,19 +176,19 @@ export const LibraryView: React.FC<LibraryViewProps> = () => {
             <button
               onClick={() => setOnlyFavorites(!onlyFavorites)}
               className={`
-                px-3.5 py-2.5 rounded-[18px] text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border
+                px-3.5 py-2.5 rounded-[20px] text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer border
                 ${
                   onlyFavorites
-                    ? 'bg-[#FEF6EC] text-[#D48B38] border-[#FCE1C2] shadow-xs'
-                    : 'bg-white text-[#697282] border-black/[0.04] hover:bg-[#FAF8F5]'
+                    ? 'bg-[#FFFBEA] text-[#171717] border-[#FFD84D]/50 shadow-2xs'
+                    : 'bg-white text-[#8C8578] border-black/[0.04] hover:bg-[#F8F4E8]'
                 }
               `}
               title="Filtrar por libros destacados"
             >
-              <Star className={`w-3.5 h-3.5 ${onlyFavorites ? 'fill-[#D48B38]' : ''}`} />
+              <Star className={`w-3.5 h-3.5 ${onlyFavorites ? 'fill-[#FFD84D] text-[#FFD84D]' : ''}`} />
               <span className="hidden sm:inline">Destacados</span>
               {counts.favoritos > 0 && (
-                <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-black/[0.05]">
+                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-black/[0.05]">
                   {counts.favoritos}
                 </span>
               )}
@@ -195,7 +199,7 @@ export const LibraryView: React.FC<LibraryViewProps> = () => {
               variant="primary"
               size="md"
               onClick={handleOpenCreate}
-              icon={<Plus className="w-4 h-4 stroke-[2.5]" />}
+              icon={<Plus className="w-4 h-4 stroke-[3]" />}
             >
               Añadir Libro
             </Button>
@@ -214,8 +218,8 @@ export const LibraryView: React.FC<LibraryViewProps> = () => {
                   px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 border
                   ${
                     isSelected
-                      ? 'bg-[#177468] text-white border-[#177468] shadow-xs'
-                      : 'bg-white text-[#697282] border-black/[0.04] hover:bg-[#FAF8F5]'
+                      ? 'bg-[#171717] text-white border-[#171717] shadow-2xs'
+                      : 'bg-white text-[#8C8578] border-black/[0.04] hover:bg-[#F8F4E8] hover:text-[#171717]'
                   }
                 `}
               >
@@ -223,8 +227,8 @@ export const LibraryView: React.FC<LibraryViewProps> = () => {
                 <span>{tab.label}</span>
                 <span
                   className={`
-                    text-[10px] px-1.5 py-0.2 rounded-full font-mono
-                    ${isSelected ? 'bg-white/25 text-white' : 'bg-black/[0.04] text-[#9DA6B5]'}
+                    text-[10px] px-1.5 py-0.2 rounded-full font-bold
+                    ${isSelected ? 'bg-white/25 text-white' : 'bg-black/[0.05] text-[#8C8578]'}
                   `}
                 >
                   {tab.count}

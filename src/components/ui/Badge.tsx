@@ -57,12 +57,13 @@ export const CategoryBadge: React.FC<{
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 font-semibold rounded-full select-none transition-colors ${
-        size === 'sm' ? 'px-2.5 py-0.5 text-[11px]' : 'px-3 py-1 text-xs'
+      className={`inline-flex items-center gap-1.5 font-bold uppercase tracking-[0.12em] rounded-full select-none transition-colors border ${
+        size === 'sm' ? 'px-2.5 py-0.5 text-[10px]' : 'px-3 py-1 text-[11px]'
       }`}
       style={{
         backgroundColor: category.bgSoft,
-        color: category.textColor,
+        borderColor: category.borderColor || `${category.color}40`,
+        color: '#171717',
       }}
     >
       {showDot && (
@@ -89,12 +90,13 @@ export const StatusBadge: React.FC<{
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 font-semibold rounded-full select-none transition-colors ${
-        size === 'sm' ? 'px-2.5 py-0.5 text-[11px]' : 'px-3 py-1 text-xs'
+      className={`inline-flex items-center gap-1.5 font-bold uppercase tracking-[0.12em] rounded-full select-none transition-colors border ${
+        size === 'sm' ? 'px-2.5 py-0.5 text-[10px]' : 'px-3 py-1 text-[11px]'
       }`}
       style={{
         backgroundColor: status.bgSoft,
-        color: status.textColor,
+        borderColor: `${status.color}40`,
+        color: '#171717',
       }}
     >
       <span
@@ -111,15 +113,21 @@ export const PriorityBadge: React.FC<{
   size?: 'sm' | 'md';
 }> = ({ priority, size = 'md' }) => {
   const config = {
-    baja: { label: 'Baja', variant: 'neutral' as const },
-    media: { label: 'Media', variant: 'sky' as const },
-    alta: { label: 'Alta', variant: 'honey' as const },
-    vital: { label: 'Vital', variant: 'coral' as const },
+    baja: { label: 'Baja', bg: 'bg-[#F0F9FE]', border: 'border-[#9DD7F5]/50' },
+    media: { label: 'Media', bg: 'bg-[#F5F2FE]', border: 'border-[#B9A7F7]/50' },
+    alta: { label: 'Alta', bg: 'bg-[#FFFBEA]', border: 'border-[#FFD84D]/50' },
+    vital: { label: 'Vital', bg: 'bg-[#FEF3F1]', border: 'border-[#F59A8B]/50' },
   }[priority];
 
   return (
-    <Badge variant={config.variant} size={size}>
+    <span
+      className={`inline-flex items-center gap-1 font-bold uppercase tracking-[0.12em] rounded-full select-none border text-[#171717] ${
+        config.bg
+      } ${config.border} ${
+        size === 'sm' ? 'px-2.5 py-0.5 text-[10px]' : 'px-3 py-1 text-[11px]'
+      }`}
+    >
       <span>{config.label}</span>
-    </Badge>
+    </span>
   );
 };

@@ -13,23 +13,23 @@ export const PwaInstallBanner: React.FC = () => {
   }
 
   return (
-    <div className="mb-4 p-3.5 sm:p-4 rounded-[22px] bg-gradient-to-r from-[#E8F6F4] via-white to-[#FEF6EC] border border-[#177468]/20 shadow-[0_4px_20px_rgba(23,116,104,0.08)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 select-none animate-fadeIn">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-2xl bg-[#E8F6F4] border border-[#177468]/20 flex items-center justify-center shrink-0 text-[#177468]">
+    <div className="mb-5 p-4 sm:p-4.5 rounded-[24px] bg-white border border-black/[0.05] shadow-[0_8px_24px_rgba(23,23,23,0.04)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 select-none animate-fadeIn">
+      <div className="flex items-center gap-3.5">
+        <div className="w-11 h-11 rounded-2xl bg-[#FFD84D]/30 border border-black/[0.04] flex items-center justify-center shrink-0 text-[#171717]">
           <Smartphone className="w-5 h-5 stroke-[2.2]" />
         </div>
 
         <div>
           <div className="flex items-center gap-2">
-            <h4 className="text-xs sm:text-sm font-bold text-[#24292F]">
+            <h4 className="text-sm font-bold font-serif-display text-[#171717]">
               Instala DHARMA en tu Android
             </h4>
-            <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#177468] text-white">
+            <span className="text-[9px] font-bold tracking-dharma px-2.5 py-0.5 rounded-full bg-[#171717] text-[#FFD84D] uppercase">
               PWA
             </span>
           </div>
-          <p className="text-[11px] text-[#697282] line-clamp-1 mt-0.5">
-            Acceso instantáneo en pantalla completa, navegación por gestos y soporte offline.
+          <p className="text-xs text-[#737373] line-clamp-1 mt-0.5 font-medium">
+            Acceso instantáneo en pantalla completa, navegación táctil y soporte offline.
           </p>
         </div>
       </div>
@@ -46,7 +46,7 @@ export const PwaInstallBanner: React.FC = () => {
 
         <button
           onClick={() => setIsDismissed(true)}
-          className="p-1.5 rounded-xl text-[#9DA6B5] hover:text-[#24292F] hover:bg-black/5 transition-colors cursor-pointer"
+          className="p-2 rounded-xl text-[#8C827A] hover:text-[#171717] hover:bg-[#F2ECE0] transition-colors cursor-pointer"
           title="Descartar por ahora"
         >
           <X className="w-4 h-4" />

@@ -135,34 +135,34 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
     <div
       onClick={handleCardClick}
       className={`
-        p-3.5 sm:p-4 rounded-[22px] transition-all select-none relative group cursor-pointer
-        shadow-[0_2px_12px_rgba(36,41,47,0.02)] hover:shadow-[0_6px_20px_rgba(36,41,47,0.05)] hover:-translate-y-0.5
+        p-4 sm:p-4.5 rounded-[24px] transition-all select-none relative group cursor-pointer border border-black/[0.04]
+        shadow-[0_2px_12px_rgba(23,23,23,0.02)] hover:shadow-[0_6px_22px_rgba(23,23,23,0.06)] hover:-translate-y-0.5
         ${
           activity.isCompleted
             ? 'bg-white/60 opacity-70 shadow-2xs'
             : activity.source === 'google'
-            ? 'bg-gradient-to-br from-white via-white to-[#F8FAFF] border border-[#4285F4]/15'
+            ? 'bg-gradient-to-br from-white via-white to-[#F0F9FE] border-[#9DD7F5]/40'
             : 'bg-white'
         }
         ${className}
       `}
+      style={{
+        borderLeftColor: category ? category.color : undefined,
+        borderLeftWidth: category ? '4px' : undefined,
+      }}
     >
       {/* Barra superior de tipo y categoría */}
-      <div className="flex items-center justify-between gap-2 mb-2">
+      <div className="flex items-center justify-between gap-2 mb-2.5">
         <div className="flex items-center gap-1.5 flex-wrap">
           {/* Badge de tipo de actividad / Google Calendar */}
           {activity.source === 'google' ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-[#E8F0FE] text-[#1A73E8] border border-[#4285F4]/20">
-              <CalendarIcon className="w-3 h-3 text-[#1A73E8]" />
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold tracking-dharma uppercase bg-[#F0F9FE] text-[#171717] border border-[#9DD7F5]/40">
+              <CalendarIcon className="w-3 h-3 text-[#171717]" />
               <span>Google Calendar</span>
             </span>
           ) : (
             <span
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase"
-              style={{
-                backgroundColor: typeConfig.badgeBg,
-                color: typeConfig.badgeText,
-              }}
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold tracking-dharma uppercase bg-[#F8F4E8] text-[#171717] border border-black/[0.04]"
             >
               {typeConfig.icon}
               <span>{typeConfig.label}</span>
@@ -172,7 +172,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
           {/* Badge de categoría con color pastel */}
           {category && (
             <span
-              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold"
+              className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold tracking-dharma uppercase border border-black/[0.03]"
               style={{
                 backgroundColor: category.bgSoft,
                 color: category.textColor,
@@ -187,8 +187,8 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
           )}
 
           {activity.priority === 'vital' && (
-            <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FEEFEF] text-[#A63838]">
-              <Flame className="w-3 h-3" />
+            <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full text-[9px] font-extrabold tracking-dharma uppercase bg-[#FFF0EE] text-[#F59A8B] border border-[#F59A8B]/30">
+              <Flame className="w-3 h-3 text-[#F59A8B]" />
               <span>Vital</span>
             </span>
           )}
@@ -197,7 +197,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
         {/* Acciones directas y Badge de Solo Lectura */}
         <div className="flex items-center gap-1.5">
           {activity.isReadOnly && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#5F6368] bg-[#FAF8F5] px-2 py-0.5 rounded-full border border-black/[0.03]">
+            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#8C8578] bg-[#F8F4E8] px-2.5 py-0.5 rounded-full border border-black/[0.04]">
               <Lock className="w-2.5 h-2.5" />
               <span>Solo lectura</span>
             </span>
@@ -206,7 +206,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
           {activity.eventId && !activity.isReadOnly && (
             <button
               onClick={handleDelete}
-              className="opacity-0 group-hover:opacity-100 p-1 text-[#9DA6B5] hover:text-[#EB6B6B] transition-opacity cursor-pointer rounded-full hover:bg-[#FAF8F5]"
+              className="opacity-0 group-hover:opacity-100 p-1 text-[#8C8578] hover:text-[#F59A8B] transition-opacity cursor-pointer rounded-full hover:bg-[#F8F4E8]"
               title="Eliminar de la agenda"
             >
               <Trash2 className="w-3.5 h-3.5" />
@@ -216,7 +216,7 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
       </div>
 
       {/* Contenido principal: Checkbox (si tarea o recordatorio) + Título + Descripción */}
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3.5">
         {(activity.type === 'tarea' || activity.type === 'recordatorio') && (
           <button
             type="button"
@@ -225,11 +225,11 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
               handleToggle();
             }}
             className={`
-              shrink-0 w-5 h-5 rounded-[7px] border-2 flex items-center justify-center transition-all cursor-pointer mt-0.5
+              shrink-0 w-5.5 h-5.5 rounded-[8px] border-2 flex items-center justify-center transition-all cursor-pointer mt-0.5
               ${
                 activity.isCompleted
-                  ? 'bg-[#177468] border-[#177468] text-white shadow-2xs'
-                  : 'border-[#D0D6E0] hover:border-[#177468] bg-white hover:bg-[#E8F6F4]/40'
+                  ? 'bg-[#171717] border-[#171717] text-white shadow-2xs'
+                  : 'border-black/20 hover:border-[#171717] bg-white hover:bg-[#F8F4E8]'
               }
             `}
             aria-label={activity.isCompleted ? 'Desmarcar' : 'Completar'}
@@ -240,33 +240,33 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
 
         <div className="flex-1 min-w-0">
           <h4
-            className={`text-sm font-bold leading-snug transition-colors ${
+            className={`text-sm sm:text-[15px] font-bold leading-snug transition-colors ${
               activity.isCompleted
-                ? 'line-through text-[#9DA6B5] font-normal'
-                : 'text-[#24292F]'
+                ? 'line-through text-[#8C8578] font-normal'
+                : 'text-[#171717]'
             }`}
           >
             {activity.title}
           </h4>
 
           {activity.description && (
-            <p className="text-xs text-[#697282] mt-1 leading-relaxed line-clamp-2">
+            <p className="text-xs text-[#525252] mt-1 leading-relaxed line-clamp-2">
               {activity.description}
             </p>
           )}
 
           {/* Fila de hora y ubicación */}
-          <div className="flex flex-wrap items-center gap-3 mt-2.5 text-[11px] text-[#697282] font-semibold">
+          <div className="flex flex-wrap items-center gap-2.5 mt-2.5 pt-2 border-t border-black/[0.04] text-[11px] text-[#8C8578]">
             {activity.time && (
-              <span className="inline-flex items-center gap-1 bg-[#FAF8F5] px-2 py-0.5 rounded-full text-[#177468]">
-                <Clock className="w-3 h-3 text-[#177468]" />
+              <span className="inline-flex items-center gap-1.5 bg-[#F8F4E8] px-2.5 py-0.5 rounded-full text-[#171717] font-bold border border-black/[0.03]">
+                <Clock className="w-3 h-3 text-[#171717]" />
                 <span>{activity.time}</span>
               </span>
             )}
 
             {activity.location && (
-              <span className="inline-flex items-center gap-1 text-[#9DA6B5]">
-                <MapPin className="w-3 h-3 text-[#9DA6B5]" />
+              <span className="inline-flex items-center gap-1 text-[#8C8578] font-medium">
+                <MapPin className="w-3 h-3 text-[#8C8578]" />
                 <span className="truncate max-w-[150px]">{activity.location}</span>
               </span>
             )}
@@ -277,10 +277,10 @@ export const ActivityCard: React.FC<ActivityCardProps> = ({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1 text-[#1A73E8] bg-[#E8F0FE] hover:bg-[#D2E3FC] px-2 py-0.5 rounded-full transition-colors"
+                className="inline-flex items-center gap-1 text-[#171717] bg-[#F0F9FE] hover:bg-[#E0F3FD] px-2.5 py-0.5 rounded-full transition-colors font-bold border border-[#9DD7F5]/40"
                 title="Unirse a Google Meet"
               >
-                <Video className="w-3 h-3 text-[#1A73E8]" />
+                <Video className="w-3 h-3 text-[#171717]" />
                 <span>Meet</span>
               </a>
             )}

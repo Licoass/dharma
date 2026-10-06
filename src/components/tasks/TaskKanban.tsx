@@ -77,27 +77,27 @@ export const TaskKanban: React.FC<TaskKanbanProps> = ({
               onDragLeave={(e) => handleDragLeave(e, status.id)}
               onDrop={(e) => handleDrop(e, status.id)}
               className={`
-                flex flex-col rounded-[26px] p-3.5 sm:p-4 min-h-[460px]
-                shrink-0 snap-center w-[82vw] sm:w-[310px] lg:flex-1 lg:w-auto transition-all duration-200
+                flex flex-col rounded-[28px] p-4 min-h-[480px]
+                shrink-0 snap-center w-[84vw] sm:w-[320px] lg:flex-1 lg:w-auto transition-all duration-200 border border-black/[0.04]
                 ${
                   isDragOver
-                    ? 'ring-2 ring-[#177468] bg-[#E8F6F4]/60 scale-[1.01]'
-                    : 'bg-[#F5F2EB]/50'
+                    ? 'ring-2 ring-[#171717] bg-[#FFFBEA] scale-[1.01]'
+                    : 'bg-white/70 shadow-[0_2px_12px_rgba(23,23,23,0.02)]'
                 }
               `}
             >
               {/* Cabecera de la columna */}
-              <div className="flex items-center justify-between mb-3.5 px-1 py-1">
+              <div className="flex items-center justify-between mb-4 px-1 py-1">
                 <div className="flex items-center gap-2.5">
                   <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
+                    className="w-3 h-3 rounded-full shrink-0 shadow-2xs"
                     style={{ backgroundColor: status.color }}
                   />
                   <div className="flex items-center gap-2">
-                    <h3 className="text-sm font-bold text-[#24292F] tracking-wide">
+                    <h3 className="text-sm font-extrabold text-[#171717] tracking-tight">
                       {status.name}
                     </h3>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-white font-mono font-bold text-[#697282] shadow-2xs">
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#171717] text-white font-bold shadow-2xs">
                       {colTasks.length}
                     </span>
                   </div>
@@ -105,7 +105,7 @@ export const TaskKanban: React.FC<TaskKanbanProps> = ({
 
                 <button
                   onClick={() => onQuickAdd(status.id)}
-                  className="w-7 h-7 rounded-[10px] bg-white text-[#697282] hover:text-[#24292F] flex items-center justify-center shadow-xs transition-colors cursor-pointer"
+                  className="w-7 h-7 rounded-[10px] bg-[#F8F4E8] text-[#171717] hover:bg-[#171717] hover:text-white flex items-center justify-center transition-colors cursor-pointer shadow-2xs"
                   title={`Agregar tarea a ${status.name}`}
                   aria-label={`Agregar tarea a ${status.name}`}
                 >
@@ -114,21 +114,21 @@ export const TaskKanban: React.FC<TaskKanbanProps> = ({
               </div>
 
               {/* Lista de tarjetas con drag and drop */}
-              <div className="space-y-3 flex-1">
+              <div className="space-y-3.5 flex-1">
                 {colTasks.length === 0 ? (
                   <div
                     className={`
-                      h-48 rounded-[20px] flex flex-col items-center justify-center p-4 text-center transition-colors
-                      ${isDragOver ? 'bg-[#177468]/10 border-2 border-dashed border-[#177468]' : 'bg-white/40'}
+                      h-48 rounded-[22px] flex flex-col items-center justify-center p-4 text-center transition-colors border border-dashed
+                      ${isDragOver ? 'bg-[#FFD84D]/10 border-[#171717]' : 'bg-[#F8F4E8]/40 border-black/10'}
                     `}
                   >
-                    <Layers className="w-6 h-6 text-[#9DA6B5] mb-2 opacity-50" />
-                    <p className="text-xs font-semibold text-[#9DA6B5]">
+                    <Layers className="w-6 h-6 text-[#8C8578] mb-2 opacity-40" />
+                    <p className="text-xs font-bold text-[#8C8578]">
                       {isDragOver ? 'Soltar aquí' : 'Sin tareas'}
                     </p>
                     <button
                       onClick={() => onQuickAdd(status.id)}
-                      className="mt-2 text-xs text-[#177468] hover:underline font-bold cursor-pointer"
+                      className="mt-2 text-xs text-[#171717] hover:underline font-extrabold cursor-pointer"
                     >
                       + Añadir tarea
                     </button>
@@ -147,11 +147,11 @@ export const TaskKanban: React.FC<TaskKanbanProps> = ({
                       />
 
                       {/* Botones de avance rápido accesibles */}
-                      <div className="flex items-center justify-between px-2 pt-0.5 text-[11px] text-[#9DA6B5]">
+                      <div className="flex items-center justify-between px-2 pt-0.5 text-[11px] text-[#8C8578]">
                         {prevStatus ? (
                           <button
                             onClick={() => onChangeStatus(task.id, prevStatus.id)}
-                            className="flex items-center gap-1 hover:text-[#24292F] transition-colors py-0.5 cursor-pointer"
+                            className="flex items-center gap-1 hover:text-[#171717] transition-colors py-0.5 cursor-pointer font-medium"
                           >
                             <ArrowLeft className="w-3 h-3" />
                             <span>{prevStatus.name}</span>
@@ -163,7 +163,7 @@ export const TaskKanban: React.FC<TaskKanbanProps> = ({
                         {nextStatus ? (
                           <button
                             onClick={() => onChangeStatus(task.id, nextStatus.id)}
-                            className="flex items-center gap-1 text-[#177468] hover:underline font-bold transition-colors py-0.5 cursor-pointer ml-auto"
+                            className="flex items-center gap-1 text-[#171717] hover:underline font-bold transition-colors py-0.5 cursor-pointer ml-auto"
                           >
                             <span>{nextStatus.name}</span>
                             <ArrowRight className="w-3 h-3" />

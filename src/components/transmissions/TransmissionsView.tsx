@@ -15,7 +15,6 @@ import { TransmissionCard } from './TransmissionCard';
 import { NewTransmissionModal } from './NewTransmissionModal';
 import { Button } from '../ui/Button';
 import { EmptyState } from '../ui/EmptyState';
-import { Card } from '../ui/Card';
 
 export interface TransmissionsViewProps {
   onNavigateTab?: (tab: NavTab) => void;
@@ -96,26 +95,32 @@ export const TransmissionsView: React.FC<TransmissionsViewProps> = () => {
         (Pastel, Suave, Contemporáneo, No militar, No terminal)
         =========================================================
       */}
-      <Card padding="md" className="bg-gradient-to-r from-white via-[#FAF8F5] to-[#F5F2EB]/50 border border-black/[0.04]">
+      {/* 
+        =========================================================
+        1. BANNER TELEMÉTRICO: ESTACIÓN DE COMUNICACIONES DHARMA
+        (Cálido, Editorial, Contemporáneo)
+        =========================================================
+      */}
+      <div className="p-5 sm:p-6 rounded-[28px] bg-white border border-black/[0.04] shadow-[0_2px_14px_rgba(23,23,23,0.02)]">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center gap-3.5">
             {/* Emblema Receptora Pastel */}
-            <div className="w-12 h-12 rounded-[18px] bg-[#E8F6F4] text-[#177468] flex items-center justify-center shrink-0 shadow-xs relative">
+            <div className="w-12 h-12 rounded-[18px] bg-[#FFFBEA] text-[#171717] font-bold border border-[#FFD84D]/40 flex items-center justify-center shrink-0 shadow-xs relative">
               <Radio className="w-6 h-6 stroke-[1.8]" />
-              <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#2EC4B6] border-2 border-white animate-ping" />
+              <span className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#FFD84D] border-2 border-white animate-ping" />
             </div>
 
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-mono font-bold tracking-widest text-[#177468] uppercase bg-[#E8F6F4] px-2 py-0.5 rounded-full">
+                <span className="text-[9px] font-mono font-extrabold tracking-dharma text-[#171717] uppercase bg-[#FFFBEA] border border-[#FFD84D]/50 px-2.5 py-0.5 rounded-full">
                   ● RECEPTORA EN LÍNEA
                 </span>
-                <span className="text-[10px] font-mono text-[#9DA6B5]">CANAL 108.4 MHz</span>
+                <span className="text-[10px] font-mono text-[#8C8578]">CANAL 108.4 MHz</span>
               </div>
-              <h2 className="text-base sm:text-lg font-bold text-[#24292F] tracking-[0.02em] mt-0.5">
-                TRANSMISIONES (INBOX)
+              <h2 className="text-base sm:text-lg font-bold font-serif-display text-[#171717] tracking-tight mt-1">
+                Transmisiones (Inbox)
               </h2>
-              <p className="text-xs text-[#697282]">
+              <p className="text-xs text-[#8C8578] font-medium">
                 Lugar de entrada para todo material crudo, notas y enlaces antes de ser clasificados
               </p>
             </div>
@@ -125,13 +130,13 @@ export const TransmissionsView: React.FC<TransmissionsViewProps> = () => {
           <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 md:pt-0 border-t md:border-t-0 border-black/[0.03]">
             {/* Métricas rápidas */}
             <div className="flex items-center gap-2">
-              <div className="px-3 py-1.5 rounded-[14px] bg-[#FEF6EC] border border-[#FCE1C2]/60 text-center">
-                <p className="text-[9px] uppercase font-bold text-[#D48B38]">Sin procesar</p>
-                <p className="text-sm font-bold text-[#D48B38] leading-none mt-0.5">{counts.nuevas}</p>
+              <div className="px-3.5 py-2 rounded-[18px] bg-[#FFFBEA] border border-[#FFD84D]/40 text-center min-w-[76px]">
+                <p className="text-[9px] uppercase tracking-dharma font-extrabold text-[#171717]">Sin procesar</p>
+                <p className="text-base font-bold font-serif-display text-[#171717] leading-none mt-1">{counts.nuevas}</p>
               </div>
-              <div className="px-3 py-1.5 rounded-[14px] bg-[#E8F4FD] border border-[#BBDEFB]/60 text-center">
-                <p className="text-[9px] uppercase font-bold text-[#1E88E5]">En cola</p>
-                <p className="text-sm font-bold text-[#1E88E5] leading-none mt-0.5">{counts.procesando}</p>
+              <div className="px-3.5 py-2 rounded-[18px] bg-[#F0F9FE] border border-[#9DD7F5]/40 text-center min-w-[76px]">
+                <p className="text-[9px] uppercase tracking-dharma font-extrabold text-[#171717]">En cola</p>
+                <p className="text-base font-bold font-serif-display text-[#171717] leading-none mt-1">{counts.procesando}</p>
               </div>
             </div>
 
@@ -140,7 +145,12 @@ export const TransmissionsView: React.FC<TransmissionsViewProps> = () => {
               variant="primary"
               size="md"
               onClick={() => setIsModalOpen(true)}
-              icon={<Plus className="w-4 h-4 stroke-[2.5]" />}
+              className="gap-2 px-4 shadow-[0_4px_16px_rgba(23,23,23,0.18)]"
+              icon={
+                <div className="w-4 h-4 rounded-full bg-[#FFD84D] text-[#171717] flex items-center justify-center font-bold">
+                  <Plus className="w-3 h-3 stroke-[3]" />
+                </div>
+              }
             >
               Nueva Transmisión
             </Button>
@@ -148,23 +158,23 @@ export const TransmissionsView: React.FC<TransmissionsViewProps> = () => {
         </div>
 
         {/* Onda Sonora Decorativa Suave */}
-        <div className="mt-4 pt-3 border-t border-black/[0.03] flex items-center justify-between text-[11px] text-[#9DA6B5] font-mono">
+        <div className="mt-4 pt-3.5 border-t border-black/[0.04] flex items-center justify-between text-[11px] text-[#8C8578] font-mono">
           <div className="flex items-center gap-2">
-            <Activity className="w-3.5 h-3.5 text-[#177468]" />
+            <Activity className="w-3.5 h-3.5 text-[#171717]" />
             <span className="hidden sm:inline">Espectro de señal receptora:</span>
             <div className="flex items-center gap-1">
               {[8, 14, 20, 10, 16, 22, 12, 18, 24, 14, 20, 12, 8, 16, 22, 14, 10].map((h, i) => (
                 <span
                   key={i}
-                  className="w-1 bg-[#177468]/30 rounded-full"
+                  className="w-1 bg-[#171717]/40 rounded-full"
                   style={{ height: `${h * 0.6}px` }}
                 />
               ))}
             </div>
           </div>
-          <span className="text-[#177468] font-bold">Protocolo DHARMA Inbox Activo</span>
+          <span className="text-[#171717] font-bold tracking-wider text-[10px]">PROTOCOLO DHARMA INBOX ACTIVO</span>
         </div>
-      </Card>
+      </div>
 
       {/* 
         =========================================================
@@ -175,18 +185,18 @@ export const TransmissionsView: React.FC<TransmissionsViewProps> = () => {
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           {/* Búsqueda */}
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-[#9DA6B5] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-4 h-4 text-[#8C8578] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               placeholder="Buscar por contenido, asunto, URL o código de frecuencia..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-9 py-2.5 rounded-[18px] bg-white border border-black/[0.04] text-xs sm:text-sm text-[#24292F] placeholder-[#9DA6B5] focus:outline-none focus:border-[#177468]/30 focus:ring-2 focus:ring-[#177468]/10 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all"
+              className="w-full pl-10 pr-9 py-2.5 rounded-[22px] bg-white border border-black/[0.04] text-xs sm:text-sm text-[#171717] placeholder-[#8C8578] focus:outline-none focus:ring-2 focus:ring-[#171717]/10 shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all"
             />
             {search && (
               <button
                 onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9DA6B5] hover:text-[#24292F] p-0.5 cursor-pointer"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8C8578] hover:text-[#171717] p-0.5 cursor-pointer"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -202,11 +212,11 @@ export const TransmissionsView: React.FC<TransmissionsViewProps> = () => {
                   key={tab.id}
                   onClick={() => setSelectedType(tab.id)}
                   className={`
-                    px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer border
+                    px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-colors cursor-pointer border
                     ${
                       isSelected
-                        ? 'bg-[#24292F] text-white border-[#24292F]'
-                        : 'bg-white text-[#697282] border-black/[0.04] hover:bg-[#FAF8F5]'
+                        ? 'bg-[#171717] text-white border-[#171717] shadow-2xs'
+                        : 'bg-white text-[#8C8578] border-black/[0.04] hover:bg-[#F8F4E8] hover:text-[#171717]'
                     }
                   `}
                 >
@@ -229,8 +239,8 @@ export const TransmissionsView: React.FC<TransmissionsViewProps> = () => {
                   px-3.5 py-1.5 rounded-full text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 border
                   ${
                     isSelected
-                      ? 'bg-[#177468] text-white border-[#177468] shadow-xs'
-                      : 'bg-white text-[#697282] border-black/[0.04] hover:bg-[#FAF8F5]'
+                      ? 'bg-[#171717] text-white border-[#171717] shadow-2xs'
+                      : 'bg-white text-[#8C8578] border-black/[0.04] hover:bg-[#F8F4E8] hover:text-[#171717]'
                   }
                 `}
               >
@@ -238,8 +248,8 @@ export const TransmissionsView: React.FC<TransmissionsViewProps> = () => {
                 <span>{tab.label}</span>
                 <span
                   className={`
-                    text-[10px] px-1.5 py-0.2 rounded-full font-mono
-                    ${isSelected ? 'bg-white/25 text-white' : 'bg-black/[0.04] text-[#9DA6B5]'}
+                    text-[10px] px-1.5 py-0.2 rounded-full font-bold
+                    ${isSelected ? 'bg-white/25 text-white' : 'bg-black/[0.05] text-[#8C8578]'}
                   `}
                 >
                   {tab.count}

@@ -42,27 +42,27 @@ export const SideAgendaPanel: React.FC<SideAgendaPanelProps> = ({
   }, [activities, selectedDate]);
 
   return (
-    <div className="flex flex-col space-y-5 bg-[#FAF8F5]/80 p-4 sm:p-5 rounded-[28px] border border-black/[0.03] select-none h-full">
+    <div className="flex flex-col space-y-5 bg-white/80 p-4 sm:p-5 rounded-[28px] border border-black/[0.04] shadow-[0_2px_14px_rgba(23,23,23,0.02)] select-none h-full">
       {/* 1. Encabezado del Panel */}
       <div className="flex items-center justify-between pb-3 border-b border-black/[0.04]">
         <div>
-          <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#177468]">
-            <CalendarIcon className="w-3.5 h-3.5" />
+          <div className="flex items-center gap-1.5 text-[10px] font-extrabold tracking-dharma uppercase text-[#8C8578]">
+            <CalendarIcon className="w-3.5 h-3.5 text-[#171717]" />
             <span>Agenda del Día</span>
           </div>
           <div className="flex items-center gap-2 mt-0.5">
-            <h3 className="text-base sm:text-lg font-extrabold text-[#24292F]">
+            <h3 className="text-base sm:text-lg font-bold font-serif-display text-[#171717]">
               {formatFriendlyDate(selectedDate)}
             </h3>
             {isToday && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E8F6F4] text-[#177468]">
+              <span className="text-[10px] font-extrabold tracking-dharma px-2.5 py-0.5 rounded-full bg-[#FFD84D] text-[#171717] shadow-2xs">
                 HOY
               </span>
             )}
           </div>
         </div>
 
-        <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-white text-[#697282] shadow-2xs">
+        <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#F8F4E8] text-[#171717] border border-black/[0.04] shadow-2xs">
           {dayActivities.length} {dayActivities.length === 1 ? 'ítem' : 'ítems'}
         </span>
       </div>

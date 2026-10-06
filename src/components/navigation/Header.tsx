@@ -2,7 +2,7 @@ import React from 'react';
 import type { NavTab } from '../../types';
 import { DharmaCore } from '../common/DharmaCore';
 import { useTaskContext } from '../../context/TaskContext';
-import { RefreshCw, Plus, Sparkles, Mic } from 'lucide-react';
+import { RefreshCw, Plus, Sparkles, Mic, Search } from 'lucide-react';
 
 export interface HeaderProps {
   currentTab: NavTab;
@@ -10,7 +10,15 @@ export interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ currentTab, onOpenQuickCapture }) => {
-  const { dharmaMood, metrics, resetToDefaults, openDharmaCore, openAudioCapture } = useTaskContext();
+  const { 
+    dharmaMood, 
+    metrics, 
+    openDharmaCore, 
+    openAudioCapture,
+    openOmniSearch,
+    cloudSyncStatus,
+    triggerManualSync
+  } = useTaskContext();
 
   const todayStr = new Intl.DateTimeFormat('es-ES', {
     weekday: 'long',
@@ -60,84 +68,105 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, onOpenQuickCapture }
   const current = tabTitles[currentTab] || tabTitles.inicio;
 
   return (
-    <header className="sticky top-0 z-30 bg-[#FAF8F5]/85 backdrop-blur-md px-5 sm:px-8 py-4 sm:py-5 transition-all select-none">
-      <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
-        {/* Titular */}
+    <header className="sticky top-0 z-30 bg-[#F8F4E8]/90 backdrop-blur-md border-b border-[#EAE3D2]/70 px-5 sm:px-8 py-3.5 sm:py-4 transition-all select-none">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        {/* Titular Editorial */}
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold tracking-[0.06em] text-[#177468] uppercase">
-              DHARMA // {currentTab.toUpperCase()}
+            <span className="text-[10px] font-extrabold tracking-[0.16em] text-[#8C8578] uppercase">
+              D H A R M A // {currentTab.toUpperCase()}
             </span>
-            <span className="w-1 h-1 rounded-full bg-[#9DA6B5]/50" />
-            <span className="text-xs text-[#697282] capitalize">
+            <span className="w-1 h-1 rounded-full bg-[#171717]/30" />
+            <span className="text-[11px] text-[#737373] font-medium capitalize">
               {todayStr}
             </span>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-extrabold tracking-[0.06em] text-[#24292F] truncate mt-0.5">
+          <h2 className="text-xl sm:text-2xl font-bold font-serif-display text-[#171717] truncate mt-0.5 tracking-tight">
             {current.title}
           </h2>
-          <p className="hidden sm:block text-xs sm:text-sm text-[#697282] tracking-[0.02em] mt-0.5 truncate">
+          <p className="hidden sm:block text-xs text-[#737373] font-medium mt-0.5 truncate">
             {current.subtitle}
           </p>
         </div>
 
         {/* Acciones */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          {/* OmniSearch Global */}
           <button
-            onClick={onOpenQuickCapture}
-            title="Captura rápida"
-            className="sm:hidden w-10 h-10 rounded-[14px] bg-[#177468] text-white flex items-center justify-center shadow-sm cursor-pointer"
+            onClick={openOmniSearch}
+            title="Búsqueda Universal (Ctrl + K)"
+            className="flex items-center gap-2 bg-white hover:bg-[#FAF8F5] text-[#171717] px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full transition-all cursor-pointer shadow-xs border border-black/[0.06]"
           >
-            <Plus className="w-5 h-5" />
+            <Search className="w-3.5 h-3.5 text-[#8C827A]" />
+            <span className="text-xs font-semibold hidden md:inline text-[#737373]">
+              Buscar...
+            </span>
+            <kbd className="hidden lg:inline-flex items-center text-[10px] font-mono text-[#8C827A] bg-[#FAF8F5] px-1.5 py-0.5 rounded border border-black/[0.04]">
+              ⌘K
+            </kbd>
+          </button>
+
+          {/* Estado de Sincronización Cloud */}
+          <button
+            onClick={() => triggerManualSync()}
+            title={`Sincronización: ${cloudSyncStatus.toUpperCase()} (Clic para sincronizar)`}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-white text-[#737373] hover:text-[#171717] rounded-full border border-black/[0.05] transition-all cursor-pointer shadow-2xs"
+          >
+            {cloudSyncStatus === 'synced' ? (
+              <span className="w-2 h-2 rounded-full bg-[#A8D8A0]" />
+            ) : cloudSyncStatus === 'syncing' ? (
+              <RefreshCw className="w-3 h-3 animate-spin text-[#FFD84D]" />
+            ) : (
+              <span className="w-2 h-2 rounded-full bg-[#8C827A]" />
+            )}
+            <span className="text-[10px] uppercase tracking-dharma font-bold">
+              {cloudSyncStatus === 'synced' ? 'NUBE OK' : cloudSyncStatus === 'syncing' ? 'SYNC...' : 'LOCAL'}
+            </span>
           </button>
 
           <button
-            onClick={() => {
-              if (window.confirm('¿Deseas recargar los datos de muestra iniciales de DHARMA?')) {
-                resetToDefaults();
-              }
-            }}
-            title="Restaurar datos de muestra"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#697282] hover:text-[#24292F] hover:bg-white rounded-[14px] transition-colors cursor-pointer"
+            onClick={onOpenQuickCapture}
+            title="Captura rápida"
+            className="sm:hidden w-10 h-10 rounded-full bg-[#171717] text-white flex items-center justify-center shadow-md cursor-pointer active:scale-95"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Datos Demo</span>
+            <Plus className="w-5 h-5 stroke-[2.8]" />
           </button>
 
           {/* Botón Grabación de Voz / Audio */}
           <button
             onClick={() => openAudioCapture()}
             title="Grabar Audio — Transcribir y detectar tareas con DHARMA CORE"
-            className="flex items-center gap-1.5 sm:gap-2 bg-[#FAF5FF] hover:bg-[#F3E8FF] text-[#8B5CF6] px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-[20px] transition-all cursor-pointer shadow-xs active:scale-95 border border-[#8B5CF6]/15"
+            className="flex items-center gap-1.5 sm:gap-2 bg-[#F5F2FE] hover:bg-[#EBE5FD] text-[#171717] px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full transition-all cursor-pointer shadow-xs active:scale-95 border border-[#B9A7F7]/50"
           >
+            <div className="w-2 h-2 rounded-full bg-[#B9A7F7] animate-pulse" />
             <Mic className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span className="text-xs font-bold hidden sm:inline">Grabar Voz</span>
+            <span className="text-xs font-bold hidden sm:inline">Voz</span>
           </button>
 
           {/* Botón Asistente IA Dharma Core */}
           <button
             onClick={() => openDharmaCore()}
             title="Dharma Core — Extracción inteligente de tareas con Gemini"
-            className="flex items-center gap-1.5 sm:gap-2 bg-[#E8F6F4] hover:bg-[#D5EFEA] text-[#177468] px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-[20px] transition-all cursor-pointer shadow-xs active:scale-95 border border-[#177468]/15"
+            className="flex items-center gap-1.5 sm:gap-2 bg-[#FFFBEA] hover:bg-[#FFF5CC] text-[#171717] px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full transition-all cursor-pointer shadow-xs active:scale-95 border border-[#FFD84D]/60"
           >
             <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span className="text-xs font-bold hidden sm:inline">Dharma Core</span>
+            <span className="text-xs font-extrabold hidden sm:inline tracking-wider">CORE IA</span>
           </button>
 
           {/* Dharma Core Status Pill */}
           <button
             onClick={() => openDharmaCore()}
             title="Abrir Dharma Core"
-            className="flex items-center gap-2.5 bg-white hover:bg-[#FAF8F5] px-3.5 py-2 rounded-[20px] shadow-[0_2px_12px_rgba(36,41,47,0.03)] border border-black/[0.03] transition-colors cursor-pointer"
+            className="flex items-center gap-2.5 bg-white hover:bg-[#FAF6ED] px-3.5 py-1.5 rounded-full shadow-2xs border border-black/[0.05] transition-colors cursor-pointer"
           >
             <DharmaCore mood={dharmaMood} size="sm" />
             <div className="text-left hidden sm:block">
-              <span className="text-[11px] font-bold text-[#24292F] tracking-wide block leading-none">
-                CORE ONLINE
+              <span className="text-[10px] font-extrabold text-[#171717] tracking-[0.12em] uppercase block leading-none">
+                ONLINE
               </span>
-              <span className="text-[10px] text-[#9DA6B5] block mt-0.5">
-                {metrics.completionPercentage}% completado
+              <span className="text-[10px] text-[#737373] block mt-0.5">
+                {metrics.completionPercentage}% hecho
               </span>
             </div>
           </button>

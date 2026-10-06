@@ -18,7 +18,7 @@ export const AppShell: React.FC<AppShellProps> = ({
   children,
 }) => {
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-[#24292F] flex flex-col antialiased selection:bg-[#E8F6F4] selection:text-[#177468]">
+    <div className="min-h-screen bg-[#F8F4E8] text-[#171717] flex flex-col antialiased selection:bg-[#FFD84D]/40 selection:text-[#171717]">
       {/* 1. Desktop & Tablet Sidebar */}
       <Sidebar currentTab={currentTab} onTabChange={onTabChange} />
 
