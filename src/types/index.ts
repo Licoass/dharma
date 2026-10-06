@@ -73,7 +73,45 @@ export interface CalendarActivity {
   eventId?: string;
 }
 
-export type NavTab = 'inicio' | 'tareas' | 'capturar' | 'calendario' | 'mas';
+export interface NoteChecklistItem {
+  id: string;
+  title: string;
+  completed: boolean;
+}
+
+export interface NoteLink {
+  id: string;
+  title: string;
+  url: string;
+}
+
+export interface Note {
+  id: string;
+  title: string;
+  content: string;
+  categoryId: string; // Referencia configurable a Category.id
+  tags?: string[];
+  links?: NoteLink[];
+  checklist?: NoteChecklistItem[];
+  isFavorite?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ArchiveItem {
+  id: string;
+  title: string;
+  url: string;
+  domain: string;
+  description: string;
+  imageUrl?: string;
+  categoryId: string; // Referencia configurable a Category.id
+  tags?: string[];
+  isFavorite?: boolean;
+  createdAt: string;
+}
+
+export type NavTab = 'inicio' | 'tareas' | 'capturar' | 'calendario' | 'registros' | 'archivo' | 'mas';
 
 export type ViewMode = 'lista' | 'kanban';
 
@@ -87,3 +125,4 @@ export interface TaskFilters {
   statusId: string | 'todas' | 'activas';
   priority: TaskPriority | 'todas';
 }
+

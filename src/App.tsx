@@ -4,6 +4,8 @@ import { AppShell } from './components/layout/AppShell';
 import { Dashboard } from './components/dashboard/Dashboard';
 import { TasksView } from './components/tasks/TasksView';
 import { CalendarView } from './components/calendar/CalendarView';
+import { RecordsView } from './components/records/RecordsView';
+import { ArchiveView } from './components/archive/ArchiveView';
 import { MoreView } from './components/more/MoreView';
 import { QuickCaptureModal } from './components/capture/QuickCaptureModal';
 import { TaskFormModal } from './components/tasks/TaskFormModal';
@@ -69,7 +71,11 @@ const MainLayout: React.FC = () => {
 
       {currentTab === 'calendario' && <CalendarView onEditTask={handleEditTask} />}
 
-      {currentTab === 'mas' && <MoreView />}
+      {currentTab === 'registros' && <RecordsView onNavigateTab={setCurrentTab} />}
+
+      {currentTab === 'archivo' && <ArchiveView onNavigateTab={setCurrentTab} />}
+
+      {currentTab === 'mas' && <MoreView onNavigateTab={setCurrentTab} />}
 
       {/* Modals */}
       <QuickCaptureModal />

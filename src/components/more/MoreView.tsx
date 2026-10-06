@@ -4,14 +4,22 @@ import {
   Upload, 
   RefreshCw, 
   Layers, 
-  Sliders
+  Sliders,
+  FileText,
+  Bookmark,
+  ArrowRight
 } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { useTaskContext } from '../../context/TaskContext';
 import { DharmaCore } from '../common/DharmaCore';
+import type { NavTab } from '../../types';
 
-export const MoreView: React.FC = () => {
+export interface MoreViewProps {
+  onNavigateTab?: (tab: NavTab) => void;
+}
+
+export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
   const { tasks, resetToDefaults, categories } = useTaskContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -89,7 +97,7 @@ export const MoreView: React.FC = () => {
       phase: 'FASE 4',
       title: 'Calendario Visual Unificado',
       status: 'completada',
-      badge: 'ACTUAL',
+      badge: 'VERIFICADO',
       items: [
         'Visualización unificada: tareas con fecha/hora, eventos y recordatorios locales',
         'Vistas: Mes (cuadrícula orgánica), Semana (columnas fluidas) y Agenda',
@@ -99,7 +107,19 @@ export const MoreView: React.FC = () => {
       ],
     },
     {
-      phase: 'FASE 5+',
+      phase: 'FASE 5',
+      title: 'Registros y Archivo',
+      status: 'completada',
+      badge: 'ACTUAL',
+      items: [
+        'Módulo Registros para notas personales con categorías, checklist interactivo, etiquetas y enlaces',
+        'Módulo Archivo con tarjetas visuales ricas para enlaces (imagen, título, dominio, descripción, etiquetas, abrir)',
+        'Búsqueda en tiempo real, filtros por categoría y favoritos en ambos módulos',
+        'Intercambiador directo Registros ↔ Archivo y acceso completo responsive',
+      ],
+    },
+    {
+      phase: 'FASE 6+',
       title: 'Sincronización en la Nube & Google Calendar',
       status: 'pendiente',
       badge: 'SIGUIENTES FASES',
@@ -113,6 +133,49 @@ export const MoreView: React.FC = () => {
 
   return (
     <div className="space-y-7 pb-12 max-w-5xl mx-auto select-none">
+      {/* 0. ACCESO RÁPIDO A MÓDULOS DE REGISTRO Y ARCHIVO */}
+      {onNavigateTab && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Card 
+            padding="lg" 
+            className="group cursor-pointer hover:shadow-[0_8px_24px_rgba(23,116,104,0.10)] transition-all bg-gradient-to-br from-white to-[#F9FAF8] border border-[#EBE8E1]"
+            onClick={() => onNavigateTab('registros')}
+          >
+            <div className="flex items-start justify-between">
+              <div className="w-11 h-11 rounded-2xl bg-[#E8F6F4] text-[#177468] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                <FileText className="w-5 h-5" />
+              </div>
+              <span className="text-xs font-bold text-[#177468] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                Explorar <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-[#24292F] mb-1">Registros</h3>
+            <p className="text-xs text-[#697282] leading-relaxed">
+              Bitácora y notas personales con checklist interactivo, etiquetas y categorías.
+            </p>
+          </Card>
+
+          <Card 
+            padding="lg" 
+            className="group cursor-pointer hover:shadow-[0_8px_24px_rgba(23,116,104,0.10)] transition-all bg-gradient-to-br from-white to-[#F9FAF8] border border-[#EBE8E1]"
+            onClick={() => onNavigateTab('archivo')}
+          >
+            <div className="flex items-start justify-between">
+              <div className="w-11 h-11 rounded-2xl bg-[#FEF6EC] text-[#D48B38] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+                <Bookmark className="w-5 h-5" />
+              </div>
+              <span className="text-xs font-bold text-[#D48B38] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                Explorar <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </div>
+            <h3 className="text-base font-bold text-[#24292F] mb-1">Archivo</h3>
+            <p className="text-xs text-[#697282] leading-relaxed">
+              Colección visual de enlaces guardados con miniaturas, dominio y filtros.
+            </p>
+          </Card>
+        </div>
+      )}
+
       {/* 1. CATEGORÍAS CONFIGURADAS */}
       <div>
         <div className="flex items-center gap-2 mb-3 px-1">

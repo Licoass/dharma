@@ -4,6 +4,8 @@ import {
   CheckSquare, 
   Plus, 
   Calendar, 
+  FileText,
+  Bookmark,
   MoreHorizontal
 } from 'lucide-react';
 import type { NavTab } from '../../types';
@@ -23,6 +25,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
     { id: 'inicio' as NavTab, label: 'Inicio', icon: Home, badge: null },
     { id: 'tareas' as NavTab, label: 'Tareas', icon: CheckSquare, badge: metrics.pending + metrics.inProgress },
     { id: 'calendario' as NavTab, label: 'Calendario', icon: Calendar, badge: null },
+    { id: 'registros' as NavTab, label: 'Registros', icon: FileText, badge: null },
+    { id: 'archivo' as NavTab, label: 'Archivo', icon: Bookmark, badge: null },
     { id: 'mas' as NavTab, label: 'Más', icon: MoreHorizontal, badge: null },
   ];
 

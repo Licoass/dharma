@@ -35,6 +35,14 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, onOpenQuickCapture }
       title: 'ESTACIÓN TEMPORAL',
       subtitle: 'Cronograma y planificación de ciclos',
     },
+    registros: {
+      title: 'REGISTROS',
+      subtitle: 'Bitácora y notas personales organizadas por categoría',
+    },
+    archivo: {
+      title: 'ARCHIVO DE RECURSOS',
+      subtitle: 'Marcadores, enlaces y referencias visuales guardadas',
+    },
     mas: {
       title: 'SISTEMAS Y AJUSTES',
       subtitle: 'Configuración de estaciones y hoja de ruta',
