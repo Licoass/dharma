@@ -1,12 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import type { Task, TaskFilters, TaskStatus, ViewMode, DharmaCoreMood, AgendaEvent } from '../types';
+import type { Task, TaskFilters, ViewMode, DharmaCoreMood, AgendaEvent, Category, TaskStatusItem } from '../types';
 import { INITIAL_TASKS } from '../data/initialTasks';
+import { INITIAL_CATEGORIES } from '../data/initialCategories';
+import { INITIAL_STATUSES } from '../data/initialStatuses';
 import { INITIAL_AGENDA_EVENTS } from '../data/agendaEvents';
 
 interface TaskContextType {
   tasks: Task[];
   filteredTasks: Task[];
+  categories: Category[];
+  statuses: TaskStatusItem[];
   agendaEvents: AgendaEvent[];
   filters: TaskFilters;
   viewMode: ViewMode;
@@ -16,12 +20,29 @@ interface TaskContextType {
   setViewMode: (mode: ViewMode) => void;
   setDharmaMood: (mood: DharmaCoreMood) => void;
   setIsQuickCaptureOpen: (open: boolean) => void;
+  
+  // Task operations
   addTask: (taskData: Omit<Task, 'id' | 'createdAt'>) => Task;
   updateTask: (id: string, updates: Partial<Task>) => void;
   deleteTask: (id: string) => void;
   toggleTaskComplete: (id: string) => void;
-  changeTaskStatus: (id: string, newStatus: TaskStatus) => void;
+  changeTaskStatus: (id: string, newStatusId: string) => void;
+  toggleSubtask: (taskId: string, subtaskId: string) => void;
+  
+  // Configurable Category operations
+  addCategory: (category: Omit<Category, 'id'>) => Category;
+  updateCategory: (id: string, updates: Partial<Category>) => void;
+  deleteCategory: (id: string) => void;
+  
+  // Configurable Status operations
+  addStatus: (status: Omit<TaskStatusItem, 'id'>) => TaskStatusItem;
+  updateStatus: (id: string, updates: Partial<TaskStatusItem>) => void;
+  deleteStatus: (id: string) => void;
+  
   resetToDefaults: () => void;
+  getCategoryById: (id: string) => Category | undefined;
+  getStatusById: (id: string) => TaskStatusItem | undefined;
+  
   metrics: {
     total: number;
     completed: number;
@@ -30,22 +51,46 @@ interface TaskContextType {
     waiting: number;
     vital: number;
     completionPercentage: number;
+    byStatus: Record<string, number>;
   };
 }
 
-const STORAGE_KEY = 'dharma_tasks_v1';
+const STORAGE_KEY_TASKS = 'dharma_tasks_v3';
+const STORAGE_KEY_CATEGORIES = 'dharma_categories_v3';
+const STORAGE_KEY_STATUSES = 'dharma_statuses_v3';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
 export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // 1. Configurable Categories
+  const [categories, setCategories] = useState<Category[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_CATEGORIES);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to load categories', e);
+    }
+    return INITIAL_CATEGORIES;
+  });
+
+  // 2. Configurable Statuses
+  const [statuses, setStatuses] = useState<TaskStatusItem[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_STATUSES);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to load statuses', e);
+    }
+    return INITIAL_STATUSES;
+  });
+
+  // 3. Tasks
   const [tasks, setTasks] = useState<Task[]>(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        return JSON.parse(saved);
-      }
+      const saved = localStorage.getItem(STORAGE_KEY_TASKS);
+      if (saved) return JSON.parse(saved);
     } catch (e) {
-      console.warn('Failed to load tasks from localStorage', e);
+      console.warn('Failed to load tasks', e);
     }
     return INITIAL_TASKS;
   });
@@ -54,8 +99,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [filters, setFilters] = useState<TaskFilters>({
     search: '',
-    stationId: 'todas',
-    status: 'todas',
+    categoryId: 'todas',
+    statusId: 'todas',
     priority: 'todas',
   });
 
@@ -66,22 +111,32 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Sync to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(tasks));
+      localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
+      localStorage.setItem(STORAGE_KEY_STATUSES, JSON.stringify(statuses));
     } catch (e) {
-      console.warn('Failed to save tasks to localStorage', e);
+      console.warn('Failed to save to localStorage', e);
     }
-  }, [tasks]);
+  }, [tasks, categories, statuses]);
 
   const fireCelebration = () => {
     confetti({
-      particleCount: 35,
-      spread: 60,
+      particleCount: 38,
+      spread: 65,
       origin: { y: 0.8 },
-      colors: ['#0D9488', '#5EEAD4', '#8B5CF6', '#FBBF24', '#38BDF8'],
+      colors: ['#0D9488', '#5EEAD4', '#8B5CF6', '#FBBF24', '#38BDF8', '#10B981'],
       ticks: 180,
       gravity: 1.1,
       scalar: 0.85,
     });
+  };
+
+  const getCategoryById = (id: string) => {
+    return categories.find((c) => c.id === id) || categories[0];
+  };
+
+  const getStatusById = (id: string) => {
+    return statuses.find((s) => s.id === id) || statuses[0];
   };
 
   const addTask = (taskData: Omit<Task, 'id' | 'createdAt'>): Task => {
@@ -90,6 +145,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       id: `dhr-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
       createdAt: new Date().toISOString(),
       protocolCode: taskData.protocolCode || `DHR-${Math.floor(10 + Math.random() * 90)}`,
+      origin: taskData.origin || 'Manual',
     };
 
     setTasks((prev) => [newTask, ...prev]);
@@ -113,7 +169,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTasks((prev) =>
       prev.map((t) => {
         if (t.id === id) {
-          const isNowCompleted = t.status !== 'completada';
+          const isNowCompleted = t.statusId !== 'completado';
           if (isNowCompleted) {
             fireCelebration();
             setDharmaMood('celebrate');
@@ -121,7 +177,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           return {
             ...t,
-            status: isNowCompleted ? 'completada' : 'pendiente',
+            statusId: isNowCompleted ? 'completado' : 'por_hacer',
             completedAt: isNowCompleted ? new Date().toISOString() : undefined,
           };
         }
@@ -130,19 +186,19 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
-  const changeTaskStatus = (id: string, newStatus: TaskStatus) => {
+  const changeTaskStatus = (id: string, newStatusId: string) => {
     setTasks((prev) =>
       prev.map((t) => {
         if (t.id === id) {
-          if (newStatus === 'completada' && t.status !== 'completada') {
+          if (newStatusId === 'completado' && t.statusId !== 'completado') {
             fireCelebration();
             setDharmaMood('celebrate');
             setTimeout(() => setDharmaMood('calm'), 3000);
           }
           return {
             ...t,
-            status: newStatus,
-            completedAt: newStatus === 'completada' ? new Date().toISOString() : undefined,
+            statusId: newStatusId,
+            completedAt: newStatusId === 'completado' ? new Date().toISOString() : undefined,
           };
         }
         return t;
@@ -150,18 +206,76 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  const toggleSubtask = (taskId: string, subtaskId: string) => {
+    setTasks((prev) =>
+      prev.map((t) => {
+        if (t.id === taskId && t.subtasks) {
+          const updatedSubtasks = t.subtasks.map((st) =>
+            st.id === subtaskId ? { ...st, completed: !st.completed } : st
+          );
+          return { ...t, subtasks: updatedSubtasks };
+        }
+        return t;
+      })
+    );
+  };
+
+  // Category operations
+  const addCategory = (categoryData: Omit<Category, 'id'>): Category => {
+    const newCategory: Category = {
+      ...categoryData,
+      id: `cat-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+    };
+    setCategories((prev) => [...prev, newCategory]);
+    return newCategory;
+  };
+
+  const updateCategory = (id: string, updates: Partial<Category>) => {
+    setCategories((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...updates } : c))
+    );
+  };
+
+  const deleteCategory = (id: string) => {
+    if (categories.length <= 1) return;
+    setCategories((prev) => prev.filter((c) => c.id !== id));
+  };
+
+  // Status operations
+  const addStatus = (statusData: Omit<TaskStatusItem, 'id'>): TaskStatusItem => {
+    const newStatus: TaskStatusItem = {
+      ...statusData,
+      id: `st-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`,
+    };
+    setStatuses((prev) => [...prev, newStatus]);
+    return newStatus;
+  };
+
+  const updateStatus = (id: string, updates: Partial<TaskStatusItem>) => {
+    setStatuses((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ...updates } : s))
+    );
+  };
+
+  const deleteStatus = (id: string) => {
+    if (statuses.length <= 1) return;
+    setStatuses((prev) => prev.filter((s) => s.id !== id));
+  };
+
   const resetToDefaults = () => {
     setTasks(INITIAL_TASKS);
+    setCategories(INITIAL_CATEGORIES);
+    setStatuses(INITIAL_STATUSES);
     setFilters({
       search: '',
-      stationId: 'todas',
-      status: 'todas',
+      categoryId: 'todas',
+      statusId: 'todas',
       priority: 'todas',
     });
     setDharmaMood('calm');
   };
 
-  // Filter tasks based on search, station, status, priority
+  // Filter tasks based on search, categoryId, statusId, priority
   const filteredTasks = tasks.filter((t) => {
     if (filters.search.trim()) {
       const q = filters.search.toLowerCase().trim();
@@ -169,18 +283,19 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const matchDesc = t.description?.toLowerCase().includes(q);
       const matchTag = t.tags?.some((tag) => tag.toLowerCase().includes(q));
       const matchProtocol = t.protocolCode?.toLowerCase().includes(q);
-      if (!matchTitle && !matchDesc && !matchTag && !matchProtocol) {
+      const matchNotes = t.notes?.toLowerCase().includes(q);
+      if (!matchTitle && !matchDesc && !matchTag && !matchProtocol && !matchNotes) {
         return false;
       }
     }
 
-    if (filters.stationId !== 'todas' && t.stationId !== filters.stationId) {
+    if (filters.categoryId !== 'todas' && t.categoryId !== filters.categoryId) {
       return false;
     }
 
-    if (filters.status === 'activas') {
-      if (t.status === 'completada' || t.status === 'archivada') return false;
-    } else if (filters.status !== 'todas' && t.status !== filters.status) {
+    if (filters.statusId === 'activas') {
+      if (t.statusId === 'completado') return false;
+    } else if (filters.statusId !== 'todas' && t.statusId !== filters.statusId) {
       return false;
     }
 
@@ -191,19 +306,27 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   });
 
+  // Calculate metrics
   const total = tasks.length;
-  const completed = tasks.filter((t) => t.status === 'completada').length;
-  const pending = tasks.filter((t) => t.status === 'pendiente').length;
-  const inProgress = tasks.filter((t) => t.status === 'en_curso').length;
-  const waiting = tasks.filter((t) => t.status === 'en_espera').length;
-  const vital = tasks.filter((t) => t.priority === 'vital' && t.status !== 'completada').length;
+  const completed = tasks.filter((t) => t.statusId === 'completado').length;
+  const pending = tasks.filter((t) => t.statusId === 'por_hacer').length;
+  const inProgress = tasks.filter((t) => t.statusId === 'en_proceso').length;
+  const waiting = tasks.filter((t) => t.statusId === 'en_espera').length;
+  const vital = tasks.filter((t) => t.priority === 'vital' && t.statusId !== 'completado').length;
   const completionPercentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  const byStatus: Record<string, number> = {};
+  statuses.forEach((s) => {
+    byStatus[s.id] = tasks.filter((t) => t.statusId === s.id).length;
+  });
 
   return (
     <TaskContext.Provider
       value={{
         tasks,
         filteredTasks,
+        categories,
+        statuses,
         agendaEvents,
         filters,
         viewMode,
@@ -218,7 +341,16 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteTask,
         toggleTaskComplete,
         changeTaskStatus,
+        toggleSubtask,
+        addCategory,
+        updateCategory,
+        deleteCategory,
+        addStatus,
+        updateStatus,
+        deleteStatus,
         resetToDefaults,
+        getCategoryById,
+        getStatusById,
         metrics: {
           total,
           completed,
@@ -227,6 +359,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
           waiting,
           vital,
           completionPercentage,
+          byStatus,
         },
       }}
     >

@@ -2,16 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Input, Textarea } from '../ui/Input';
-import type { Task, StationId, TaskPriority, TaskStatus } from '../../types';
-import { STATIONS_LIST } from '../../data/stations';
-import { Calendar, Clock, Tag, Flag } from 'lucide-react';
+import type { Task, TaskPriority, Subtask } from '../../types';
+import { useTaskContext } from '../../context/TaskContext';
+import { Calendar, Clock, Tag, Flag, CheckSquare, Plus, Trash2, FileText, Compass } from 'lucide-react';
 
 export interface TaskFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (taskData: Omit<Task, 'id' | 'createdAt'>) => void;
   initialTask?: Task | null;
-  defaultStatus?: TaskStatus;
+  defaultStatusId?: string;
 }
 
 export const TaskFormModal: React.FC<TaskFormModalProps> = ({
@@ -19,41 +19,76 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
   onClose,
   onSubmit,
   initialTask = null,
-  defaultStatus = 'pendiente',
+  defaultStatusId,
 }) => {
+  const { categories, statuses } = useTaskContext();
+
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [stationId, setStationId] = useState<StationId>('trabajo');
+  const [categoryId, setCategoryId] = useState('');
+  const [statusId, setStatusId] = useState('');
   const [priority, setPriority] = useState<TaskPriority>('media');
-  const [status, setStatus] = useState<TaskStatus>(defaultStatus);
   const [dueDate, setDueDate] = useState('');
-  const [estimatedMinutes, setEstimatedMinutes] = useState<number | undefined>(undefined);
+  const [dueTime, setDueTime] = useState('');
   const [tagsInput, setTagsInput] = useState('');
-  const [protocolCode, setProtocolCode] = useState('');
+  const [notes, setNotes] = useState('');
+  const [origin, setOrigin] = useState('Manual');
+  const [subtasks, setSubtasks] = useState<Subtask[]>([]);
+  const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
 
   useEffect(() => {
     if (initialTask) {
       setTitle(initialTask.title);
       setDescription(initialTask.description || '');
-      setStationId(initialTask.stationId);
+      setCategoryId(initialTask.categoryId);
+      setStatusId(initialTask.statusId);
       setPriority(initialTask.priority);
-      setStatus(initialTask.status);
       setDueDate(initialTask.dueDate || '');
-      setEstimatedMinutes(initialTask.estimatedMinutes);
+      setDueTime(initialTask.dueTime || '');
       setTagsInput(initialTask.tags ? initialTask.tags.join(', ') : '');
-      setProtocolCode(initialTask.protocolCode || '');
+      setNotes(initialTask.notes || '');
+      setOrigin(initialTask.origin || 'Manual');
+      setSubtasks(initialTask.subtasks || []);
     } else {
       setTitle('');
       setDescription('');
-      setStationId('trabajo');
+      setCategoryId(categories[0]?.id || '');
+      setStatusId(defaultStatusId || statuses[0]?.id || 'por_hacer');
       setPriority('media');
-      setStatus(defaultStatus);
-      setDueDate('');
-      setEstimatedMinutes(undefined);
+      setDueDate('Hoy');
+      setDueTime('18:00');
       setTagsInput('');
-      setProtocolCode('');
+      setNotes('');
+      setOrigin('Manual');
+      setSubtasks([]);
     }
-  }, [initialTask, defaultStatus, isOpen]);
+    setNewSubtaskTitle('');
+  }, [initialTask, defaultStatusId, isOpen, categories, statuses]);
+
+  const handleAddSubtask = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!newSubtaskTitle.trim()) return;
+
+    setSubtasks((prev) => [
+      ...prev,
+      {
+        id: `sub-${Date.now()}-${Math.random().toString(36).substr(2, 3)}`,
+        title: newSubtaskTitle.trim(),
+        completed: false,
+      },
+    ]);
+    setNewSubtaskTitle('');
+  };
+
+  const handleRemoveSubtask = (id: string) => {
+    setSubtasks((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  const handleToggleSubtask = (id: string) => {
+    setSubtasks((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, completed: !s.completed } : s))
+    );
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,13 +102,15 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
     onSubmit({
       title: title.trim(),
       description: description.trim() || undefined,
-      stationId,
+      categoryId: categoryId || categories[0]?.id || 'cat-eco',
+      statusId: statusId || statuses[0]?.id || 'por_hacer',
       priority,
-      status,
       dueDate: dueDate.trim() || undefined,
-      estimatedMinutes: estimatedMinutes ? Number(estimatedMinutes) : undefined,
+      dueTime: dueTime.trim() || undefined,
       tags: tags.length > 0 ? tags : undefined,
-      protocolCode: protocolCode.trim() || undefined,
+      subtasks: subtasks.length > 0 ? subtasks : undefined,
+      notes: notes.trim() || undefined,
+      origin: origin.trim() || 'Manual',
     });
 
     onClose();
@@ -83,68 +120,90 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={initialTask ? 'Editar Protocolo' : 'Nuevo Protocolo'}
-      subtitle={initialTask ? 'Modifica los parámetros de la tarea' : 'Asigna la tarea a su estación correspondiente'}
+      title={initialTask ? 'Editar Tarea' : 'Nueva Tarea'}
+      subtitle={initialTask ? 'Actualiza los parámetros y subtareas' : 'Completa los detalles de la tarea'}
       maxWidth="lg"
     >
-      <form onSubmit={handleSubmit} className="space-y-5 select-none">
-        {/* Título */}
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 select-none">
+        {/* 1. Título */}
         <Input
           label="Título de la tarea"
           required
           autoFocus
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Ej. Revisar objetivos del ciclo"
+          placeholder="Ej. Revisar informe de emisiones"
         />
 
-        {/* Descripción */}
+        {/* 2. Descripción */}
         <Textarea
-          label="Notas y detalles"
+          label="Descripción"
           rows={2}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Contexto adicional, enlaces o pasos necesarios..."
+          placeholder="Resumen o pasos clave de la tarea..."
         />
 
-        {/* Estación */}
+        {/* 3. Categoría (Configurable) */}
         <div>
           <label className="block text-xs font-semibold text-[#697282] uppercase tracking-[0.04em] mb-2 px-1">
-            Estación
+            Categoría
           </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {STATIONS_LIST.map((st) => {
-              const isSelected = stationId === st.id;
+          <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1">
+            {categories.map((cat) => {
+              const isSelected = categoryId === cat.id;
               return (
                 <button
                   type="button"
-                  key={st.id}
-                  onClick={() => setStationId(st.id as StationId)}
+                  key={cat.id}
+                  onClick={() => setCategoryId(cat.id)}
                   className={`
-                    flex items-center gap-2.5 px-3.5 py-2.5 rounded-[16px] text-xs font-semibold text-left transition-all cursor-pointer
+                    px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer
                     ${
                       isSelected
-                        ? 'bg-white shadow-xs text-[#24292F] ring-2 ring-[#177468]/30 font-bold'
-                        : 'bg-[#FAF8F5] text-[#697282] hover:bg-[#F5F2EB]'
+                        ? 'shadow-xs text-[#24292F] ring-2 ring-[#177468]/30 font-bold'
+                        : 'text-[#697282] hover:bg-[#F5F2EB]'
                     }
                   `}
+                  style={{
+                    backgroundColor: isSelected ? cat.bgSoft : '#FAF8F5',
+                  }}
                 >
                   <span
-                    className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: st.color }}
+                    className="w-2 h-2 rounded-full"
+                    style={{ backgroundColor: cat.color }}
                   />
-                  <div className="truncate">
-                    <p className="truncate">{st.name}</p>
-                    <p className="text-[10px] text-[#9DA6B5] font-mono">{st.code}</p>
-                  </div>
+                  <span>{cat.name}</span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Prioridad y Estado */}
+        {/* 4. Estado y Prioridad */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-[#697282] uppercase tracking-[0.04em] mb-2 px-1">
+              Estado
+            </label>
+            <div className="flex flex-wrap gap-1.5">
+              {statuses.map((st) => (
+                <button
+                  type="button"
+                  key={st.id}
+                  onClick={() => setStatusId(st.id)}
+                  className={`px-3 py-1.5 text-xs font-bold rounded-full transition-all cursor-pointer ${
+                    statusId === st.id
+                      ? 'bg-[#177468] text-white shadow-xs'
+                      : 'bg-[#FAF8F5] text-[#697282] hover:bg-[#F5F2EB]'
+                  }`}
+                >
+                  {st.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div>
             <label className="block text-xs font-semibold text-[#697282] uppercase tracking-[0.04em] mb-2 px-1 flex items-center gap-1.5">
               <Flag className="w-3.5 h-3.5 text-[#9DA6B5]" />
@@ -156,7 +215,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                   type="button"
                   key={p}
                   onClick={() => setPriority(p)}
-                  className={`py-2 text-xs font-bold rounded-[14px] capitalize transition-all cursor-pointer ${
+                  className={`py-1.5 text-xs font-bold rounded-[14px] capitalize transition-all cursor-pointer ${
                     priority === p
                       ? 'bg-[#24292F] text-white shadow-xs'
                       : 'bg-[#FAF8F5] text-[#697282] hover:bg-[#F5F2EB]'
@@ -167,38 +226,12 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
               ))}
             </div>
           </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-[#697282] uppercase tracking-[0.04em] mb-2 px-1">
-              Estado
-            </label>
-            <div className="grid grid-cols-3 gap-1.5">
-              {[
-                { id: 'pendiente', label: 'Pendiente' },
-                { id: 'en_curso', label: 'En curso' },
-                { id: 'completada', label: 'Completada' },
-              ].map((st) => (
-                <button
-                  type="button"
-                  key={st.id}
-                  onClick={() => setStatus(st.id as TaskStatus)}
-                  className={`py-2 text-xs font-bold rounded-[14px] transition-all cursor-pointer ${
-                    status === st.id
-                      ? 'bg-[#177468] text-white shadow-xs'
-                      : 'bg-[#FAF8F5] text-[#697282] hover:bg-[#F5F2EB]'
-                  }`}
-                >
-                  {st.label}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
-        {/* Fecha y Tiempo Estimado */}
+        {/* 5. Fecha y Hora */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
-            label="Fecha / Momento"
+            label="Fecha"
             icon={<Calendar className="w-4 h-4" />}
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
@@ -206,25 +239,115 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
           />
 
           <Input
-            label="Tiempo estimado (minutos)"
+            label="Hora"
             icon={<Clock className="w-4 h-4" />}
-            type="number"
-            min="1"
-            max="480"
-            value={estimatedMinutes || ''}
-            onChange={(e) => setEstimatedMinutes(e.target.value ? parseInt(e.target.value) : undefined)}
-            placeholder="Ej. 25"
+            value={dueTime}
+            onChange={(e) => setDueTime(e.target.value)}
+            placeholder="Ej. 18:00, 14:30..."
           />
         </div>
 
-        {/* Etiquetas */}
-        <Input
-          label="Etiquetas (separadas por comas)"
-          icon={<Tag className="w-4 h-4" />}
-          value={tagsInput}
-          onChange={(e) => setTagsInput(e.target.value)}
-          placeholder="DeepWork, Personal, Hogar, Finanzas"
-        />
+        {/* 6. Subtareas dinámicas */}
+        <div>
+          <label className="block text-xs font-semibold text-[#697282] uppercase tracking-[0.04em] mb-2 px-1 flex items-center gap-1.5">
+            <CheckSquare className="w-3.5 h-3.5 text-[#177468]" />
+            Subtareas
+          </label>
+
+          <div className="space-y-1.5 mb-2">
+            {subtasks.map((st) => (
+              <div
+                key={st.id}
+                className="flex items-center justify-between p-2 rounded-[14px] bg-[#FAF8F5] text-xs gap-2"
+              >
+                <div
+                  onClick={() => handleToggleSubtask(st.id)}
+                  className="flex items-center gap-2 cursor-pointer flex-1 min-w-0"
+                >
+                  <span
+                    className={`w-4 h-4 rounded-[5px] border flex items-center justify-center shrink-0 ${
+                      st.completed
+                        ? 'bg-[#177468] border-[#177468] text-white'
+                        : 'border-[#CBD5E1] bg-white'
+                    }`}
+                  >
+                    {st.completed && '✓'}
+                  </span>
+                  <span className={`truncate ${st.completed ? 'line-through text-[#9DA6B5]' : 'text-[#24292F]'}`}>
+                    {st.title}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleRemoveSubtask(st.id)}
+                  className="text-[#9DA6B5] hover:text-[#EB6B6B] p-1"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Input para agregar nueva subtarea */}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={newSubtaskTitle}
+              onChange={(e) => setNewSubtaskTitle(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  handleAddSubtask();
+                }
+              }}
+              placeholder="Nueva subtarea... (Enter para agregar)"
+              className="flex-1 px-3.5 py-2 rounded-[14px] bg-[#FAF8F5] text-xs text-[#24292F] outline-none focus:ring-1 focus:ring-[#177468]/30"
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => handleAddSubtask()}
+              icon={<Plus className="w-3.5 h-3.5" />}
+            >
+              Añadir
+            </Button>
+          </div>
+        </div>
+
+        {/* 7. Etiquetas y Origen */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="Etiquetas (separadas por comas)"
+            icon={<Tag className="w-4 h-4" />}
+            value={tagsInput}
+            onChange={(e) => setTagsInput(e.target.value)}
+            placeholder="Sostenibilidad, Q3, Finanzas..."
+          />
+
+          <Input
+            label="Origen"
+            icon={<Compass className="w-4 h-4" />}
+            value={origin}
+            onChange={(e) => setOrigin(e.target.value)}
+            placeholder="Manual, Captura Rápida, etc."
+          />
+        </div>
+
+        {/* 8. Notas */}
+        <div>
+          <label className="block text-xs font-semibold text-[#697282] uppercase tracking-[0.04em] mb-1.5 px-1 flex items-center gap-1.5">
+            <FileText className="w-3.5 h-3.5 text-[#9DA6B5]" />
+            Notas adicionales
+          </label>
+          <Textarea
+            rows={2}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Información adicional, enlaces o contexto relevante..."
+          />
+        </div>
 
         {/* Botones de acción */}
         <div className="flex items-center justify-end gap-3 pt-3">
@@ -232,7 +355,7 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
             Cancelar
           </Button>
           <Button type="submit" variant="primary">
-            {initialTask ? 'Guardar Cambios' : 'Registrar Protocolo'}
+            {initialTask ? 'Guardar Cambios' : 'Crear Tarea'}
           </Button>
         </div>
       </form>

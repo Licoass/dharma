@@ -9,11 +9,10 @@ import {
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { useTaskContext } from '../../context/TaskContext';
-import { STATIONS_LIST } from '../../data/stations';
 import { DharmaCore } from '../common/DharmaCore';
 
 export const MoreView: React.FC = () => {
-  const { tasks, resetToDefaults } = useTaskContext();
+  const { tasks, resetToDefaults, categories } = useTaskContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExportJSON = () => {
@@ -35,7 +34,7 @@ export const MoreView: React.FC = () => {
       try {
         const imported = JSON.parse(event.target?.result as string);
         if (Array.isArray(imported)) {
-          localStorage.setItem('dharma_tasks_v1', JSON.stringify(imported));
+          localStorage.setItem('dharma_tasks_v3', JSON.stringify(imported));
           window.location.reload();
         } else {
           alert('El archivo no contiene un formato de tareas válido para DHARMA.');
@@ -50,80 +49,80 @@ export const MoreView: React.FC = () => {
   const roadmap = [
     {
       phase: 'FASE 1',
-      title: 'Sistema Visual & Núcleo de Tareas',
+      title: 'Sistema Visual Dharma',
       status: 'completada',
-      badge: 'ACTIVA Y OPERATIVA',
+      badge: 'VERIFICADO',
       items: [
-        'Arquitectura React + TypeScript + Vite + Tailwind',
-        'Sistema de diseño orgánico y componentes centralizados',
-        'Mascota y asistente visual: Dharma Core',
-        'Navegación adaptativa (Móvil, Tablet, Desktop)',
-        'Gestión de tareas, estaciones, prioridades y estados',
-        'Vistas duales: Lista secuencial y Tablero Kanban',
-        'Captura rápida (botón central móvil y atajos)',
+        'App Shell, Sidebar, Bottom Navigation, Header, Dashboard',
+        'Sistema de tokens centralizado (colores suaves, sombras, tipografía)',
+        'Componentes reutilizables: Card, Button, Badge, Modal, Input',
+        'Diseño pastel, orgánico, espacioso y sin recargo visual',
       ],
     },
     {
       phase: 'FASE 2',
-      title: 'Backend & Sincronización en la Nube',
-      status: 'pendiente',
-      badge: 'SIGUIENTE FASE',
+      title: 'Dashboard Dharma',
+      status: 'completada',
+      badge: 'VERIFICADO',
       items: [
-        'Integración de Supabase (PostgreSQL + Auth)',
-        'Sincronización en tiempo real multidispositivo',
-        'Políticas de seguridad RLS',
+        'Saludo contextual y frase "¿Qué necesitas resolver hoy?"',
+        'Botón principal CAPTURAR con accesibilidad mobile-first',
+        'Estado del sistema con métricas reactivas por estado',
+        'Tarea prioritaria con selector inteligente de foco',
+        'Ilustración discreta de Dharma Core integrada armónicamente',
       ],
     },
     {
       phase: 'FASE 3',
-      title: 'Integraciones Externas (Google Calendar)',
-      status: 'pendiente',
-      badge: 'PLANIFICADO',
+      title: 'Sistema de Tareas Completo',
+      status: 'completada',
+      badge: 'ACTUAL',
       items: [
-        'Sincronización con Google Calendar y eventos',
-        'Time-blocking y agenda unificada',
+        'Modelo completo: título, descripción, categoría, estado, prioridad, fecha, hora, etiquetas, subtareas, notas, origen',
+        'Categorías y Estados como entidades 100% configurables',
+        'Vista LISTA limpia y compacta con progreso de subtareas',
+        'Vista KANBAN con drag-and-drop interactivo',
+        'Desplazamiento horizontal fluido en móviles sin comprimir tarjetas',
       ],
     },
     {
-      phase: 'FASE 4',
-      title: 'Dharma Core Inteligente (IA Gemini)',
+      phase: 'FASE 4+',
+      title: 'Persistencia & Integraciones Avanzadas',
       status: 'pendiente',
-      badge: 'PLANIFICADO',
+      badge: 'SIGUIENTES FASES',
       items: [
-        'Procesamiento en lenguaje natural mediante Gemini',
-        'Categorización autónoma y resúmenes de protocolo',
+        'Sincronización de base de datos en nube',
+        'Integración con Google Calendar bidireccional',
+        'Automatizaciones y resúmenes inteligentes',
       ],
     },
   ];
 
   return (
     <div className="space-y-7 pb-12 max-w-5xl mx-auto select-none">
-      {/* 1. ESTACIONES CONFIGURADAS */}
+      {/* 1. CATEGORÍAS CONFIGURADAS */}
       <div>
         <div className="flex items-center gap-2 mb-3 px-1">
           <Layers className="w-4 h-4 text-[#177468]" />
           <h3 className="text-sm font-bold uppercase tracking-[0.05em] text-[#697282]">
-            Estaciones del Sistema
+            Categorías del Sistema ({categories.length})
           </h3>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-          {STATIONS_LIST.map((st) => (
-            <Card key={st.id} padding="md" className="space-y-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          {categories.map((cat) => (
+            <Card key={cat.id} padding="md" className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: st.color }}
+                    className="w-3 h-3 rounded-full shrink-0"
+                    style={{ backgroundColor: cat.color }}
                   />
-                  <span className="font-bold text-sm text-[#24292F]">{st.name}</span>
+                  <span className="font-bold text-sm text-[#24292F] truncate">{cat.name}</span>
                 </div>
-                <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-[#F5F2EB] text-[#697282]">
-                  {st.code}
-                </span>
               </div>
-              <p className="text-xs text-[#697282] leading-relaxed">
-                {st.description}
+              <p className="text-xs text-[#697282] leading-relaxed line-clamp-2">
+                {cat.description || 'Categoría activa en Dharma'}
               </p>
             </Card>
           ))}

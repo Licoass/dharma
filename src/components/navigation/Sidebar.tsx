@@ -6,8 +6,7 @@ import {
   Calendar, 
   MoreHorizontal
 } from 'lucide-react';
-import type { NavTab, StationId } from '../../types';
-import { STATIONS_LIST } from '../../data/stations';
+import type { NavTab } from '../../types';
 import { DharmaCore } from '../common/DharmaCore';
 import { Avatar } from '../ui/Avatar';
 import { useTaskContext } from '../../context/TaskContext';
@@ -18,7 +17,7 @@ export interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => {
-  const { metrics, setIsQuickCaptureOpen, dharmaMood, filters, setFilters } = useTaskContext();
+  const { metrics, setIsQuickCaptureOpen, dharmaMood, filters, setFilters, categories } = useTaskContext();
 
   const navItems = [
     { id: 'inicio' as NavTab, label: 'Inicio', icon: Home, badge: null },
@@ -91,35 +90,35 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
           );
         })}
 
-        {/* Estaciones de Vida */}
+        {/* Categorías Dinámicas */}
         <div className="hidden lg:block pt-6 pb-2">
           <p className="px-4 mb-2.5 text-[11px] font-bold text-[#9DA6B5] uppercase tracking-[0.06em]">
-            Estaciones
+            Categorías
           </p>
 
-          <div className="space-y-1">
+          <div className="space-y-1 max-h-56 overflow-y-auto pr-1">
             <button
               onClick={() => {
-                setFilters((prev) => ({ ...prev, stationId: 'todas' }));
+                setFilters((prev) => ({ ...prev, categoryId: 'todas' }));
                 if (currentTab !== 'tareas') onTabChange('tareas');
               }}
               className={`w-full flex items-center gap-2.5 px-4 py-2 text-xs rounded-[14px] transition-colors cursor-pointer ${
-                filters.stationId === 'todas'
+                filters.categoryId === 'todas'
                   ? 'bg-white text-[#24292F] font-bold shadow-[0_2px_8px_rgba(0,0,0,0.02)]'
                   : 'text-[#697282] hover:bg-[#F5F2EB]/60'
               }`}
             >
               <span className="w-2 h-2 rounded-full bg-[#9DA6B5] shrink-0" />
-              <span>Todas las estaciones</span>
+              <span>Todas las categorías</span>
             </button>
 
-            {STATIONS_LIST.map((station) => {
-              const isSelected = filters.stationId === station.id;
+            {categories.map((category) => {
+              const isSelected = filters.categoryId === category.id;
               return (
                 <button
-                  key={station.id}
+                  key={category.id}
                   onClick={() => {
-                    setFilters((prev) => ({ ...prev, stationId: station.id as StationId }));
+                    setFilters((prev) => ({ ...prev, categoryId: category.id }));
                     if (currentTab !== 'tareas') onTabChange('tareas');
                   }}
                   className={`w-full flex items-center justify-between px-4 py-2 text-xs rounded-[14px] transition-colors cursor-pointer ${
@@ -131,9 +130,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
                   <div className="flex items-center gap-2.5 truncate">
                     <span
                       className="w-2 h-2 rounded-full shrink-0"
-                      style={{ backgroundColor: station.color }}
+                      style={{ backgroundColor: category.color }}
                     />
-                    <span className="truncate">{station.name}</span>
+                    <span className="truncate">{category.name}</span>
                   </div>
                 </button>
               );
@@ -147,7 +146,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
         <Avatar name="Dharma User" variant="teal" statusDot="online" size="sm" />
         <div className="hidden lg:block text-left truncate">
           <p className="text-xs font-bold text-[#24292F] truncate">Centro Activo</p>
-          <p className="text-[11px] text-[#9DA6B5] truncate">Fase 1 · Modo Local</p>
+          <p className="text-[11px] text-[#9DA6B5] truncate">Fase 3 · Sistema de Tareas</p>
         </div>
       </div>
     </aside>

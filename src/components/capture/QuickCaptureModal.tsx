@@ -2,15 +2,14 @@ import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { useTaskContext } from '../../context/TaskContext';
-import type { StationId, TaskPriority } from '../../types';
-import { STATIONS_LIST } from '../../data/stations';
+import type { TaskPriority } from '../../types';
 import { DharmaCore } from '../common/DharmaCore';
 import { ArrowRight, CornerDownLeft } from 'lucide-react';
 
 export const QuickCaptureModal: React.FC = () => {
-  const { isQuickCaptureOpen, setIsQuickCaptureOpen, addTask } = useTaskContext();
+  const { isQuickCaptureOpen, setIsQuickCaptureOpen, addTask, categories, statuses } = useTaskContext();
   const [title, setTitle] = useState('');
-  const [stationId, setStationId] = useState<StationId>('trabajo');
+  const [categoryId, setCategoryId] = useState(categories[0]?.id || 'cat-eco');
   const [priority, setPriority] = useState<TaskPriority>('media');
   const [dueDate] = useState('Hoy');
 
@@ -20,10 +19,11 @@ export const QuickCaptureModal: React.FC = () => {
 
     addTask({
       title: title.trim(),
-      stationId,
+      categoryId: categoryId || categories[0]?.id || 'cat-eco',
+      statusId: statuses[0]?.id || 'por_hacer',
       priority,
-      status: 'pendiente',
       dueDate: dueDate || undefined,
+      origin: 'Captura Rápida',
     });
 
     setTitle('');
@@ -35,7 +35,7 @@ export const QuickCaptureModal: React.FC = () => {
       isOpen={isQuickCaptureOpen}
       onClose={() => setIsQuickCaptureOpen(false)}
       title="Captura Rápida"
-      subtitle="Ingresa una idea o protocolo a tu centro de mando"
+      subtitle="Ingresa una tarea o idea instantáneamente"
       maxWidth="md"
     >
       <form onSubmit={handleSubmit} className="space-y-4 select-none">
@@ -43,7 +43,7 @@ export const QuickCaptureModal: React.FC = () => {
         <div className="flex items-center gap-3 p-3.5 rounded-[20px] bg-[#E8F6F4]/70 text-[#177468] text-xs">
           <DharmaCore mood="focus" size="sm" />
           <p className="leading-snug">
-            Escribe con naturalidad. El <span className="font-bold">Dharma Core</span> organizará la tarea en tu estación local.
+            Captura ágilmente. El <span className="font-bold">Dharma Core</span> clasificará la tarea en tu categoría seleccionada.
           </p>
         </div>
 
@@ -55,48 +55,48 @@ export const QuickCaptureModal: React.FC = () => {
             autoFocus
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="¿Qué deseas procesar hoy? (ej. Calibrar plan semanal)"
+            placeholder="¿Qué deseas resolver? (ej. Verificar auditoría Eco)"
             className="w-full px-4 py-3.5 rounded-[20px] bg-[#FAF8F5] text-sm sm:text-base font-semibold text-[#24292F] placeholder:text-[#9DA6B5] focus:ring-2 focus:ring-[#177468]/15 outline-none transition-all shadow-xs"
           />
         </div>
 
-        {/* Station select */}
+        {/* Categorías dinámicas */}
         <div>
           <span className="block text-[11px] font-bold text-[#697282] uppercase tracking-[0.05em] mb-2">
-            Estación
+            Categoría
           </span>
-          <div className="flex flex-wrap gap-1.5">
-            {STATIONS_LIST.map((st) => {
-              const isSelected = stationId === st.id;
+          <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto pr-1">
+            {categories.map((cat) => {
+              const isSelected = categoryId === cat.id;
               return (
                 <button
                   type="button"
-                  key={st.id}
-                  onClick={() => setStationId(st.id as StationId)}
+                  key={cat.id}
+                  onClick={() => setCategoryId(cat.id)}
                   className={`
                     px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer
                     ${
                       isSelected
-                        ? 'shadow-xs text-[#24292F] font-bold'
+                        ? 'shadow-xs text-[#24292F] ring-2 ring-[#177468]/30 font-bold'
                         : 'text-[#697282] hover:bg-[#F5F2EB]'
                     }
                   `}
                   style={{
-                    backgroundColor: isSelected ? st.bgSoft : 'transparent',
+                    backgroundColor: isSelected ? cat.bgSoft : '#FAF8F5',
                   }}
                 >
                   <span
                     className="w-2 h-2 rounded-full"
-                    style={{ backgroundColor: st.color }}
+                    style={{ backgroundColor: cat.color }}
                   />
-                  <span>{st.name}</span>
+                  <span>{cat.name}</span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Priority */}
+        {/* Prioridad */}
         <div className="flex items-center justify-between gap-3 pt-1">
           <div className="flex items-center gap-1.5">
             <span className="text-[11px] font-bold text-[#697282] uppercase tracking-[0.05em] mr-1">
@@ -134,7 +134,7 @@ export const QuickCaptureModal: React.FC = () => {
             Cancelar
           </Button>
           <Button type="submit" variant="primary">
-            <span>Procesar Entrada</span>
+            <span>Guardar Tarea</span>
             <ArrowRight className="w-4 h-4" />
           </Button>
         </div>

@@ -8,7 +8,7 @@ import { EmptyState } from '../ui/EmptyState';
 export const CalendarPlaceholderView: React.FC = () => {
   const { tasks } = useTaskContext();
 
-  const tasksWithDate = tasks.filter((t) => t.dueDate && t.status !== 'completada');
+  const tasksWithDate = tasks.filter((t) => t.dueDate && t.statusId !== 'completado');
 
   return (
     <div className="space-y-6 pb-12 max-w-4xl mx-auto select-none">
@@ -65,7 +65,7 @@ export const CalendarPlaceholderView: React.FC = () => {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <CategoryBadge stationId={task.stationId} size="sm" />
+                    <CategoryBadge categoryId={task.categoryId} size="sm" />
                     {task.protocolCode && (
                       <span className="text-[10px] font-mono text-[#9DA6B5]">
                         {task.protocolCode}

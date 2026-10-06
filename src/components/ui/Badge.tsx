@@ -1,6 +1,6 @@
 import React from 'react';
-import type { StationId, TaskStatus, TaskPriority } from '../../types';
-import { STATIONS } from '../../data/stations';
+import type { TaskPriority } from '../../types';
+import { useTaskContext } from '../../context/TaskContext';
 
 export interface BadgeProps {
   variant?: 'teal' | 'lavender' | 'sage' | 'honey' | 'coral' | 'sky' | 'neutral';
@@ -8,6 +8,7 @@ export interface BadgeProps {
   children: React.ReactNode;
   icon?: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export const Badge: React.FC<BadgeProps> = ({
@@ -16,6 +17,7 @@ export const Badge: React.FC<BadgeProps> = ({
   children,
   icon,
   className = '',
+  style,
 }) => {
   const sizeClasses = {
     sm: 'px-2.5 py-0.5 text-[11px]',
@@ -34,7 +36,8 @@ export const Badge: React.FC<BadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 font-medium rounded-full select-none ${sizeClasses} ${variantClasses} ${className}`}
+      style={style}
+      className={`inline-flex items-center gap-1.5 font-semibold rounded-full select-none ${sizeClasses} ${variantClasses} ${className}`}
     >
       {icon && <span className="shrink-0">{icon}</span>}
       <span>{children}</span>
@@ -43,60 +46,63 @@ export const Badge: React.FC<BadgeProps> = ({
 };
 
 export const CategoryBadge: React.FC<{
-  stationId: StationId;
+  categoryId?: string;
   size?: 'sm' | 'md';
   showDot?: boolean;
-}> = ({ stationId, size = 'md', showDot = true }) => {
-  const station = STATIONS[stationId] || STATIONS.personal;
+}> = ({ categoryId = '', size = 'md', showDot = true }) => {
+  const { getCategoryById } = useTaskContext();
+  const category = getCategoryById(categoryId);
 
-  const colorVariants: Record<StationId, 'teal' | 'lavender' | 'honey' | 'sage' | 'sky'> = {
-    trabajo: 'teal',
-    personal: 'lavender',
-    enfoque: 'honey',
-    bienestar: 'sage',
-    protocolos: 'sky',
-  };
+  if (!category) return null;
 
   return (
-    <Badge variant={colorVariants[stationId] || 'teal'} size={size}>
+    <span
+      className={`inline-flex items-center gap-1.5 font-semibold rounded-full select-none transition-colors ${
+        size === 'sm' ? 'px-2.5 py-0.5 text-[11px]' : 'px-3 py-1 text-xs'
+      }`}
+      style={{
+        backgroundColor: category.bgSoft,
+        color: category.textColor,
+      }}
+    >
       {showDot && (
         <span
           className="w-1.5 h-1.5 rounded-full shrink-0"
-          style={{ backgroundColor: station.color }}
+          style={{ backgroundColor: category.color }}
         />
       )}
-      <span>{station.name}</span>
-    </Badge>
+      <span className="truncate">{category.name}</span>
+    </span>
   );
 };
 
 export const StatusBadge: React.FC<{
-  status: TaskStatus;
+  statusId?: string;
   size?: 'sm' | 'md';
-}> = ({ status, size = 'md' }) => {
-  const config = {
-    pendiente: { label: 'Pendiente', variant: 'neutral' as const },
-    en_curso: { label: 'En proceso', variant: 'teal' as const },
-    en_espera: { label: 'En espera', variant: 'honey' as const },
-    completada: { label: 'Completada', variant: 'sage' as const },
-    archivada: { label: 'Archivada', variant: 'neutral' as const },
-  }[status];
+}> = ({ statusId = '', size = 'md' }) => {
+  const { getStatusById } = useTaskContext();
+  const status = getStatusById(statusId);
+
+  if (!status) return null;
+
+  const isProgress = status.id === 'en_proceso';
 
   return (
-    <Badge variant={config.variant} size={size}>
+    <span
+      className={`inline-flex items-center gap-1.5 font-semibold rounded-full select-none transition-colors ${
+        size === 'sm' ? 'px-2.5 py-0.5 text-[11px]' : 'px-3 py-1 text-xs'
+      }`}
+      style={{
+        backgroundColor: status.bgSoft,
+        color: status.textColor,
+      }}
+    >
       <span
-        className={`w-1.5 h-1.5 rounded-full ${
-          status === 'en_curso'
-            ? 'animate-pulse bg-[#177468]'
-            : status === 'en_espera'
-            ? 'bg-[#E8A743]'
-            : status === 'completada'
-            ? 'bg-[#5CA16B]'
-            : 'bg-[#9DA6B5]'
-        }`}
+        className={`w-1.5 h-1.5 rounded-full shrink-0 ${isProgress ? 'animate-pulse' : ''}`}
+        style={{ backgroundColor: status.color }}
       />
-      <span>{config.label}</span>
-    </Badge>
+      <span className="truncate">{status.name}</span>
+    </span>
   );
 };
 

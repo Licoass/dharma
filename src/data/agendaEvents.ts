@@ -7,7 +7,7 @@ export const INITIAL_AGENDA_EVENTS: AgendaEvent[] = [
     time: '10:00 - 10:45',
     date: 'Hoy',
     location: 'Llamada remota',
-    stationId: 'trabajo',
+    categoryId: 'cat-eco',
   },
   {
     id: 'evt-2',
@@ -15,7 +15,7 @@ export const INITIAL_AGENDA_EVENTS: AgendaEvent[] = [
     time: '13:30 - 14:00',
     date: 'Hoy',
     location: 'Sin pantallas',
-    stationId: 'bienestar',
+    categoryId: 'cat-ocio',
   },
   {
     id: 'evt-3',
@@ -23,6 +23,6 @@ export const INITIAL_AGENDA_EVENTS: AgendaEvent[] = [
     time: '16:00 - 17:30',
     date: 'Hoy',
     location: 'Estación personal',
-    stationId: 'enfoque',
+    categoryId: 'cat-trabajo-personal',
   },
 ];

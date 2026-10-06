@@ -7,19 +7,19 @@ import { CalendarPlaceholderView } from './components/calendar/CalendarPlacehold
 import { MoreView } from './components/more/MoreView';
 import { QuickCaptureModal } from './components/capture/QuickCaptureModal';
 import { TaskFormModal } from './components/tasks/TaskFormModal';
-import type { NavTab, Task, TaskStatus } from './types';
+import type { NavTab, Task } from './types';
 
 const MainLayout: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<NavTab>('inicio');
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [defaultStatusForNew, setDefaultStatusForNew] = useState<TaskStatus>('pendiente');
+  const [defaultStatusForNew, setDefaultStatusForNew] = useState<string>('por_hacer');
 
   const { addTask, updateTask, setIsQuickCaptureOpen } = useTaskContext();
 
-  const handleOpenCreateTask = (status: TaskStatus = 'pendiente') => {
+  const handleOpenCreateTask = (statusId: string = 'por_hacer') => {
     setEditingTask(null);
-    setDefaultStatusForNew(status);
+    setDefaultStatusForNew(statusId);
     setIsTaskModalOpen(true);
   };
 
@@ -55,14 +55,14 @@ const MainLayout: React.FC = () => {
       {currentTab === 'inicio' && (
         <Dashboard
           onNavigateTab={setCurrentTab}
-          onOpenCreateTask={() => handleOpenCreateTask('pendiente')}
+          onOpenCreateTask={() => handleOpenCreateTask('por_hacer')}
           onEditTask={handleEditTask}
         />
       )}
 
       {currentTab === 'tareas' && (
         <TasksView
-          onOpenCreateTask={(status) => handleOpenCreateTask(status || 'pendiente')}
+          onOpenCreateTask={(statusId) => handleOpenCreateTask(statusId || 'por_hacer')}
           onEditTask={handleEditTask}
         />
       )}
@@ -82,7 +82,7 @@ const MainLayout: React.FC = () => {
         }}
         onSubmit={handleSaveTask}
         initialTask={editingTask}
-        defaultStatus={defaultStatusForNew}
+        defaultStatusId={defaultStatusForNew}
       />
     </AppShell>
   );

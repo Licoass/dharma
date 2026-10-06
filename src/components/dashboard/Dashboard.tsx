@@ -40,14 +40,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
 
   // 1. Tarea prioritaria destacada (primera vital o de alta prioridad no completada)
   const priorityTask =
-    tasks.find((t) => t.status !== 'completada' && t.priority === 'vital') ||
-    tasks.find((t) => t.status !== 'completada' && t.priority === 'alta') ||
-    tasks.find((t) => t.status !== 'completada') ||
+    tasks.find((t) => t.statusId !== 'completado' && t.priority === 'vital') ||
+    tasks.find((t) => t.statusId !== 'completado' && t.priority === 'alta') ||
+    tasks.find((t) => t.statusId !== 'completado') ||
     null;
 
   // 2. Próximas tareas para "HOY" (excluyendo la prioritaria principal para no duplicar)
   const todayTasks = tasks
-    .filter((t) => t.id !== priorityTask?.id && t.status !== 'completada')
+    .filter((t) => t.id !== priorityTask?.id && t.statusId !== 'completado')
     .slice(0, 3);
 
   return (
@@ -132,10 +132,10 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {/* Fila superior: Categoría, Prioridad y Estado */}
             <div className="flex items-center justify-between gap-2 flex-wrap mb-3.5">
               <div className="flex items-center gap-2">
-                <CategoryBadge stationId={priorityTask.stationId} size="md" />
+                <CategoryBadge categoryId={priorityTask.categoryId} size="md" />
                 <PriorityBadge priority={priorityTask.priority} size="md" />
               </div>
-              <StatusBadge status={priorityTask.status} size="md" />
+              <StatusBadge statusId={priorityTask.statusId} size="md" />
             </div>
 
             {/* Título y descripción */}
@@ -207,7 +207,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {/* 1. Tareas pendientes */}
           <div
             onClick={() => {
-              setFilters((prev) => ({ ...prev, status: 'pendiente' }));
+              setFilters((prev) => ({ ...prev, statusId: 'por_hacer' }));
               onNavigateTab('tareas');
             }}
             className="p-4 sm:p-5 rounded-[24px] bg-white shadow-[0_4px_20px_-2px_rgba(36,41,47,0.03)] hover:shadow-[0_8px_24px_-2px_rgba(36,41,47,0.06)] hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
@@ -229,7 +229,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {/* 2. En proceso */}
           <div
             onClick={() => {
-              setFilters((prev) => ({ ...prev, status: 'en_curso' }));
+              setFilters((prev) => ({ ...prev, statusId: 'en_proceso' }));
               onNavigateTab('tareas');
             }}
             className="p-4 sm:p-5 rounded-[24px] bg-[#E8F6F4]/50 shadow-[0_4px_20px_-2px_rgba(36,41,47,0.03)] hover:shadow-[0_8px_24px_-2px_rgba(36,41,47,0.06)] hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
@@ -251,7 +251,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {/* 3. En espera */}
           <div
             onClick={() => {
-              setFilters((prev) => ({ ...prev, status: 'en_espera' }));
+              setFilters((prev) => ({ ...prev, statusId: 'en_espera' }));
               onNavigateTab('tareas');
             }}
             className="p-4 sm:p-5 rounded-[24px] bg-[#FEF6E9]/50 shadow-[0_4px_20px_-2px_rgba(36,41,47,0.03)] hover:shadow-[0_8px_24px_-2px_rgba(36,41,47,0.06)] hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
@@ -273,7 +273,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
           {/* 4. Completadas */}
           <div
             onClick={() => {
-              setFilters((prev) => ({ ...prev, status: 'completada' }));
+              setFilters((prev) => ({ ...prev, statusId: 'completado' }));
               onNavigateTab('tareas');
             }}
             className="p-4 sm:p-5 rounded-[24px] bg-[#EEF6F0]/50 shadow-[0_4px_20px_-2px_rgba(36,41,47,0.03)] hover:shadow-[0_8px_24px_-2px_rgba(36,41,47,0.06)] hover:-translate-y-0.5 transition-all cursor-pointer flex flex-col justify-between"
@@ -340,12 +340,12 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         <span className="text-[11px] text-[#9DA6B5] font-semibold">
                           {task.dueTime || 'Hoy'}
                         </span>
-                        <CategoryBadge stationId={task.stationId} size="sm" showDot={false} />
+                        <CategoryBadge categoryId={task.categoryId} size="sm" showDot={false} />
                       </div>
                     </div>
                   </div>
 
-                  <StatusBadge status={task.status} size="sm" />
+                  <StatusBadge statusId={task.statusId} size="sm" />
                 </div>
               ))
             )}
@@ -387,7 +387,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                       </span>
                     )}
                     <div className="ml-auto">
-                      <CategoryBadge stationId={evt.stationId} size="sm" />
+                      <CategoryBadge categoryId={evt.categoryId} size="sm" />
                     </div>
                   </div>
                 </div>
