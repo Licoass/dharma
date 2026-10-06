@@ -43,6 +43,10 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, onOpenQuickCapture }
       title: 'ARCHIVO DE RECURSOS',
       subtitle: 'Marcadores, enlaces y referencias visuales guardadas',
     },
+    biblioteca: {
+      title: 'BIBLIOTECA PERSONAL',
+      subtitle: 'Estación de lecturas, protocolos y conocimiento acumulado',
+    },
     mas: {
       title: 'SISTEMAS Y AJUSTES',
       subtitle: 'Configuración de estaciones y hoja de ruta',

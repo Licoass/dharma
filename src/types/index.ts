@@ -111,7 +111,27 @@ export interface ArchiveItem {
   createdAt: string;
 }
 
-export type NavTab = 'inicio' | 'tareas' | 'capturar' | 'calendario' | 'registros' | 'archivo' | 'mas';
+export type BookStatus = 'quiero_leer' | 'leyendo' | 'terminado' | 'abandonado';
+
+export interface Book {
+  id: string;
+  title: string;
+  author: string;
+  coverUrl?: string;
+  status: BookStatus;
+  tags?: string[];
+  pages?: number;
+  currentPage?: number;
+  rating?: number;
+  notes?: string;
+  isFavorite?: boolean;
+  startedAt?: string;
+  finishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type NavTab = 'inicio' | 'tareas' | 'capturar' | 'calendario' | 'registros' | 'archivo' | 'biblioteca' | 'mas';
 
 export type ViewMode = 'lista' | 'kanban';
 

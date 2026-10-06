@@ -6,6 +6,7 @@ import { TasksView } from './components/tasks/TasksView';
 import { CalendarView } from './components/calendar/CalendarView';
 import { RecordsView } from './components/records/RecordsView';
 import { ArchiveView } from './components/archive/ArchiveView';
+import { LibraryView } from './components/books/LibraryView';
 import { MoreView } from './components/more/MoreView';
 import { QuickCaptureModal } from './components/capture/QuickCaptureModal';
 import { TaskFormModal } from './components/tasks/TaskFormModal';
@@ -74,6 +75,8 @@ const MainLayout: React.FC = () => {
       {currentTab === 'registros' && <RecordsView onNavigateTab={setCurrentTab} />}
 
       {currentTab === 'archivo' && <ArchiveView onNavigateTab={setCurrentTab} />}
+
+      {currentTab === 'biblioteca' && <LibraryView onNavigateTab={setCurrentTab} />}
 
       {currentTab === 'mas' && <MoreView onNavigateTab={setCurrentTab} />}
 

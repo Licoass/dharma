@@ -11,7 +11,9 @@ import type {
   Category, 
   TaskStatusItem,
   Note,
-  ArchiveItem
+  ArchiveItem,
+  Book,
+  BookStatus
 } from '../types';
 import { INITIAL_TASKS } from '../data/initialTasks';
 import { INITIAL_CATEGORIES } from '../data/initialCategories';
@@ -19,6 +21,7 @@ import { INITIAL_STATUSES } from '../data/initialStatuses';
 import { INITIAL_AGENDA_EVENTS } from '../data/agendaEvents';
 import { INITIAL_NOTES } from '../data/initialNotes';
 import { INITIAL_ARCHIVE_ITEMS } from '../data/initialArchive';
+import { INITIAL_BOOKS } from '../data/initialBooks';
 import { normalizeDateToISO, getTodayISO } from '../utils/dateUtils';
 
 interface TaskContextType {
@@ -30,6 +33,7 @@ interface TaskContextType {
   calendarActivities: CalendarActivity[];
   notes: Note[];
   archiveItems: ArchiveItem[];
+  books: Book[];
   filters: TaskFilters;
   viewMode: ViewMode;
   calendarViewMode: CalendarViewMode;
@@ -70,6 +74,13 @@ interface TaskContextType {
   deleteArchiveItem: (id: string) => void;
   toggleArchiveFavorite: (id: string) => void;
 
+  // Book operations (BIBLIOTECA)
+  addBook: (bookData: Omit<Book, 'id' | 'createdAt' | 'updatedAt'>) => Book;
+  updateBook: (id: string, updates: Partial<Book>) => void;
+  deleteBook: (id: string) => void;
+  changeBookStatus: (id: string, status: BookStatus) => void;
+  toggleBookFavorite: (id: string) => void;
+
   // Configurable Category operations
   addCategory: (category: Omit<Category, 'id'>) => Category;
   updateCategory: (id: string, updates: Partial<Category>) => void;
@@ -102,6 +113,7 @@ const STORAGE_KEY_STATUSES = 'dharma_statuses_v3';
 const STORAGE_KEY_EVENTS = 'dharma_events_v3';
 const STORAGE_KEY_NOTES = 'dharma_notes_v3';
 const STORAGE_KEY_ARCHIVE = 'dharma_archive_v3';
+const STORAGE_KEY_BOOKS = 'dharma_books_v3';
 
 const TaskContext = createContext<TaskContextType | undefined>(undefined);
 
@@ -172,6 +184,17 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return INITIAL_ARCHIVE_ITEMS;
   });
 
+  // 7. Biblioteca (Libros)
+  const [books, setBooks] = useState<Book[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY_BOOKS);
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.warn('Failed to load books', e);
+    }
+    return INITIAL_BOOKS;
+  });
+
   const [filters, setFilters] = useState<TaskFilters>({
     search: '',
     categoryId: 'todas',
@@ -201,10 +224,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem(STORAGE_KEY_EVENTS, JSON.stringify(agendaEvents));
       localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(notes));
       localStorage.setItem(STORAGE_KEY_ARCHIVE, JSON.stringify(archiveItems));
+      localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(books));
     } catch (e) {
       console.warn('Failed to save to localStorage', e);
     }
-  }, [tasks, categories, statuses, agendaEvents, notes, archiveItems]);
+  }, [tasks, categories, statuses, agendaEvents, notes, archiveItems, books]);
 
   const fireCelebration = () => {
     confetti({
@@ -458,6 +482,51 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  // -------------------------------------------------------------
+  // OPERACIONES DE BIBLIOTECA (LIBROS)
+  // -------------------------------------------------------------
+  const addBook = (bookData: Omit<Book, 'id' | 'createdAt' | 'updatedAt'>): Book => {
+    const newBook: Book = {
+      ...bookData,
+      id: `book-${Date.now()}-${Math.random().toString(36).substr(2, 3)}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    setBooks((prev) => [newBook, ...prev]);
+    return newBook;
+  };
+
+  const updateBook = (id: string, updates: Partial<Book>) => {
+    setBooks((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, ...updates, updatedAt: new Date().toISOString() } : b))
+    );
+  };
+
+  const deleteBook = (id: string) => {
+    setBooks((prev) => prev.filter((b) => b.id !== id));
+  };
+
+  const changeBookStatus = (id: string, status: BookStatus) => {
+    setBooks((prev) =>
+      prev.map((b) => {
+        if (b.id !== id) return b;
+        const updates: Partial<Book> = { status, updatedAt: new Date().toISOString() };
+        if (status === 'terminado' && !b.finishedAt) {
+          updates.finishedAt = new Date().toISOString().slice(0, 10);
+          if (b.pages) updates.currentPage = b.pages;
+          fireCelebration();
+        }
+        return { ...b, ...updates };
+      })
+    );
+  };
+
+  const toggleBookFavorite = (id: string) => {
+    setBooks((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, isFavorite: !b.isFavorite } : b))
+    );
+  };
+
   const resetToDefaults = () => {
     setTasks(INITIAL_TASKS);
     setCategories(INITIAL_CATEGORIES);
@@ -465,6 +534,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAgendaEvents(INITIAL_AGENDA_EVENTS);
     setNotes(INITIAL_NOTES);
     setArchiveItems(INITIAL_ARCHIVE_ITEMS);
+    setBooks(INITIAL_BOOKS);
     setSelectedCalendarDate(getTodayISO());
     setFilters({
       search: '',
@@ -569,6 +639,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         calendarActivities,
         notes,
         archiveItems,
+        books,
         filters,
         viewMode,
         calendarViewMode,
@@ -600,6 +671,11 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateArchiveItem,
         deleteArchiveItem,
         toggleArchiveFavorite,
+        addBook,
+        updateBook,
+        deleteBook,
+        changeBookStatus,
+        toggleBookFavorite,
         addCategory,
         updateCategory,
         deleteCategory,

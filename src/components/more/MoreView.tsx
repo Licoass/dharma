@@ -7,6 +7,7 @@ import {
   Sliders,
   FileText,
   Bookmark,
+  BookOpen,
   ArrowRight
 } from 'lucide-react';
 import { Card } from '../ui/Card';
@@ -110,7 +111,7 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
       phase: 'FASE 5',
       title: 'Registros y Archivo',
       status: 'completada',
-      badge: 'ACTUAL',
+      badge: 'VERIFICADO',
       items: [
         'Módulo Registros para notas personales con categorías, checklist interactivo, etiquetas y enlaces',
         'Módulo Archivo con tarjetas visuales ricas para enlaces (imagen, título, dominio, descripción, etiquetas, abrir)',
@@ -119,7 +120,19 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
       ],
     },
     {
-      phase: 'FASE 6+',
+      phase: 'FASE 6',
+      title: 'Biblioteca de Libros',
+      status: 'completada',
+      badge: 'ACTUAL',
+      items: [
+        'Módulo Biblioteca con estados: Quiero leer, Leyendo, Terminado y Abandonado',
+        'Tarjetas suaves con portada, título, autor, insignia de estado y etiquetas',
+        'Cuadrícula responsive: 2 columnas en móvil, 3 en tablet, 4+ en desktop',
+        'Filtros por estado con métricas en tiempo real, búsqueda y destacados',
+      ],
+    },
+    {
+      phase: 'FASE 7+',
       title: 'Sincronización en la Nube & Google Calendar',
       status: 'pendiente',
       badge: 'SIGUIENTES FASES',
@@ -133,25 +146,25 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
 
   return (
     <div className="space-y-7 pb-12 max-w-5xl mx-auto select-none">
-      {/* 0. ACCESO RÁPIDO A MÓDULOS DE REGISTRO Y ARCHIVO */}
+      {/* 0. ACCESO RÁPIDO A MÓDULOS ACTIVOS */}
       {onNavigateTab && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
           <Card 
             padding="lg" 
             className="group cursor-pointer hover:shadow-[0_8px_24px_rgba(23,116,104,0.10)] transition-all bg-gradient-to-br from-white to-[#F9FAF8] border border-[#EBE8E1]"
             onClick={() => onNavigateTab('registros')}
           >
             <div className="flex items-start justify-between">
-              <div className="w-11 h-11 rounded-2xl bg-[#E8F6F4] text-[#177468] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-2xl bg-[#E8F6F4] text-[#177468] flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
                 <FileText className="w-5 h-5" />
               </div>
               <span className="text-xs font-bold text-[#177468] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                Explorar <ArrowRight className="w-3.5 h-3.5" />
+                Abrir <ArrowRight className="w-3.5 h-3.5" />
               </span>
             </div>
-            <h3 className="text-base font-bold text-[#24292F] mb-1">Registros</h3>
-            <p className="text-xs text-[#697282] leading-relaxed">
-              Bitácora y notas personales con checklist interactivo, etiquetas y categorías.
+            <h3 className="text-sm sm:text-base font-bold text-[#24292F] mb-1">Registros</h3>
+            <p className="text-xs text-[#697282] leading-relaxed line-clamp-2">
+              Bitácora y notas personales con checklist interactivo y etiquetas.
             </p>
           </Card>
 
@@ -161,16 +174,35 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
             onClick={() => onNavigateTab('archivo')}
           >
             <div className="flex items-start justify-between">
-              <div className="w-11 h-11 rounded-2xl bg-[#FEF6EC] text-[#D48B38] flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-2xl bg-[#FEF6EC] text-[#D48B38] flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
                 <Bookmark className="w-5 h-5" />
               </div>
               <span className="text-xs font-bold text-[#D48B38] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-                Explorar <ArrowRight className="w-3.5 h-3.5" />
+                Abrir <ArrowRight className="w-3.5 h-3.5" />
               </span>
             </div>
-            <h3 className="text-base font-bold text-[#24292F] mb-1">Archivo</h3>
-            <p className="text-xs text-[#697282] leading-relaxed">
-              Colección visual de enlaces guardados con miniaturas, dominio y filtros.
+            <h3 className="text-sm sm:text-base font-bold text-[#24292F] mb-1">Archivo</h3>
+            <p className="text-xs text-[#697282] leading-relaxed line-clamp-2">
+              Colección visual de enlaces guardados con miniaturas y dominio.
+            </p>
+          </Card>
+
+          <Card 
+            padding="lg" 
+            className="group cursor-pointer hover:shadow-[0_8px_24px_rgba(23,116,104,0.10)] transition-all bg-gradient-to-br from-white to-[#F9FAF8] border border-[#EBE8E1]"
+            onClick={() => onNavigateTab('biblioteca')}
+          >
+            <div className="flex items-start justify-between">
+              <div className="w-10 h-10 rounded-2xl bg-[#EAF5EA] text-[#2E7D32] flex items-center justify-center mb-2.5 group-hover:scale-105 transition-transform">
+                <BookOpen className="w-5 h-5" />
+              </div>
+              <span className="text-xs font-bold text-[#2E7D32] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+                Abrir <ArrowRight className="w-3.5 h-3.5" />
+              </span>
+            </div>
+            <h3 className="text-sm sm:text-base font-bold text-[#24292F] mb-1">Biblioteca</h3>
+            <p className="text-xs text-[#697282] leading-relaxed line-clamp-2">
+              Estación de lecturas personales, progreso y libros guardados.
             </p>
           </Card>
         </div>

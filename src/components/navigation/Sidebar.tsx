@@ -6,6 +6,7 @@ import {
   Calendar, 
   FileText,
   Bookmark,
+  BookOpen,
   MoreHorizontal
 } from 'lucide-react';
 import type { NavTab } from '../../types';
@@ -27,6 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onTabChange }) => 
     { id: 'calendario' as NavTab, label: 'Calendario', icon: Calendar, badge: null },
     { id: 'registros' as NavTab, label: 'Registros', icon: FileText, badge: null },
     { id: 'archivo' as NavTab, label: 'Archivo', icon: Bookmark, badge: null },
+    { id: 'biblioteca' as NavTab, label: 'Biblioteca', icon: BookOpen, badge: null },
     { id: 'mas' as NavTab, label: 'Más', icon: MoreHorizontal, badge: null },
   ];
 
