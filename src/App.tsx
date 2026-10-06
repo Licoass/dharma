@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { TaskProvider, useTaskContext } from './context/TaskContext';
-import { Navbar } from './components/navigation/Navbar';
-import { Header } from './components/navigation/Header';
-import { DashboardView } from './components/dashboard/DashboardView';
+import { AppShell } from './components/layout/AppShell';
+import { Dashboard } from './components/dashboard/Dashboard';
 import { TasksView } from './components/tasks/TasksView';
 import { CalendarPlaceholderView } from './components/calendar/CalendarPlaceholderView';
 import { MoreView } from './components/more/MoreView';
@@ -40,50 +39,37 @@ const MainLayout: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF9F6] text-[#1E293B] flex flex-col antialiased">
-      {/* Navigation (Sidebar on Desktop/Tablet, Bottom Bar on Mobile) */}
-      <Navbar
-        currentTab={currentTab}
-        onTabChange={(tab) => {
-          if (tab === 'capturar') {
-            setIsQuickCaptureOpen(true);
-          } else {
-            setCurrentTab(tab);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-        }}
-      />
-
-      {/* Main Container adjusted for navigation offsets */}
-      <div className="flex-1 flex flex-col md:pl-20 lg:pl-64 transition-all duration-300">
-        {/* Top Header */}
-        <Header
-          currentTab={currentTab}
-          onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
+    <AppShell
+      currentTab={currentTab}
+      onTabChange={(tab) => {
+        if (tab === 'capturar') {
+          setIsQuickCaptureOpen(true);
+        } else {
+          setCurrentTab(tab);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }}
+      onOpenQuickCapture={() => setIsQuickCaptureOpen(true)}
+    >
+      {/* Dynamic View Content */}
+      {currentTab === 'inicio' && (
+        <Dashboard
+          onNavigateTab={setCurrentTab}
+          onOpenCreateTask={() => handleOpenCreateTask('pendiente')}
+          onEditTask={handleEditTask}
         />
+      )}
 
-        {/* Dynamic View Content */}
-        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-5 sm:py-7 max-w-6xl w-full mx-auto pb-28 md:pb-12">
-          {currentTab === 'inicio' && (
-            <DashboardView
-              onNavigateTab={setCurrentTab}
-              onOpenCreateTask={() => handleOpenCreateTask('pendiente')}
-              onEditTask={handleEditTask}
-            />
-          )}
+      {currentTab === 'tareas' && (
+        <TasksView
+          onOpenCreateTask={(status) => handleOpenCreateTask(status || 'pendiente')}
+          onEditTask={handleEditTask}
+        />
+      )}
 
-          {currentTab === 'tareas' && (
-            <TasksView
-              onOpenCreateTask={(status) => handleOpenCreateTask(status || 'pendiente')}
-              onEditTask={handleEditTask}
-            />
-          )}
+      {currentTab === 'calendario' && <CalendarPlaceholderView />}
 
-          {currentTab === 'calendario' && <CalendarPlaceholderView />}
-
-          {currentTab === 'mas' && <MoreView />}
-        </main>
-      </div>
+      {currentTab === 'mas' && <MoreView />}
 
       {/* Modals */}
       <QuickCaptureModal />
@@ -98,7 +84,7 @@ const MainLayout: React.FC = () => {
         initialTask={editingTask}
         defaultStatus={defaultStatusForNew}
       />
-    </div>
+    </AppShell>
   );
 };
 

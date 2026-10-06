@@ -4,7 +4,7 @@ import { DharmaCore } from '../common/DharmaCore';
 import { useTaskContext } from '../../context/TaskContext';
 import { RefreshCw, Plus } from 'lucide-react';
 
-interface HeaderProps {
+export interface HeaderProps {
   currentTab: NavTab;
   onOpenQuickCapture: () => void;
 }
@@ -21,7 +21,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, onOpenQuickCapture }
   const tabTitles: Record<NavTab, { title: string; subtitle: string }> = {
     inicio: {
       title: 'CENTRO DE MANDO',
-      subtitle: 'Visión general de estaciones y protocolos activos',
+      subtitle: 'Visión general de estaciones y protocolos',
     },
     tareas: {
       title: 'REGISTRO DE TAREAS',
@@ -44,65 +44,59 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, onOpenQuickCapture }
   const current = tabTitles[currentTab] || tabTitles.inicio;
 
   return (
-    <header className="sticky top-0 z-30 bg-[#FAF9F6]/90 backdrop-blur-md border-b border-slate-200/50 px-4 sm:px-6 lg:px-8 py-3.5 sm:py-4 transition-all">
-      <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
-        {/* Left: Title & Subtitle */}
+    <header className="sticky top-0 z-30 bg-[#FAF8F5]/85 backdrop-blur-md px-5 sm:px-8 py-4 sm:py-5 transition-all select-none">
+      <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
+        {/* Titular */}
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold tracking-wider text-teal-700/80 uppercase">
+            <span className="text-[11px] font-bold tracking-[0.06em] text-[#177468] uppercase">
               DHARMA // {currentTab.toUpperCase()}
             </span>
-            <span className="hidden sm:inline-block w-1 h-1 rounded-full bg-slate-300" />
-            <span className="hidden sm:inline-block text-xs text-slate-500 capitalize">
+            <span className="w-1 h-1 rounded-full bg-[#9DA6B5]/50" />
+            <span className="text-xs text-[#697282] capitalize">
               {todayStr}
             </span>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-bold tracking-[0.06em] text-slate-800 truncate mt-0.5">
+          <h2 className="text-xl sm:text-2xl font-extrabold tracking-[0.06em] text-[#24292F] truncate mt-0.5">
             {current.title}
           </h2>
-          <p className="hidden sm:block text-xs sm:text-sm text-slate-500 tracking-[0.02em] mt-0.5 truncate">
+          <p className="hidden sm:block text-xs sm:text-sm text-[#697282] tracking-[0.02em] mt-0.5 truncate">
             {current.subtitle}
           </p>
         </div>
 
-        {/* Right Actions: System Health & Core Pill */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* Quick Capture button on Tablet/Desktop header */}
+        {/* Acciones */}
+        <div className="flex items-center gap-2.5 shrink-0">
           <button
             onClick={onOpenQuickCapture}
             title="Captura rápida"
-            className="hidden sm:inline-flex md:hidden items-center gap-1.5 px-3 py-2 text-xs font-semibold bg-teal-600 hover:bg-teal-700 text-white rounded-xl shadow-xs transition-colors cursor-pointer"
+            className="sm:hidden w-10 h-10 rounded-[14px] bg-[#177468] text-white flex items-center justify-center shadow-sm cursor-pointer"
           >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Capturar</span>
+            <Plus className="w-5 h-5" />
           </button>
 
-          {/* Reset to sample data button */}
           <button
             onClick={() => {
-              if (window.confirm('¿Deseas recargar los datos demostrativos iniciales de DHARMA?')) {
+              if (window.confirm('¿Deseas recargar los datos de muestra iniciales de DHARMA?')) {
                 resetToDefaults();
               }
             }}
-            title="Restaurar datos iniciales"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+            title="Restaurar datos de muestra"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-[#697282] hover:text-[#24292F] hover:bg-white rounded-[14px] transition-colors cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Datos Demo</span>
           </button>
 
-          {/* Quick Dharma Core indicator badge */}
-          <div className="flex items-center gap-2 bg-white px-3 py-1.5 sm:py-2 rounded-2xl border border-slate-200/80 shadow-xs">
+          {/* Dharma Core Status Pill */}
+          <div className="flex items-center gap-2.5 bg-white px-3.5 py-2 rounded-[20px] shadow-[0_2px_12px_rgba(36,41,47,0.03)]">
             <DharmaCore mood={dharmaMood} size="sm" />
             <div className="text-left hidden sm:block">
-              <div className="flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span className="text-[11px] font-bold text-slate-700 tracking-wider">
-                  CORE ONLINE
-                </span>
-              </div>
-              <span className="text-[10px] text-slate-400 block -mt-0.5">
+              <span className="text-[11px] font-bold text-[#24292F] tracking-wide block leading-none">
+                CORE ONLINE
+              </span>
+              <span className="text-[10px] text-[#9DA6B5] block mt-0.5">
                 {metrics.completionPercentage}% completado
               </span>
             </div>

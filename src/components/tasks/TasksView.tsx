@@ -8,13 +8,13 @@ import {
 } from 'lucide-react';
 import { useTaskContext } from '../../context/TaskContext';
 import { STATIONS_LIST } from '../../data/stations';
-import type { Task, TaskStatus } from '../../types';
+import type { Task, TaskStatus, StationId } from '../../types';
 import { TaskCard } from './TaskCard';
 import { TaskKanban } from './TaskKanban';
-import { Button } from '../common/Button';
-import { DharmaCore } from '../common/DharmaCore';
+import { Button } from '../ui/Button';
+import { EmptyState } from '../ui/EmptyState';
 
-interface TasksViewProps {
+export interface TasksViewProps {
   onOpenCreateTask: (defaultStatus?: TaskStatus) => void;
   onEditTask: (task: Task) => void;
 }
@@ -50,39 +50,38 @@ export const TasksView: React.FC<TasksViewProps> = ({
     filters.priority !== 'todas';
 
   return (
-    <div className="space-y-6 pb-12">
-      {/* 1. TOP CONTROLS BAR: SEARCH + VIEW MODE + NEW BUTTON */}
+    <div className="space-y-6 pb-12 select-none">
+      {/* 1. Barra superior: Búsqueda + Toggle Lista/Kanban + Nueva Tarea */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        {/* Search Input */}
+        {/* Input de Búsqueda */}
         <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <Search className="w-4 h-4 text-[#9DA6B5] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={filters.search}
             onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
             placeholder="Buscar por protocolo, título o #etiqueta..."
-            className="w-full pl-10 pr-9 py-2.5 rounded-2xl bg-white border border-slate-200/90 text-sm placeholder:text-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all shadow-2xs"
+            className="w-full pl-11 pr-10 py-3 rounded-[20px] bg-white text-sm text-[#24292F] placeholder:text-[#9DA6B5] focus:ring-2 focus:ring-[#177468]/15 outline-none transition-all shadow-[0_2px_12px_rgba(36,41,47,0.02)]"
           />
           {filters.search && (
             <button
               onClick={() => setFilters((prev) => ({ ...prev, search: '' }))}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#9DA6B5] hover:text-[#24292F] p-1 cursor-pointer"
             >
-              <X className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
             </button>
           )}
         </div>
 
-        {/* View Switcher & Create Button */}
+        {/* Toggle de Vistas y Botón de creación */}
         <div className="flex items-center gap-2.5">
-          {/* List / Kanban Toggle */}
-          <div className="bg-slate-100/90 p-1 rounded-2xl flex items-center border border-slate-200/70">
+          <div className="bg-[#F5F2EB]/80 p-1 rounded-[18px] flex items-center">
             <button
               onClick={() => setViewMode('lista')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-[14px] text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'lista'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'bg-white text-[#24292F] shadow-xs'
+                  : 'text-[#697282] hover:text-[#24292F]'
               }`}
             >
               <List className="w-4 h-4" />
@@ -91,10 +90,10 @@ export const TasksView: React.FC<TasksViewProps> = ({
 
             <button
               onClick={() => setViewMode('kanban')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-[14px] text-xs font-bold transition-all cursor-pointer ${
                 viewMode === 'kanban'
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'bg-white text-[#24292F] shadow-xs'
+                  : 'text-[#697282] hover:text-[#24292F]'
               }`}
             >
               <Kanban className="w-4 h-4" />
@@ -106,26 +105,26 @@ export const TasksView: React.FC<TasksViewProps> = ({
             variant="primary"
             size="md"
             onClick={() => onOpenCreateTask('pendiente')}
-            icon={<Plus className="w-4 h-4" />}
+            icon={<Plus className="w-4 h-4 stroke-[2.5]" />}
           >
             Nueva Tarea
           </Button>
         </div>
       </div>
 
-      {/* 2. CHIP FILTERS: STATIONS & STATUS */}
-      <div className="space-y-2.5 bg-white p-3.5 sm:p-4 rounded-[22px] border border-slate-200/70 shadow-2xs">
-        {/* Stations Row */}
+      {/* 2. Filtros orgánicos: Chips de Estaciones y Estados */}
+      <div className="space-y-3 bg-white p-4 sm:p-5 rounded-[26px] shadow-[0_4px_20px_-2px_rgba(36,41,47,0.02)]">
+        {/* Estaciones */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
-          <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider shrink-0 mr-1">
+          <span className="text-[11px] font-bold text-[#9DA6B5] uppercase tracking-wider shrink-0 mr-1">
             Estación:
           </span>
           <button
             onClick={() => setFilters((prev) => ({ ...prev, stationId: 'todas' }))}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 transition-colors cursor-pointer ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold shrink-0 transition-colors cursor-pointer ${
               filters.stationId === 'todas'
-                ? 'bg-slate-800 text-white'
-                : 'bg-slate-100/70 text-slate-600 hover:bg-slate-200/60'
+                ? 'bg-[#24292F] text-white'
+                : 'bg-[#F5F2EB] text-[#697282] hover:bg-[#EBE7DD]'
             }`}
           >
             Todas
@@ -135,15 +134,14 @@ export const TasksView: React.FC<TasksViewProps> = ({
             return (
               <button
                 key={st.id}
-                onClick={() => setFilters((prev) => ({ ...prev, stationId: st.id }))}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold shrink-0 flex items-center gap-1.5 transition-all cursor-pointer ${
+                onClick={() => setFilters((prev) => ({ ...prev, stationId: st.id as StationId }))}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold shrink-0 flex items-center gap-1.5 transition-all cursor-pointer ${
                   isSelected
-                    ? 'border-2 text-slate-900 shadow-xs'
-                    : 'border border-slate-200/80 text-slate-600 hover:bg-slate-50'
+                    ? 'shadow-xs text-[#24292F] font-bold'
+                    : 'text-[#697282] hover:bg-[#F5F2EB]'
                 }`}
                 style={{
-                  backgroundColor: isSelected ? st.bgSoft : 'white',
-                  borderColor: isSelected ? st.color : undefined,
+                  backgroundColor: isSelected ? st.bgSoft : 'transparent',
                 }}
               >
                 <span
@@ -156,10 +154,10 @@ export const TasksView: React.FC<TasksViewProps> = ({
           })}
         </div>
 
-        {/* Status and Priority Sub-filters */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-100 text-xs">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+        {/* Estados */}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-black/[0.03] text-xs">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[11px] font-bold text-[#9DA6B5] uppercase tracking-wider mr-1">
               Estado:
             </span>
             {[
@@ -172,10 +170,10 @@ export const TasksView: React.FC<TasksViewProps> = ({
               <button
                 key={s.id}
                 onClick={() => setFilters((prev) => ({ ...prev, status: s.id as any }))}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium cursor-pointer transition-colors ${
+                className={`px-3 py-1 rounded-full text-xs font-medium cursor-pointer transition-colors ${
                   filters.status === s.id
-                    ? 'bg-teal-700 text-white font-semibold'
-                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
+                    ? 'bg-[#177468] text-white font-bold'
+                    : 'text-[#697282] hover:bg-[#F5F2EB]'
                 }`}
               >
                 {s.label}
@@ -186,7 +184,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
           {hasActiveFilters && (
             <button
               onClick={handleClearFilters}
-              className="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 cursor-pointer"
+              className="text-xs text-[#A63838] hover:underline font-semibold flex items-center gap-1 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
               <span>Limpiar filtros</span>
@@ -195,36 +193,20 @@ export const TasksView: React.FC<TasksViewProps> = ({
         </div>
       </div>
 
-      {/* 3. CONTENT AREA: LIST VIEW OR KANBAN VIEW */}
+      {/* 3. Área de contenido: Lista o Kanban */}
       {filteredTasks.length === 0 ? (
-        <div className="p-10 sm:p-14 text-center rounded-[28px] bg-white border border-dashed border-slate-200 flex flex-col items-center justify-center">
-          <DharmaCore mood="idle" size="lg" />
-          <h3 className="mt-4 text-base font-bold text-slate-700 tracking-wide">
-            Sin protocolos coincidentes
-          </h3>
-          <p className="text-xs sm:text-sm text-slate-400 max-w-sm mt-1">
-            No se han encontrado registros con los filtros seleccionados o el canal está en calma.
-          </p>
-          <div className="flex gap-2 mt-4">
-            {hasActiveFilters && (
-              <Button variant="secondary" size="sm" onClick={handleClearFilters}>
-                Restablecer Filtros
-              </Button>
-            )}
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => onOpenCreateTask('pendiente')}
-            >
-              Crear Nueva Tarea
-            </Button>
-          </div>
-        </div>
+        <EmptyState
+          title="Sin tareas en este canal"
+          description="No se han encontrado registros con los filtros activos. Las estaciones se encuentran despejadas."
+          mood="idle"
+          actionLabel="Registrar Nueva Tarea"
+          onAction={() => onOpenCreateTask('pendiente')}
+        />
       ) : viewMode === 'lista' ? (
         <div className="space-y-3">
-          <div className="flex items-center justify-between text-xs text-slate-400 px-1">
-            <span>Mostrando {filteredTasks.length} tarea(s)</span>
-            <span className="font-mono">LISTA SECUENCIAL</span>
+          <div className="flex items-center justify-between text-xs text-[#9DA6B5] px-1">
+            <span>{filteredTasks.length} tarea(s) en registro</span>
+            <span className="font-mono text-[10px]">VISTA SECUENCIAL</span>
           </div>
 
           <div className="space-y-3">
@@ -242,9 +224,9 @@ export const TasksView: React.FC<TasksViewProps> = ({
         </div>
       ) : (
         <div>
-          <div className="flex items-center justify-between text-xs text-slate-400 px-1 mb-3">
-            <span>Tablero activo · {filteredTasks.length} tarea(s)</span>
-            <span className="font-mono">FLUJO KANBAN</span>
+          <div className="flex items-center justify-between text-xs text-[#9DA6B5] px-1 mb-3">
+            <span>Tablero de flujo · {filteredTasks.length} tarea(s)</span>
+            <span className="font-mono text-[10px]">VISTA KANBAN</span>
           </div>
 
           <TaskKanban

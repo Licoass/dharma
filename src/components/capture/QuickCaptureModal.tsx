@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Modal } from '../common/Modal';
-import { Button } from '../common/Button';
+import { Modal } from '../ui/Modal';
+import { Button } from '../ui/Button';
 import { useTaskContext } from '../../context/TaskContext';
 import type { StationId, TaskPriority } from '../../types';
 import { STATIONS_LIST } from '../../data/stations';
@@ -35,15 +35,15 @@ export const QuickCaptureModal: React.FC = () => {
       isOpen={isQuickCaptureOpen}
       onClose={() => setIsQuickCaptureOpen(false)}
       title="Captura Rápida"
-      subtitle="Ingresa una idea, compromiso o protocolo al sistema"
+      subtitle="Ingresa una idea o protocolo a tu centro de mando"
       maxWidth="md"
     >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Core helper prompt */}
-        <div className="flex items-center gap-3 p-3 rounded-2xl bg-teal-50/60 border border-teal-100 text-teal-900 text-xs">
+      <form onSubmit={handleSubmit} className="space-y-4 select-none">
+        {/* Core Prompt */}
+        <div className="flex items-center gap-3 p-3.5 rounded-[20px] bg-[#E8F6F4]/70 text-[#177468] text-xs">
           <DharmaCore mood="focus" size="sm" />
           <p className="leading-snug">
-            Escribe directamente. El <span className="font-semibold">Dharma Core</span> clasificará y resguardará la tarea en tu estación local.
+            Escribe con naturalidad. El <span className="font-bold">Dharma Core</span> organizará la tarea en tu estación local.
           </p>
         </div>
 
@@ -55,14 +55,14 @@ export const QuickCaptureModal: React.FC = () => {
             autoFocus
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="¿Qué necesitas procesar? (ej. Enviar propuesta a cliente)"
-            className="w-full px-4 py-3.5 rounded-2xl border-2 border-teal-600/30 text-sm sm:text-base font-medium placeholder:text-slate-400 focus:border-teal-600 focus:ring-4 focus:ring-teal-500/10 outline-none transition-all shadow-xs"
+            placeholder="¿Qué deseas procesar hoy? (ej. Calibrar plan semanal)"
+            className="w-full px-4 py-3.5 rounded-[20px] bg-[#FAF8F5] text-sm sm:text-base font-semibold text-[#24292F] placeholder:text-[#9DA6B5] focus:ring-2 focus:ring-[#177468]/15 outline-none transition-all shadow-xs"
           />
         </div>
 
-        {/* Quick Station select */}
+        {/* Station select */}
         <div>
-          <span className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+          <span className="block text-[11px] font-bold text-[#697282] uppercase tracking-[0.05em] mb-2">
             Estación
           </span>
           <div className="flex flex-wrap gap-1.5">
@@ -72,18 +72,17 @@ export const QuickCaptureModal: React.FC = () => {
                 <button
                   type="button"
                   key={st.id}
-                  onClick={() => setStationId(st.id)}
+                  onClick={() => setStationId(st.id as StationId)}
                   className={`
-                    px-2.5 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer
+                    px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer
                     ${
                       isSelected
-                        ? 'border-2 text-slate-900 shadow-xs'
-                        : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
+                        ? 'shadow-xs text-[#24292F] font-bold'
+                        : 'text-[#697282] hover:bg-[#F5F2EB]'
                     }
                   `}
                   style={{
-                    backgroundColor: isSelected ? st.bgSoft : 'white',
-                    borderColor: isSelected ? st.color : undefined,
+                    backgroundColor: isSelected ? st.bgSoft : 'transparent',
                   }}
                 >
                   <span
@@ -97,10 +96,10 @@ export const QuickCaptureModal: React.FC = () => {
           </div>
         </div>
 
-        {/* Quick Priority & Timing */}
+        {/* Priority */}
         <div className="flex items-center justify-between gap-3 pt-1">
           <div className="flex items-center gap-1.5">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mr-1">
+            <span className="text-[11px] font-bold text-[#697282] uppercase tracking-[0.05em] mr-1">
               Prioridad:
             </span>
             {(['baja', 'media', 'alta', 'vital'] as TaskPriority[]).map((p) => (
@@ -108,10 +107,10 @@ export const QuickCaptureModal: React.FC = () => {
                 type="button"
                 key={p}
                 onClick={() => setPriority(p)}
-                className={`px-2 py-1 text-[11px] font-semibold rounded-lg capitalize border transition-all cursor-pointer ${
+                className={`px-2.5 py-1 text-[11px] font-bold rounded-full capitalize transition-all cursor-pointer ${
                   priority === p
-                    ? 'bg-slate-800 text-white border-slate-800'
-                    : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+                    ? 'bg-[#24292F] text-white shadow-xs'
+                    : 'text-[#697282] hover:bg-[#F5F2EB]'
                 }`}
               >
                 {p}
@@ -119,14 +118,14 @@ export const QuickCaptureModal: React.FC = () => {
             ))}
           </div>
 
-          <div className="hidden sm:flex items-center gap-1 text-[11px] text-slate-400">
+          <div className="hidden sm:flex items-center gap-1 text-[11px] text-[#9DA6B5]">
             <CornerDownLeft className="w-3.5 h-3.5" />
             <span>Enter para guardar</span>
           </div>
         </div>
 
-        {/* Submit button */}
-        <div className="pt-2 flex justify-end gap-2">
+        {/* Botones de acción */}
+        <div className="pt-3 flex justify-end gap-2.5">
           <Button
             type="button"
             variant="ghost"

@@ -6,8 +6,8 @@ import {
   Layers, 
   Sliders
 } from 'lucide-react';
-import { Card } from '../common/Card';
-import { Button } from '../common/Button';
+import { Card } from '../ui/Card';
+import { Button } from '../ui/Button';
 import { useTaskContext } from '../../context/TaskContext';
 import { STATIONS_LIST } from '../../data/stations';
 import { DharmaCore } from '../common/DharmaCore';
@@ -55,7 +55,7 @@ export const MoreView: React.FC = () => {
       badge: 'ACTIVA Y OPERATIVA',
       items: [
         'Arquitectura React + TypeScript + Vite + Tailwind',
-        'Sistema de diseño orgánico y tarjetas redondeadas (24px)',
+        'Sistema de diseño orgánico y componentes centralizados',
         'Mascota y asistente visual: Dharma Core',
         'Navegación adaptativa (Móvil, Tablet, Desktop)',
         'Gestión de tareas, estaciones, prioridades y estados',
@@ -97,51 +97,48 @@ export const MoreView: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 sm:space-y-8 pb-12 max-w-5xl mx-auto">
+    <div className="space-y-7 pb-12 max-w-5xl mx-auto select-none">
       {/* 1. ESTACIONES CONFIGURADAS */}
       <div>
-        <div className="flex items-center gap-2 mb-3">
-          <Layers className="w-5 h-5 text-teal-600" />
-          <h3 className="text-base sm:text-lg font-bold text-slate-800 tracking-[0.03em]">
-            ESTACIONES DEL SISTEMA
+        <div className="flex items-center gap-2 mb-3 px-1">
+          <Layers className="w-4 h-4 text-[#177468]" />
+          <h3 className="text-sm font-bold uppercase tracking-[0.05em] text-[#697282]">
+            Estaciones del Sistema
           </h3>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
           {STATIONS_LIST.map((st) => (
-            <div
-              key={st.id}
-              className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs"
-            >
-              <div className="flex items-center justify-between mb-2">
+            <Card key={st.id} padding="md" className="space-y-2">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span
                     className="w-3 h-3 rounded-full"
                     style={{ backgroundColor: st.color }}
                   />
-                  <span className="font-bold text-sm text-slate-800">{st.name}</span>
+                  <span className="font-bold text-sm text-[#24292F]">{st.name}</span>
                 </div>
-                <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-slate-100 text-slate-500">
+                <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-[#F5F2EB] text-[#697282]">
                   {st.code}
                 </span>
               </div>
-              <p className="text-xs text-slate-500 leading-relaxed">
+              <p className="text-xs text-[#697282] leading-relaxed">
                 {st.description}
               </p>
-            </div>
+            </Card>
           ))}
         </div>
       </div>
 
       {/* 2. PLAN DE DESARROLLO POR FASES (ROADMAP) */}
       <Card padding="lg">
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
+        <div className="flex items-center justify-between mb-6 pb-2">
           <div>
-            <h3 className="text-lg font-bold text-slate-800 tracking-[0.03em]">
-              PROGRESIÓN POR FASES DEL PROYECTO
+            <h3 className="text-lg font-bold text-[#24292F] tracking-[0.03em]">
+              PROGRESIÓN POR FASES
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Desarrollo iterativo garantizando estabilidad en cada etapa
+            <p className="text-xs text-[#697282] mt-0.5">
+              Construcción secuencial verificando cada etapa antes de avanzar
             </p>
           </div>
           <DharmaCore mood="calm" size="sm" />
@@ -151,37 +148,37 @@ export const MoreView: React.FC = () => {
           {roadmap.map((item, idx) => (
             <div
               key={idx}
-              className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+              className={`p-5 rounded-[22px] transition-all ${
                 item.status === 'completada'
-                  ? 'bg-teal-50/40 border-teal-200/80'
-                  : 'bg-slate-50/50 border-slate-200/70 opacity-90'
+                  ? 'bg-[#E8F6F4]/50'
+                  : 'bg-[#F5F2EB]/50'
               }`}
             >
               <div className="flex items-center justify-between gap-2 mb-2">
-                <span className="text-[11px] font-mono font-bold tracking-wider text-teal-800">
+                <span className="text-[11px] font-mono font-bold tracking-wider text-[#177468]">
                   {item.phase}
                 </span>
                 <span
                   className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
                     item.status === 'completada'
-                      ? 'bg-emerald-100 text-emerald-800'
-                      : 'bg-slate-200/70 text-slate-600'
+                      ? 'bg-[#177468] text-white'
+                      : 'bg-white/80 text-[#697282]'
                   }`}
                 >
                   {item.badge}
                 </span>
               </div>
 
-              <h4 className="text-sm font-bold text-slate-800 mb-2">
+              <h4 className="text-sm font-bold text-[#24292F] mb-2">
                 {item.title}
               </h4>
 
-              <ul className="space-y-1.5 text-xs text-slate-600">
+              <ul className="space-y-1.5 text-xs text-[#697282]">
                 {item.items.map((sub, i) => (
                   <li key={i} className="flex items-start gap-2">
                     <span
-                      className={`mt-1 w-1.5 h-1.5 rounded-full shrink-0 ${
-                        item.status === 'completada' ? 'bg-teal-600' : 'bg-slate-400'
+                      className={`mt-1.5 w-1.5 h-1.5 rounded-full shrink-0 ${
+                        item.status === 'completada' ? 'bg-[#177468]' : 'bg-[#9DA6B5]'
                       }`}
                     />
                     <span>{sub}</span>
@@ -196,13 +193,13 @@ export const MoreView: React.FC = () => {
       {/* 3. GESTIÓN DE DATOS LOCALES */}
       <Card padding="lg">
         <div className="flex items-center gap-2 mb-2">
-          <Sliders className="w-5 h-5 text-teal-600" />
-          <h3 className="text-base sm:text-lg font-bold text-slate-800 tracking-[0.03em]">
-            CONTROL Y RESPALDO DE DATOS LOCALES
+          <Sliders className="w-4 h-4 text-[#177468]" />
+          <h3 className="text-base sm:text-lg font-bold text-[#24292F] tracking-[0.03em]">
+            CONTROL DE DATOS LOCALES
           </h3>
         </div>
-        <p className="text-xs text-slate-500 mb-6">
-          Durante la Fase 1, todos los datos residen en el almacenamiento de tu navegador de manera segura. Puedes exportar o importar copias de seguridad en formato JSON.
+        <p className="text-xs text-[#697282] mb-6">
+          Durante la Fase 1, todos los datos residen en el almacenamiento de tu navegador. Puedes exportar o importar tus copias en cualquier momento.
         </p>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -232,10 +229,11 @@ export const MoreView: React.FC = () => {
           />
 
           <Button
-            variant="station"
+            variant="pastel"
+            pastelColor="teal"
             size="md"
             onClick={() => {
-              if (window.confirm('¿Deseas restaurar las tareas a los ejemplos iniciales?')) {
+              if (window.confirm('¿Deseas restaurar los registros a los ejemplos iniciales?')) {
                 resetToDefaults();
               }
             }}
