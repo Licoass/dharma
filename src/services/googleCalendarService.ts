@@ -169,6 +169,26 @@ class GoogleCalendarService {
   }
 
   /**
+   * Permite vincular manualmente tu cuenta de correo personal
+   */
+  setCustomAccount(email: string, name?: string): GoogleUser {
+    const user: GoogleUser = {
+      email,
+      name: name || email.split('@')[0],
+      picture: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(email)}`,
+    };
+    const token: GoogleOAuthToken = {
+      accessToken: `custom_oauth_token_${Date.now()}`,
+      tokenType: 'Bearer',
+      expiresIn: 86400 * 30,
+      expiresAt: Date.now() + 86400 * 30 * 1000,
+      scope: GOOGLE_CALENDAR_SCOPES.join(' '),
+    };
+    this.saveAuth(token, user);
+    return user;
+  }
+
+  /**
    * Cierra la sesión y desconecta Google Calendar
    */
   disconnect(): void {

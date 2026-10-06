@@ -131,6 +131,7 @@ interface TaskContextType {
   connectGoogleCalendar: () => Promise<void>;
   disconnectGoogleCalendar: () => void;
   syncGoogleCalendar: () => Promise<void>;
+  setCustomGoogleAccount: (email: string, name?: string) => Promise<void>;
   openGoogleCalendarModal: () => void;
   closeGoogleCalendarModal: () => void;
   setSelectedGoogleEvent: (event: GoogleCalendarEvent | null) => void;
@@ -369,6 +370,13 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.removeItem('dharma_google_last_sync');
       localStorage.removeItem('dharma_google_synced_events');
     } catch (_) {}
+  };
+
+  const setCustomGoogleAccount = async (email: string, name?: string) => {
+    const user = googleCalendarService.setCustomAccount(email, name);
+    setGoogleUser(user);
+    setGoogleSyncStatus('connected');
+    await syncGoogleCalendar();
   };
 
   const openGoogleCalendarModal = () => setIsGoogleCalendarModalOpen(true);
@@ -1015,6 +1023,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         connectGoogleCalendar,
         disconnectGoogleCalendar,
         syncGoogleCalendar,
+        setCustomGoogleAccount,
         openGoogleCalendarModal,
         closeGoogleCalendarModal,
         setSelectedGoogleEvent,

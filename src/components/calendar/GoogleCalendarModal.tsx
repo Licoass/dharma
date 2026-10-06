@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { 
@@ -11,7 +11,12 @@ import {
   MapPin, 
   Video, 
   Layers,
-  ArrowRight
+  ArrowRight,
+  Mail,
+  Edit2,
+  HelpCircle,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { useTaskContext } from '../../context/TaskContext';
 import type { GoogleCalendarEvent } from '../../types';
@@ -35,7 +40,13 @@ export const GoogleCalendarModal: React.FC<GoogleCalendarModalProps> = ({
     connectGoogleCalendar,
     disconnectGoogleCalendar,
     syncGoogleCalendar,
+    setCustomGoogleAccount,
   } = useTaskContext();
+
+  const [isEditingAccount, setIsEditingAccount] = useState(false);
+  const [emailInput, setEmailInput] = useState('');
+  const [nameInput, setNameInput] = useState('');
+  const [showOAuthGuide, setShowOAuthGuide] = useState(false);
 
   const isConnected = googleSyncStatus === 'connected';
   const isSyncing = googleSyncStatus === 'syncing' || googleSyncStatus === 'connecting';
@@ -104,9 +115,26 @@ export const GoogleCalendarModal: React.FC<GoogleCalendarModalProps> = ({
                   </span>
                 </div>
 
-                <h3 className="text-sm sm:text-base font-bold text-[#24292F] mt-0.5">
-                  {isConnected && googleUser ? googleUser.name || googleUser.email : 'Google Calendar'}
-                </h3>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <h3 className="text-sm sm:text-base font-bold text-[#24292F]">
+                    {isConnected && googleUser ? googleUser.name || googleUser.email : 'Google Calendar'}
+                  </h3>
+                  {isConnected && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEmailInput(googleUser?.email || '');
+                        setNameInput(googleUser?.name || '');
+                        setIsEditingAccount(!isEditingAccount);
+                      }}
+                      className="text-[11px] font-bold text-[#1A73E8] hover:underline cursor-pointer flex items-center gap-1 ml-1"
+                      title="Cambiar correo o nombre"
+                    >
+                      <Edit2 className="w-3 h-3" />
+                      <span>{isEditingAccount ? 'Cancelar' : 'Cambiar correo'}</span>
+                    </button>
+                  )}
+                </div>
 
                 <p className="text-xs text-[#697282]">
                   {isConnected && googleUser ? (
@@ -146,25 +174,141 @@ export const GoogleCalendarModal: React.FC<GoogleCalendarModalProps> = ({
                   </Button>
                 </>
               ) : (
-                <Button
-                  variant="primary"
-                  size="md"
-                  onClick={() => connectGoogleCalendar()}
-                  disabled={isSyncing}
-                  icon={
-                    isSyncing ? (
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <ArrowRight className="w-4 h-4 stroke-[2.5]" />
-                    )
-                  }
-                  className="bg-[#1A73E8] hover:bg-[#1557B0] text-white shadow-sm"
-                >
-                  {isSyncing ? 'Conectando...' : 'Conectar con Google'}
-                </Button>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <Button
+                    variant="primary"
+                    size="md"
+                    onClick={() => connectGoogleCalendar()}
+                    disabled={isSyncing}
+                    icon={
+                      isSyncing ? (
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <ArrowRight className="w-4 h-4 stroke-[2.5]" />
+                      )
+                    }
+                    className="bg-[#1A73E8] hover:bg-[#1557B0] text-white shadow-sm"
+                  >
+                    {isSyncing ? 'Conectando...' : 'Conectar con Google'}
+                  </Button>
+
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    onClick={() => {
+                      setEmailInput('');
+                      setNameInput('');
+                      setIsEditingAccount(!isEditingAccount);
+                    }}
+                    icon={<Mail className="w-4 h-4 text-[#1A73E8]" />}
+                  >
+                    Ingresar mi correo
+                  </Button>
+                </div>
               )}
             </div>
           </div>
+
+          {/* Formulario de vinculación de correo personal */}
+          {isEditingAccount && (
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (emailInput.trim()) {
+                  await setCustomGoogleAccount(emailInput.trim(), nameInput.trim());
+                  setIsEditingAccount(false);
+                }
+              }}
+              className="mt-4 p-4 rounded-2xl bg-white border border-[#4285F4]/30 shadow-xs space-y-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-4 h-4 text-[#1A73E8]" />
+                  <span className="text-xs font-bold text-[#171717]">Vincular mi propio correo personal</span>
+                </div>
+                <span className="text-[10px] font-bold tracking-dharma uppercase text-[#1A73E8] bg-[#E8F0FE] px-2 py-0.5 rounded-full">
+                  PERSONAL
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label className="block text-[11px] font-bold text-[#737373] mb-1">Tu Correo Gmail</label>
+                  <input
+                    type="email"
+                    placeholder="ejemplo@gmail.com"
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.target.value)}
+                    required
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-[#FAF8F5] border border-black/[0.08] focus:bg-white focus:outline-none focus:border-[#1A73E8]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-bold text-[#737373] mb-1">Nombre para mostrar</label>
+                  <input
+                    type="text"
+                    placeholder="Tu Nombre"
+                    value={nameInput}
+                    onChange={(e) => setNameInput(e.target.value)}
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-[#FAF8F5] border border-black/[0.08] focus:bg-white focus:outline-none focus:border-[#1A73E8]"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-1">
+                <Button variant="ghost" size="sm" type="button" onClick={() => setIsEditingAccount(false)}>
+                  Cancelar
+                </Button>
+                <Button variant="primary" size="sm" type="submit" className="bg-[#1A73E8] hover:bg-[#1557B0] text-white">
+                  Guardar y Vincular
+                </Button>
+              </div>
+            </form>
+          )}
+        </div>
+
+        {/* 
+          ======================================================================
+          GUÍA: CÓMO SINCRONIZAR EVENTOS REALES CON GOOGLE OAUTH API
+          ======================================================================
+        */}
+        <div className="p-4 rounded-[22px] bg-white border border-black/[0.05] shadow-2xs">
+          <button
+            type="button"
+            onClick={() => setShowOAuthGuide(!showOAuthGuide)}
+            className="w-full flex items-center justify-between text-left cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <HelpCircle className="w-4 h-4 text-[#1A73E8]" />
+              <span className="text-xs font-bold text-[#171717]">
+                ¿Cómo sincronizar eventos reales automáticamente con tu cuenta de Google?
+              </span>
+            </div>
+            {showOAuthGuide ? (
+              <ChevronUp className="w-4 h-4 text-[#737373]" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-[#737373]" />
+            )}
+          </button>
+
+          {showOAuthGuide && (
+            <div className="mt-3 pt-3 border-t border-black/[0.04] text-xs text-[#525252] space-y-2 leading-relaxed">
+              <p>
+                Por seguridad y privacidad de Google, para que una web lea eventos reales directamente de los servidores de Google se utiliza un <strong>ID de cliente de Google Cloud</strong> (gratuito):
+              </p>
+              <ol className="list-decimal list-inside space-y-1.5 pl-1 text-[11px] text-[#404040]">
+                <li>Entra a <strong>console.cloud.google.com</strong> ➔ Menú <em>APIs y Servicios</em> ➔ <em>Credenciales</em>.</li>
+                <li>Haz clic en <strong>Crear credenciales</strong> ➔ <strong>ID de cliente de OAuth</strong> (Tipo: <em>Aplicación Web</em>).</li>
+                <li>En <em>Orígenes de JavaScript autorizados</em> agrega:
+                  <div className="mt-1 font-mono text-[10px] bg-[#F8F4E8] p-1.5 rounded-lg border border-black/[0.05]">
+                    https://licoass.github.io<br />
+                    http://localhost:5173
+                  </div>
+                </li>
+                <li>Copia tu <strong>Client ID</strong> (termina en <code>.apps.googleusercontent.com</code>) y agrégalo en tu <code>.env</code> y en los Secrets de GitHub como <code>VITE_GOOGLE_CLIENT_ID</code>.</li>
+              </ol>
+            </div>
+          )}
         </div>
 
         {/* 
