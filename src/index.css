@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    
+    /* DHARMA Color System */
+    --dharma-bg: #FAF9F6;
+    --dharma-card: #FFFFFF;
+    --dharma-border: #F1F0EB;
+    --dharma-text-main: #1E293B;
+    --dharma-text-muted: #64748B;
+    --dharma-text-subtle: #94A3B8;
+
+    /* Station Accents */
+    --dharma-teal: #0D9488;
+    --dharma-teal-soft: #CCFBF1;
+    --dharma-lavender: #8B5CF6;
+    --dharma-lavender-soft: #EDE9FE;
+    --dharma-sky: #0284C7;
+    --dharma-sky-soft: #E0F2FE;
+    --dharma-amber: #D97706;
+    --dharma-amber-soft: #FEF3C7;
+    --dharma-coral: #E11D48;
+    --dharma-coral-soft: #FFE4E6;
+    --dharma-green: #16A34A;
+    --dharma-green-soft: #DCFCE7;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--dharma-bg);
+    color: var(--dharma-text-main);
+    letter-spacing: -0.01em;
+  }
+
+  h1, .dharma-title {
+    letter-spacing: 0.06em;
+  }
+
+  h2, h3, .dharma-subtitle {
+    letter-spacing: 0.03em;
+  }
+}
+
+/* Custom Soft Elevation and Rounded Utilities */
+.dharma-card {
+  background-color: #FFFFFF;
+  border-radius: 24px;
+  border: 1px solid rgba(226, 232, 240, 0.65);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.03), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dharma-card-interactive {
+  background-color: #FFFFFF;
+  border-radius: 24px;
+  border: 1px solid rgba(226, 232, 240, 0.65);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.03), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dharma-card-interactive:hover {
+  transform: translateY(-2px);
+  border-color: rgba(203, 213, 225, 0.9);
+  box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.06), 0 4px 10px -2px rgba(15, 23, 42, 0.03);
+}
+
+/* Safe Area Insets for Mobile */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 16px);
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.45);
+}
