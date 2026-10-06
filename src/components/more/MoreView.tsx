@@ -15,7 +15,8 @@ import {
   Smartphone,
   CheckCircle2,
   Bell,
-  Cloud
+  Cloud,
+  Trash2
 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useTaskContext } from '../../context/TaskContext';
@@ -32,6 +33,7 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
   const { 
     tasks, 
     resetToDefaults, 
+    clearAllData,
     categories, 
     openDharmaCore,
     openGoogleCalendarModal,
@@ -900,6 +902,19 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
             icon={<RefreshCw className="w-4 h-4" />}
           >
             Restaurar Demo
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={() => {
+              if (window.confirm('¿Deseas vaciar todas las tareas, notas, libros y transmisiones de prueba para empezar DHARMA en limpio desde cero? (Tus categorías y estados se mantendrán intactos)')) {
+                clearAllData();
+              }
+            }}
+            icon={<Trash2 className="w-4 h-4 text-[#D93025]" />}
+          >
+            Empezar desde Cero
           </Button>
         </div>
       </div>

@@ -117,6 +117,7 @@ interface TaskContextType {
   deleteStatus: (id: string) => void;
   
   resetToDefaults: () => void;
+  clearAllData: () => void;
   getCategoryById: (id: string) => Category | undefined;
   getStatusById: (id: string) => TaskStatusItem | undefined;
 
@@ -863,6 +864,29 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setDharmaMood('calm');
   };
 
+  const clearAllData = () => {
+    setTasks([]);
+    setAgendaEvents([]);
+    setNotes([]);
+    setArchiveItems([]);
+    setBooks([]);
+    setTransmissions([]);
+    localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEY_EVENTS, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEY_ARCHIVE, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify([]));
+    localStorage.setItem(STORAGE_KEY_TRANSMISSIONS, JSON.stringify([]));
+    setSelectedCalendarDate(getTodayISO());
+    setFilters({
+      search: '',
+      categoryId: 'todas',
+      statusId: 'todas',
+      priority: 'todas',
+    });
+    setDharmaMood('calm');
+  };
+
   // Unified Calendar Activities (Tasks with date + Agenda Events + Reminders)
   const calendarActivities: CalendarActivity[] = useMemo(() => {
     const taskActivities: CalendarActivity[] = tasks
@@ -1039,6 +1063,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateStatus,
         deleteStatus,
         resetToDefaults,
+        clearAllData,
         getCategoryById,
         getStatusById,
         metrics: {
