@@ -117,7 +117,14 @@ export interface ArchiveItem {
   tags?: string[];
   isFavorite?: boolean;
   createdAt: string;
+  // Integración Google Drive (FASE 11)
+  source?: 'manual' | 'google_drive';
+  driveFileId?: string;
+  driveMimeType?: string;
+  driveIconLink?: string;
 }
+
+export * from './googleDrive';
 
 export type BookStatus = 'quiero_leer' | 'leyendo' | 'terminado' | 'abandonado';
 

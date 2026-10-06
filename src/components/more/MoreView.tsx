@@ -198,12 +198,25 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
       ],
     },
     {
-      phase: 'FASE 11+',
-      title: 'Sincronización en la Nube & Escritura Calendar',
+      phase: 'FASE 11',
+      title: 'Google Drive (Buscador & Recursos de Archivo)',
+      status: 'completada',
+      badge: 'VERIFICADO',
+      items: [
+        'Integración con Google Drive API v3 y Google OAuth 2.0',
+        'Buscador y explorador de archivos con filtros por tipo (Docs, Sheets, Slides, PDFs, Carpetas)',
+        'Vinculación de archivos como recursos dentro de ARCHIVO sin copiar archivos a Supabase',
+        'Almacenamiento exclusivo de referencia ligera (URL, id, metadata y miniatura)',
+        'Apertura directa del archivo en Google Drive en nueva pestaña al interactuar con el recurso',
+      ],
+    },
+    {
+      phase: 'FASE 12+',
+      title: 'Sincronización en la Nube & Automatizaciones',
       status: 'pendiente',
       badge: 'SIGUIENTES FASES',
       items: [
-        'Persistencia completa en Supabase Database en tiempo real multidispositivo',
+        'Persistencia en tiempo real en Supabase Database multidispositivo',
         'Operaciones de escritura en Google Calendar (crear, editar, eliminar eventos)',
         'Sincronización bidireccional automática en segundo plano',
         'Automatizaciones y análisis de hábitos inteligentes con DHARMA CORE',
@@ -213,8 +226,8 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
 
   return (
     <div className="space-y-7 pb-12 max-w-5xl mx-auto select-none">
-      {/* BANNERS PRINCIPALES: DHARMA CORE & GOOGLE CALENDAR */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+      {/* BANNERS PRINCIPALES: DHARMA CORE, GOOGLE CALENDAR & GOOGLE DRIVE */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
         {/* BANNER DHARMA CORE IA */}
         <Card
           padding="md"
@@ -304,6 +317,54 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
               icon={<Calendar className="w-3.5 h-3.5 text-[#1A73E8]" />}
             >
               Gestionar
+            </Button>
+          </div>
+        </Card>
+
+        {/* BANNER GOOGLE DRIVE */}
+        <Card
+          padding="md"
+          className="bg-gradient-to-r from-[#FEF6EC] via-white to-[#F8F9FA] border border-[#F59E0B]/20 cursor-pointer hover:shadow-[0_8px_24px_rgba(245,158,11,0.12)] transition-all"
+          onClick={() => onNavigateTab && onNavigateTab('archivo')}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-[#FEF6EC] flex items-center justify-center shrink-0 border border-[#FDE68A]">
+                <svg className="w-5 h-5" viewBox="0 0 87.3 78" xmlns="http://www.w3.org/2000/svg">
+                  <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+                  <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44c-.8 1.4-1.2 2.95-1.2 4.5h27.5z" fill="#00ac47"/>
+                  <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>
+                  <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
+                  <path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
+                  <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+                </svg>
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#FEF6EC] text-[#D97706]">
+                    GOOGLE DRIVE
+                  </span>
+                  <span className="text-[10px] font-mono text-[#D97706]">ENLACE DIRECTO</span>
+                </div>
+                <h3 className="text-sm font-bold text-[#24292F] mt-0.5">
+                  Archivos de Drive
+                </h3>
+                <p className="text-[11px] text-[#697282] line-clamp-1">
+                  Explora y vincula a Archivo sin descargas en Supabase.
+                </p>
+              </div>
+            </div>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onNavigateTab) onNavigateTab('archivo');
+              }}
+              icon={<ArrowRight className="w-3.5 h-3.5 text-[#D97706]" />}
+            >
+              Explorar
             </Button>
           </div>
         </Card>
