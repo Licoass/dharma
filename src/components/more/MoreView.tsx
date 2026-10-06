@@ -244,7 +244,20 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
       ],
     },
     {
-      phase: 'FASE 14+',
+      phase: 'FASE 14',
+      title: 'Experiencia Tablet (Tercera Experiencia Dedicada)',
+      status: 'completada',
+      badge: 'VERIFICADO',
+      items: [
+        'Breakpoints específicos: Mobile (< 768px), Tablet (768px – 1199px), Desktop (1200px+)',
+        'Sidebar compacto táctil (80px) con iconos centrados, badges compactos y FAB de captura integrado',
+        'Composición dedicada de Dashboard: contenido principal fluido + panel lateral integrado de Agenda y Google Calendar',
+        'Grids adaptativos de 2 y 3 columnas en Tareas (lista 2 cols), Biblioteca (3 cols exactas) y Archivo',
+        'Paneles laterales sticky cuando existe espacio sin estirar ni encoger interfaces desktop',
+      ],
+    },
+    {
+      phase: 'FASE 15+',
       title: 'Empaquetado APK/AAB (Capacitor) & Nube',
       status: 'pendiente',
       badge: 'SIGUIENTES FASES',

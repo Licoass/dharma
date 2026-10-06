@@ -23,12 +23,12 @@ export const AppShell: React.FC<AppShellProps> = ({
       <Sidebar currentTab={currentTab} onTabChange={onTabChange} />
 
       {/* 2. Main Content Container */}
-      <div className="flex-1 flex flex-col md:pl-20 lg:pl-64 transition-all duration-300">
+      <div className="flex-1 flex flex-col md:pl-20 desktop:pl-64 transition-all duration-300">
         {/* Header */}
         <Header currentTab={currentTab} onOpenQuickCapture={onOpenQuickCapture} />
 
-        {/* Dynamic Page Content */}
-        <main className="flex-1 px-4 sm:px-8 py-5 sm:py-7 max-w-5xl w-full mx-auto pb-28 md:pb-12">
+        {/* Dynamic Page Content (Optimized for Mobile, Tablet, and Desktop) */}
+        <main className="flex-1 px-4 sm:px-6 md:px-7 desktop:px-8 py-5 sm:py-7 max-w-5xl md:max-w-6xl desktop:max-w-7xl w-full mx-auto pb-28 md:pb-12">
           {children}
         </main>
       </div>

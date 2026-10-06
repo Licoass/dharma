@@ -296,10 +296,10 @@ export const TasksView: React.FC<TasksViewProps> = ({
         <div className="space-y-3">
           <div className="flex items-center justify-between text-xs text-[#9DA6B5] px-1">
             <span>{filteredTasks.length} tarea(s) en lista</span>
-            <span className="font-mono text-[10px]">VISTA LISTA COMPACTA</span>
+            <span className="font-mono text-[10px]">VISTA LISTA ADAPTABLE</span>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {filteredTasks.map((task) => (
               <TaskCard
                 key={task.id}

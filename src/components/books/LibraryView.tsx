@@ -238,13 +238,13 @@ export const LibraryView: React.FC<LibraryViewProps> = () => {
       {/* 
         =========================================================
         3. CUADRÍCULA RESPONSIVE DE LIBROS
-        - Móvil: 2 columnas (grid-cols-2)
-        - Tablet: 3 columnas (sm:grid-cols-3)
-        - Desktop: 4 o más columnas (lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6)
+        - Móvil (< 768px): 2 columnas (grid-cols-2)
+        - Tablet (768px - 1199px): 3 columnas (md:grid-cols-3)
+        - Desktop (1200px+): 4 o más columnas (desktop:grid-cols-4 xl:grid-cols-5)
         =========================================================
       */}
       {filteredBooks.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3.5 sm:gap-4 md:gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-3 desktop:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-4 md:gap-5">
           {filteredBooks.map((book) => (
             <BookCard
               key={book.id}

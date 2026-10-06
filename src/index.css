@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+@theme {
+  --breakpoint-sm: 640px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-desktop: 1200px;
+  --breakpoint-xl: 1200px;
+}
+
 @layer base {
   :root {
     --font-sans: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

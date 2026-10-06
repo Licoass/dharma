@@ -294,9 +294,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
 
       {/* 3. VISTAS DEL CALENDARIO SEGÚN MODO ACTIVO Y DISPOSITIVO */}
       {calendarViewMode === 'mes' && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Cuadrícula Mensual Orgánica (Desktop: 7-8 columnas | Móvil/Tablet: ancho completo) */}
-          <div className="lg:col-span-7 xl:col-span-8 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+          {/* Cuadrícula Mensual Orgánica (Tablet/Desktop: 7-8 columnas | Móvil: ancho completo) */}
+          <div className="md:col-span-7 desktop:col-span-8 space-y-4">
             <MonthView
               currentDate={currentDate}
               selectedDate={selectedCalendarDate}
@@ -306,8 +306,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
               onEditEvent={handleEditEventById}
             />
 
-            {/* En pantallas móviles y tablets, mostrar las actividades del día seleccionado debajo */}
-            <div className="lg:hidden mt-6 pt-4 border-t border-black/[0.04]">
+            {/* En pantallas móviles (<768px), mostrar las actividades del día seleccionado debajo */}
+            <div className="md:hidden mt-6 pt-4 border-t border-black/[0.04]">
               <SideAgendaPanel
                 selectedDate={selectedCalendarDate}
                 activities={calendarActivities}
@@ -318,8 +318,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onEditTask }) => {
             </div>
           </div>
 
-          {/* Panel Lateral de Agenda en Desktop (Requerimiento: "En desktop: Mes + panel lateral de agenda") */}
-          <div className="hidden lg:block lg:col-span-5 xl:col-span-4 sticky top-6">
+          {/* Panel Lateral de Agenda en Tablet & Desktop (Cuando exista espacio horizontal) */}
+          <div className="hidden md:block md:col-span-5 desktop:col-span-4 sticky top-6">
             <SideAgendaPanel
               selectedDate={selectedCalendarDate}
               activities={calendarActivities}
