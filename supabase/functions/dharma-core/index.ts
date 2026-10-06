@@ -11,7 +11,10 @@ const corsHeaders = {
 };
 
 interface RequestPayload {
-  text: string;
+  text?: string;
+  audioBase64?: string;
+  audioMimeType?: string;
+  audioUrl?: string;
   categories?: { id: string; name: string }[];
   currentDate?: string;
 }
@@ -37,11 +40,21 @@ serve(async (req: Request) => {
     }
 
     const body: RequestPayload = await req.json();
-    const { text, categories = [], currentDate = new Date().toISOString() } = body;
+    const { 
+      text, 
+      audioBase64, 
+      audioMimeType = "audio/webm", 
+      audioUrl,
+      categories = [], 
+      currentDate = new Date().toISOString() 
+    } = body;
 
-    if (!text || text.trim().length === 0) {
+    const hasAudio = !!audioBase64 && audioBase64.trim().length > 0;
+    const hasText = !!text && text.trim().length > 0;
+
+    if (!hasAudio && !hasText) {
       return new Response(
-        JSON.stringify({ error: "Text prompt is required" }),
+        JSON.stringify({ error: "Either text prompt or audioBase64 is required" }),
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -55,18 +68,20 @@ serve(async (req: Request) => {
 
     const systemPrompt = `
 Eres DHARMA CORE, el motor semántico de inteligencia artificial del Centro de Mando Personal DHARMA.
-Tu misión es recibir texto libre o transcripciones informales en español y extraer información estructurada (tareas, categorías, fechas y prioridades).
+Tu misión es recibir notas de voz en audio o texto libre en español y extraer información estructurada (transcripción, tareas, categorías, fechas y prioridades).
 
 REGLAS DE EXTRACCIÓN:
-1. Divide el texto en tareas atómicas y claras. Si el usuario menciona varias acciones (por ejemplo usando "y", "también", "además", "recordarle a"), crea una tarea para cada acción separada.
-2. Cada título de tarea debe redactarse en infinitivo o imperativo claro, limpio y accionable (ejemplo: "Revisar publicaciones de Ocupamor", "Recordarle a Anderling enviar las fotos").
-3. Asigna la categoría más coherente entre las siguientes disponibles:
+1. Si se te proporciona audio, transcríbelo con máxima precisión y fidelidad en el campo "transcription". Si se proporcionó texto, copia dicho texto en "transcription".
+2. Divide la información en tareas atómicas y claras. Si el usuario menciona varias acciones (por ejemplo usando "y", "también", "además", "recordarle a", "revisar"), crea una tarea separada para cada acción.
+3. Cada título de tarea debe redactarse en infinitivo o imperativo claro, limpio y conciso (ejemplo: "Revisar publicaciones de Ocupamor", "Recordarle a Anderling enviar las fotos").
+4. Asigna la categoría más coherente entre las siguientes disponibles:
 ${categoriesList}
-4. Detecta fechas relativas respecto a la fecha actual (${currentDate}). Por ejemplo "mañana", "hoy", "el jueves", "la próxima semana".
-5. Extrae la prioridad sugerida: "baja", "media", "alta" o "vital" (por defecto "media" salvo si se indica urgencia o criticidad).
+5. Detecta fechas relativas respecto a la fecha de hoy (${currentDate}). Por ejemplo "mañana", "hoy", "el jueves", "la próxima semana".
+6. Extrae la prioridad sugerida: "baja", "media", "alta" o "vital" (por defecto "media" salvo si se indica urgencia o criticidad).
 
-DEBES RESPONDER EXCLUSIVAMENTE EN FORMATO JSON VÁLIDO CON ESTA ESTRUCTURA:
+DEBES RESPONDER EXCLUSIVAMENTE EN FORMATO JSON VÁLIDO CON ESTA ESTRUCTURA EXACTA:
 {
+  "transcription": "Texto transcrito del audio o texto original analizado",
   "summary": "Resumen conciso de lo encontrado (ej: He encontrado 2 tareas para Ocupamor fechadas para mañana)",
   "detectedCategory": "Nombre de la categoría principal detectada",
   "detectedCategoryId": "id_de_la_categoria",
@@ -85,6 +100,27 @@ DEBES RESPONDER EXCLUSIVAMENTE EN FORMATO JSON VÁLIDO CON ESTA ESTRUCTURA:
 }
 `;
 
+    // Preparar parts para Gemini
+    const parts: any[] = [{ text: systemPrompt }];
+
+    if (hasAudio) {
+      parts.push({
+        inlineData: {
+          mimeType: audioMimeType,
+          data: audioBase64,
+        },
+      });
+      parts.push({
+        text: `Por favor escucha atentamente este audio grabado en español:
+1. Transcribe exactamente lo que se dijo en el campo "transcription".
+2. Analiza las tareas, categorías, fechas y prioridades solicitadas según las instrucciones.`,
+      });
+    } else {
+      parts.push({
+        text: `Texto del usuario para analizar:\n"${text}"`,
+      });
+    }
+
     // Call Gemini 1.5 Flash API with structured JSON output
     const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
@@ -95,10 +131,7 @@ DEBES RESPONDER EXCLUSIVAMENTE EN FORMATO JSON VÁLIDO CON ESTA ESTRUCTURA:
         contents: [
           {
             role: "user",
-            parts: [
-              { text: systemPrompt },
-              { text: `Texto del usuario para analizar:\n"${text}"` },
-            ],
+            parts,
           },
         ],
         generationConfig: {
@@ -124,6 +157,10 @@ DEBES RESPONDER EXCLUSIVAMENTE EN FORMATO JSON VÁLIDO CON ESTA ESTRUCTURA:
       geminiData.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
 
     const parsedOutput = JSON.parse(candidateText);
+
+    if (audioUrl) {
+      parsedOutput.audioUrl = audioUrl;
+    }
 
     return new Response(JSON.stringify(parsedOutput), {
       status: 200,

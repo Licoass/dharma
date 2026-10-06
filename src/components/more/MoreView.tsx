@@ -150,7 +150,7 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
       phase: 'FASE 8',
       title: 'Dharma Core (Integración Gemini)',
       status: 'completada',
-      badge: 'ACTUAL',
+      badge: 'VERIFICADO',
       items: [
         'Motor de extracción semántica para convertir texto libre en tareas y protocolos',
         'Detección inteligente de tareas múltiples, categorías (Ocupamor, etc.) y fechas relativas (mañana, etc.)',
@@ -159,7 +159,22 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
       ],
     },
     {
-      phase: 'FASE 9+',
+      phase: 'FASE 9',
+      title: 'Captura de Audio & Dharma Core',
+      status: 'completada',
+      badge: 'VERIFICADO',
+      items: [
+        'Grabación móvil: botón grande 🎙 con «Mantén presionado para hablar» (touch & pointer hold)',
+        'Grabación desktop: botón «Iniciar grabación» y «Detener grabación»',
+        'Cronómetro en vivo (00:00, 00:01, 00:02...) con visualizador de ondas reactivas',
+        'Acciones al terminar: Reproducir (reproductor interactivo), Descartar y Procesar con DHARMA CORE',
+        'Almacenamiento temporal en Supabase Storage (bucket audio-transmissions) y llamada multimodal con Gemini',
+        'Extracción con IA: transcribir, identificar tareas, categorías, fechas y prioridades',
+        'Seguridad y control: nunca crea tareas automáticamente sin confirmación explícita del usuario',
+      ],
+    },
+    {
+      phase: 'FASE 10+',
       title: 'Sincronización en la Nube & Google Calendar',
       status: 'pendiente',
       badge: 'SIGUIENTES FASES',

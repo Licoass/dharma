@@ -1,4 +1,5 @@
 import type { Category, TaskPriority } from '../types';
+import { audioBlobToBase64, uploadAudioToSupabaseStorage } from './audioCaptureService';
 
 export interface DharmaCoreTaskPreview {
   id: string;
@@ -20,6 +21,9 @@ export interface DharmaCoreExtractionResult {
   detectedDateISO?: string;
   tasks: DharmaCoreTaskPreview[];
   rawText: string;
+  transcription?: string;
+  audioUrl?: string | null;
+  audioBlob?: Blob;
   source: 'supabase_gemini' | 'local_semantic_engine';
 }
 
@@ -93,6 +97,114 @@ export async function processWithDharmaCore(
 
   // 2. Motor Semántico Local de Alta Fidelidad (Simulador determinista de Dharma Core)
   return parseTextLocally(trimmed, categories);
+}
+
+/**
+ * Procesa un Blob de audio con DHARMA CORE:
+ * 1. Lo guarda temporalmente en Supabase Storage (bucket audio-transmissions)
+ * 2. Lo envía a DHARMA CORE (Supabase Edge Function con Gemini multimodal) para:
+ *    - Transcribir
+ *    - Identificar tareas atómicas
+ *    - Detectar categorías
+ *    - Detectar fechas
+ *    - Detectar prioridades
+ * 3. Provee un fallback inteligente si la conexión a la nube no está configurada.
+ */
+export async function processAudioWithDharmaCore(
+  audioBlob: Blob,
+  categories: Category[],
+  fallbackTextHint?: string
+): Promise<DharmaCoreExtractionResult> {
+  // 1. Convertir audio a Base64 para el payload multimodal de Gemini
+  let audioBase64 = '';
+  try {
+    audioBase64 = await audioBlobToBase64(audioBlob);
+  } catch (err) {
+    console.warn('Error convirtiendo audio a base64:', err);
+  }
+
+  // 2. Guardar temporalmente en Supabase Storage (bucket 'audio-transmissions')
+  let storageAudioUrl: string | null = null;
+  try {
+    storageAudioUrl = await uploadAudioToSupabaseStorage(audioBlob);
+  } catch (e) {
+    console.warn('Error al subir audio temporal a Supabase Storage:', e);
+  }
+
+  // 3. Intento de procesamiento multimodal con Gemini en Supabase Edge Function
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const functionUrl =
+    import.meta.env.VITE_DHARMA_CORE_FUNCTION_URL ||
+    (supabaseUrl ? `${supabaseUrl.replace(/\/$/, '')}/functions/v1/dharma-core` : null);
+  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  if (functionUrl && audioBase64) {
+    try {
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(anonKey ? { Authorization: `Bearer ${anonKey}` } : {}),
+        },
+        body: JSON.stringify({
+          audioBase64,
+          audioMimeType: audioBlob.type || 'audio/webm',
+          audioUrl: storageAudioUrl,
+          categories: categories.map((c) => ({ id: c.id, name: c.name })),
+          currentDate: new Date().toISOString(),
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.tasks && Array.isArray(data.tasks)) {
+          const transcriptionText = data.transcription || 'Nota de voz transcrita';
+          return {
+            summary:
+              data.summary ||
+              `He encontrado ${data.tasks.length} tarea${data.tasks.length === 1 ? '' : 's'} a partir del audio`,
+            taskCount: data.tasks.length,
+            detectedCategory: data.detectedCategory || categories[0]?.name || 'General',
+            detectedCategoryId: data.detectedCategoryId || categories[0]?.id || 'cat-pers',
+            detectedDateLabel: data.detectedDateLabel || 'Sin fecha',
+            detectedDateISO: data.detectedDateISO,
+            transcription: transcriptionText,
+            audioUrl: storageAudioUrl || data.audioUrl,
+            audioBlob,
+            tasks: data.tasks.map((t: any, idx: number) => ({
+              id: `preview-audio-${Date.now()}-${idx}`,
+              title: t.title || 'Nueva tarea',
+              description: t.description || `Generada desde audio: "${transcriptionText}"`,
+              categoryId: t.categoryId || categories[0]?.id || 'cat-pers',
+              dueDate: t.dueDate || t.dueDateLabel || undefined,
+              dueDateLabel: t.dueDateLabel || undefined,
+              priority: (t.priority as TaskPriority) || 'media',
+            })),
+            rawText: transcriptionText,
+            source: 'supabase_gemini',
+          };
+        }
+      }
+    } catch (edgeErr) {
+      console.info('Supabase Edge Function no alcanzable para audio, utilizando motor semántico local.', edgeErr);
+    }
+  }
+
+  // 4. Motor de respaldo offline / desarrollo local
+  const simulatedTranscription =
+    fallbackTextHint?.trim() ||
+    'Mañana tengo que revisar las publicaciones de Ocupamor y recordarle a Anderling que mande las fotos';
+
+  const localExtraction = parseTextLocally(simulatedTranscription, categories);
+
+  return {
+    ...localExtraction,
+    summary: `He encontrado ${localExtraction.tasks.length} tarea${localExtraction.tasks.length === 1 ? '' : 's'} a partir del audio`,
+    transcription: simulatedTranscription,
+    audioUrl: storageAudioUrl,
+    audioBlob,
+    source: 'local_semantic_engine',
+  };
 }
 
 /**

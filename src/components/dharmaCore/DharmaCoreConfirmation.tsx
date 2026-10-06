@@ -118,6 +118,17 @@ export const DharmaCoreConfirmation: React.FC<DharmaCoreConfirmationProps> = ({
             Fecha: <span className="text-[#D48B38] capitalize">{result.detectedDateLabel}</span>
           </span>
         </div>
+
+        {result.transcription && (
+          <div className="pt-2 mt-2 border-t border-black/[0.04] flex items-start gap-2 text-xs text-[#697282]">
+            <span className="text-[10px] font-mono font-bold text-[#177468] bg-[#E8F6F4] px-1.5 py-0.5 rounded shrink-0">
+              AUDIO / TEXTO
+            </span>
+            <p className="italic text-[#4A5568] line-clamp-2">
+              "{result.transcription}"
+            </p>
+          </div>
+        )}
       </div>
 
       {/* 

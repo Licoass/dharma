@@ -12,6 +12,7 @@ import { MoreView } from './components/more/MoreView';
 import { QuickCaptureModal } from './components/capture/QuickCaptureModal';
 import { TaskFormModal } from './components/tasks/TaskFormModal';
 import { DharmaCoreModal } from './components/dharmaCore/DharmaCoreModal';
+import { AudioCaptureModal } from './components/audio/AudioCaptureModal';
 import type { NavTab, Task } from './types';
 
 const MainLayout: React.FC = () => {
@@ -26,7 +27,9 @@ const MainLayout: React.FC = () => {
     setIsQuickCaptureOpen, 
     isDharmaCoreModalOpen, 
     closeDharmaCore, 
-    dharmaCoreInitialText 
+    dharmaCoreInitialText,
+    isAudioCaptureOpen,
+    closeAudioCapture
   } = useTaskContext();
 
   const handleOpenCreateTask = (statusId: string = 'por_hacer') => {
@@ -109,6 +112,11 @@ const MainLayout: React.FC = () => {
         isOpen={isDharmaCoreModalOpen}
         onClose={closeDharmaCore}
         initialText={dharmaCoreInitialText}
+      />
+
+      <AudioCaptureModal
+        isOpen={isAudioCaptureOpen}
+        onClose={closeAudioCapture}
       />
     </AppShell>
   );

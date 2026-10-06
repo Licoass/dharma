@@ -2,7 +2,7 @@ import React from 'react';
 import type { NavTab } from '../../types';
 import { DharmaCore } from '../common/DharmaCore';
 import { useTaskContext } from '../../context/TaskContext';
-import { RefreshCw, Plus, Sparkles } from 'lucide-react';
+import { RefreshCw, Plus, Sparkles, Mic } from 'lucide-react';
 
 export interface HeaderProps {
   currentTab: NavTab;
@@ -10,7 +10,7 @@ export interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ currentTab, onOpenQuickCapture }) => {
-  const { dharmaMood, metrics, resetToDefaults, openDharmaCore } = useTaskContext();
+  const { dharmaMood, metrics, resetToDefaults, openDharmaCore, openAudioCapture } = useTaskContext();
 
   const todayStr = new Intl.DateTimeFormat('es-ES', {
     weekday: 'long',
@@ -103,6 +103,16 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, onOpenQuickCapture }
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Datos Demo</span>
+          </button>
+
+          {/* Botón Grabación de Voz / Audio */}
+          <button
+            onClick={() => openAudioCapture()}
+            title="Grabar Audio — Transcribir y detectar tareas con DHARMA CORE"
+            className="flex items-center gap-1.5 sm:gap-2 bg-[#FAF5FF] hover:bg-[#F3E8FF] text-[#8B5CF6] px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-[20px] transition-all cursor-pointer shadow-xs active:scale-95 border border-[#8B5CF6]/15"
+          >
+            <Mic className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span className="text-xs font-bold hidden sm:inline">Grabar Voz</span>
           </button>
 
           {/* Botón Asistente IA Dharma Core */}

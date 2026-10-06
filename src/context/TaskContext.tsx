@@ -46,6 +46,7 @@ interface TaskContextType {
   isQuickCaptureOpen: boolean;
   isDharmaCoreModalOpen: boolean;
   dharmaCoreInitialText: string;
+  isAudioCaptureOpen: boolean;
   setFilters: React.Dispatch<React.SetStateAction<TaskFilters>>;
   setViewMode: (mode: ViewMode) => void;
   setCalendarViewMode: (mode: CalendarViewMode) => void;
@@ -54,6 +55,8 @@ interface TaskContextType {
   setIsQuickCaptureOpen: (open: boolean) => void;
   openDharmaCore: (initialText?: string) => void;
   closeDharmaCore: () => void;
+  openAudioCapture: () => void;
+  closeAudioCapture: () => void;
   
   // Task operations
   addTask: (taskData: Omit<Task, 'id' | 'createdAt'>) => Task;
@@ -242,6 +245,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isQuickCaptureOpen, setIsQuickCaptureOpen] = useState(false);
   const [isDharmaCoreModalOpen, setIsDharmaCoreModalOpen] = useState(false);
   const [dharmaCoreInitialText, setDharmaCoreInitialText] = useState('');
+  const [isAudioCaptureOpen, setIsAudioCaptureOpen] = useState(false);
 
   const openDharmaCore = (initialText: string = '') => {
     setDharmaCoreInitialText(initialText);
@@ -251,6 +255,14 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const closeDharmaCore = () => {
     setIsDharmaCoreModalOpen(false);
     setDharmaCoreInitialText('');
+  };
+
+  const openAudioCapture = () => {
+    setIsAudioCaptureOpen(true);
+  };
+
+  const closeAudioCapture = () => {
+    setIsAudioCaptureOpen(false);
   };
 
   // Sync to localStorage
@@ -730,6 +742,7 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isQuickCaptureOpen,
         isDharmaCoreModalOpen,
         dharmaCoreInitialText,
+        isAudioCaptureOpen,
         setFilters,
         setViewMode,
         setCalendarViewMode,
@@ -738,6 +751,8 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsQuickCaptureOpen,
         openDharmaCore,
         closeDharmaCore,
+        openAudioCapture,
+        closeAudioCapture,
         addTask,
         updateTask,
         deleteTask,

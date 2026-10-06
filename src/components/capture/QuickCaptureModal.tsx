@@ -4,7 +4,7 @@ import { Button } from '../ui/Button';
 import { useTaskContext } from '../../context/TaskContext';
 import type { TaskPriority } from '../../types';
 import { DharmaCore } from '../common/DharmaCore';
-import { ArrowRight, CornerDownLeft, Sparkles } from 'lucide-react';
+import { ArrowRight, CornerDownLeft, Sparkles, Mic } from 'lucide-react';
 
 export const QuickCaptureModal: React.FC = () => {
   const { 
@@ -13,7 +13,8 @@ export const QuickCaptureModal: React.FC = () => {
     addTask, 
     categories, 
     statuses, 
-    openDharmaCore 
+    openDharmaCore,
+    openAudioCapture
   } = useTaskContext();
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState(categories[0]?.id || 'cat-eco');
@@ -53,17 +54,33 @@ export const QuickCaptureModal: React.FC = () => {
             <p className="leading-snug">
               Captura ágilmente. El <span className="font-bold">Dharma Core</span> clasificará la tarea en tu categoría seleccionada.
             </p>
-            <button
-              type="button"
-              onClick={() => {
-                setIsQuickCaptureOpen(false);
-                openDharmaCore(title);
-              }}
-              className="mt-1 text-[11px] font-bold text-[#177468] hover:underline flex items-center gap-1 cursor-pointer"
-            >
-              <Sparkles className="w-3 h-3 stroke-[2.5]" />
-              <span>¿Texto largo con varias tareas? Analizar con Dharma Core (IA)</span>
-            </button>
+            <div className="mt-1.5 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsQuickCaptureOpen(false);
+                  openDharmaCore(title);
+                }}
+                className="text-[11px] font-bold text-[#177468] hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <Sparkles className="w-3 h-3 stroke-[2.5]" />
+                <span>Analizar texto con Core</span>
+              </button>
+
+              <span className="text-[#9DA6B5] text-[10px]">·</span>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsQuickCaptureOpen(false);
+                  openAudioCapture();
+                }}
+                className="text-[11px] font-bold text-[#8B5CF6] hover:underline flex items-center gap-1 cursor-pointer"
+              >
+                <Mic className="w-3 h-3" />
+                <span>Grabar nota de voz</span>
+              </button>
+            </div>
           </div>
         </div>
 
