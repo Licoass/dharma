@@ -4,10 +4,17 @@ import { Button } from '../ui/Button';
 import { useTaskContext } from '../../context/TaskContext';
 import type { TaskPriority } from '../../types';
 import { DharmaCore } from '../common/DharmaCore';
-import { ArrowRight, CornerDownLeft } from 'lucide-react';
+import { ArrowRight, CornerDownLeft, Sparkles } from 'lucide-react';
 
 export const QuickCaptureModal: React.FC = () => {
-  const { isQuickCaptureOpen, setIsQuickCaptureOpen, addTask, categories, statuses } = useTaskContext();
+  const { 
+    isQuickCaptureOpen, 
+    setIsQuickCaptureOpen, 
+    addTask, 
+    categories, 
+    statuses, 
+    openDharmaCore 
+  } = useTaskContext();
   const [title, setTitle] = useState('');
   const [categoryId, setCategoryId] = useState(categories[0]?.id || 'cat-eco');
   const [priority, setPriority] = useState<TaskPriority>('media');
@@ -42,9 +49,22 @@ export const QuickCaptureModal: React.FC = () => {
         {/* Core Prompt */}
         <div className="flex items-center gap-3 p-3.5 rounded-[20px] bg-[#E8F6F4]/70 text-[#177468] text-xs">
           <DharmaCore mood="focus" size="sm" />
-          <p className="leading-snug">
-            Captura ágilmente. El <span className="font-bold">Dharma Core</span> clasificará la tarea en tu categoría seleccionada.
-          </p>
+          <div className="flex-1">
+            <p className="leading-snug">
+              Captura ágilmente. El <span className="font-bold">Dharma Core</span> clasificará la tarea en tu categoría seleccionada.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                setIsQuickCaptureOpen(false);
+                openDharmaCore(title);
+              }}
+              className="mt-1 text-[11px] font-bold text-[#177468] hover:underline flex items-center gap-1 cursor-pointer"
+            >
+              <Sparkles className="w-3 h-3 stroke-[2.5]" />
+              <span>¿Texto largo con varias tareas? Analizar con Dharma Core (IA)</span>
+            </button>
+          </div>
         </div>
 
         {/* Input */}

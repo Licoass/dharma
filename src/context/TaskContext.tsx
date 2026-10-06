@@ -44,12 +44,16 @@ interface TaskContextType {
   selectedCalendarDate: string;
   dharmaMood: DharmaCoreMood;
   isQuickCaptureOpen: boolean;
+  isDharmaCoreModalOpen: boolean;
+  dharmaCoreInitialText: string;
   setFilters: React.Dispatch<React.SetStateAction<TaskFilters>>;
   setViewMode: (mode: ViewMode) => void;
   setCalendarViewMode: (mode: CalendarViewMode) => void;
   setSelectedCalendarDate: (date: string) => void;
   setDharmaMood: (mood: DharmaCoreMood) => void;
   setIsQuickCaptureOpen: (open: boolean) => void;
+  openDharmaCore: (initialText?: string) => void;
+  closeDharmaCore: () => void;
   
   // Task operations
   addTask: (taskData: Omit<Task, 'id' | 'createdAt'>) => Task;
@@ -236,6 +240,18 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [dharmaMood, setDharmaMood] = useState<DharmaCoreMood>('calm');
   const [isQuickCaptureOpen, setIsQuickCaptureOpen] = useState(false);
+  const [isDharmaCoreModalOpen, setIsDharmaCoreModalOpen] = useState(false);
+  const [dharmaCoreInitialText, setDharmaCoreInitialText] = useState('');
+
+  const openDharmaCore = (initialText: string = '') => {
+    setDharmaCoreInitialText(initialText);
+    setIsDharmaCoreModalOpen(true);
+  };
+
+  const closeDharmaCore = () => {
+    setIsDharmaCoreModalOpen(false);
+    setDharmaCoreInitialText('');
+  };
 
   // Sync to localStorage
   useEffect(() => {
@@ -712,12 +728,16 @@ export const TaskProvider: React.FC<{ children: React.ReactNode }> = ({ children
         selectedCalendarDate,
         dharmaMood,
         isQuickCaptureOpen,
+        isDharmaCoreModalOpen,
+        dharmaCoreInitialText,
         setFilters,
         setViewMode,
         setCalendarViewMode,
         setSelectedCalendarDate,
         setDharmaMood,
         setIsQuickCaptureOpen,
+        openDharmaCore,
+        closeDharmaCore,
         addTask,
         updateTask,
         deleteTask,

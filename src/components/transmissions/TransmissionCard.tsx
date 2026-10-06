@@ -15,7 +15,8 @@ import {
   ArrowUpRight, 
   Play, 
   Pause,
-  Radio
+  Radio,
+  Sparkles
 } from 'lucide-react';
 import type { Transmission, TransmissionStatus, TransmissionType } from '../../types';
 import { DropdownMenu } from '../ui/DropdownMenu';
@@ -98,7 +99,7 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
   onChangeStatus,
   onDelete,
 }) => {
-  const { addTask, addNote } = useTaskContext();
+  const { addTask, addNote, openDharmaCore } = useTaskContext();
   const [isPlayingAudio, setIsPlayingAudio] = useState(false);
 
   const statusCfg = TRANSMISSION_STATUS_CONFIG[transmission.status] || TRANSMISSION_STATUS_CONFIG.nueva;
@@ -142,6 +143,12 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
   };
 
   const menuItems = [
+    {
+      id: 'dharma-core',
+      label: 'Procesar con Dharma Core (IA)',
+      icon: <Sparkles className="w-3.5 h-3.5 text-[#177468]" />,
+      onClick: () => openDharmaCore(transmission.content),
+    },
     {
       id: 'convert-task',
       label: 'Convertir en Tarea',
@@ -368,14 +375,26 @@ export const TransmissionCard: React.FC<TransmissionCardProps> = ({
         {/* Acciones Rápidas directas */}
         <div className="flex items-center gap-1.5">
           {transmission.status !== 'procesada' && (
-            <button
-              type="button"
-              onClick={handleConvertToTask}
-              className="px-2.5 py-1 rounded-lg bg-[#FAF8F5] hover:bg-[#E8F6F4] text-[#177468] font-bold text-[11px] transition-colors cursor-pointer border border-black/[0.03]"
-              title="Convertir rápidamente en tarea de Dharma"
-            >
-              A Tarea
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => openDharmaCore(transmission.content)}
+                className="px-2 py-1 rounded-lg bg-[#E8F6F4] hover:bg-[#D5EFEA] text-[#177468] font-bold text-[11px] transition-colors cursor-pointer flex items-center gap-1 border border-[#177468]/15"
+                title="Extraer tareas automáticamente con Dharma Core (Gemini)"
+              >
+                <Sparkles className="w-3 h-3 stroke-[2.5]" />
+                <span className="hidden sm:inline">Dharma Core</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleConvertToTask}
+                className="px-2.5 py-1 rounded-lg bg-[#FAF8F5] hover:bg-[#E8F6F4] text-[#177468] font-bold text-[11px] transition-colors cursor-pointer border border-black/[0.03]"
+                title="Convertir rápidamente en tarea de Dharma"
+              >
+                A Tarea
+              </button>
+            </>
           )}
 
           {transmission.status !== 'archivada' && (

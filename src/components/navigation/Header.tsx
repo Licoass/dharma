@@ -2,7 +2,7 @@ import React from 'react';
 import type { NavTab } from '../../types';
 import { DharmaCore } from '../common/DharmaCore';
 import { useTaskContext } from '../../context/TaskContext';
-import { RefreshCw, Plus } from 'lucide-react';
+import { RefreshCw, Plus, Sparkles } from 'lucide-react';
 
 export interface HeaderProps {
   currentTab: NavTab;
@@ -10,7 +10,7 @@ export interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ currentTab, onOpenQuickCapture }) => {
-  const { dharmaMood, metrics, resetToDefaults } = useTaskContext();
+  const { dharmaMood, metrics, resetToDefaults, openDharmaCore } = useTaskContext();
 
   const todayStr = new Intl.DateTimeFormat('es-ES', {
     weekday: 'long',
@@ -105,8 +105,22 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, onOpenQuickCapture }
             <span>Datos Demo</span>
           </button>
 
+          {/* Botón Asistente IA Dharma Core */}
+          <button
+            onClick={() => openDharmaCore()}
+            title="Dharma Core — Extracción inteligente de tareas con Gemini"
+            className="flex items-center gap-1.5 sm:gap-2 bg-[#E8F6F4] hover:bg-[#D5EFEA] text-[#177468] px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-[20px] transition-all cursor-pointer shadow-xs active:scale-95 border border-[#177468]/15"
+          >
+            <Sparkles className="w-3.5 h-3.5 stroke-[2.5]" />
+            <span className="text-xs font-bold hidden sm:inline">Dharma Core</span>
+          </button>
+
           {/* Dharma Core Status Pill */}
-          <div className="flex items-center gap-2.5 bg-white px-3.5 py-2 rounded-[20px] shadow-[0_2px_12px_rgba(36,41,47,0.03)]">
+          <button
+            onClick={() => openDharmaCore()}
+            title="Abrir Dharma Core"
+            className="flex items-center gap-2.5 bg-white hover:bg-[#FAF8F5] px-3.5 py-2 rounded-[20px] shadow-[0_2px_12px_rgba(36,41,47,0.03)] border border-black/[0.03] transition-colors cursor-pointer"
+          >
             <DharmaCore mood={dharmaMood} size="sm" />
             <div className="text-left hidden sm:block">
               <span className="text-[11px] font-bold text-[#24292F] tracking-wide block leading-none">
@@ -116,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({ currentTab, onOpenQuickCapture }
                 {metrics.completionPercentage}% completado
               </span>
             </div>
-          </div>
+          </button>
         </div>
       </div>
     </header>

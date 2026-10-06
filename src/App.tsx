@@ -11,6 +11,7 @@ import { LibraryView } from './components/books/LibraryView';
 import { MoreView } from './components/more/MoreView';
 import { QuickCaptureModal } from './components/capture/QuickCaptureModal';
 import { TaskFormModal } from './components/tasks/TaskFormModal';
+import { DharmaCoreModal } from './components/dharmaCore/DharmaCoreModal';
 import type { NavTab, Task } from './types';
 
 const MainLayout: React.FC = () => {
@@ -19,7 +20,14 @@ const MainLayout: React.FC = () => {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [defaultStatusForNew, setDefaultStatusForNew] = useState<string>('por_hacer');
 
-  const { addTask, updateTask, setIsQuickCaptureOpen } = useTaskContext();
+  const { 
+    addTask, 
+    updateTask, 
+    setIsQuickCaptureOpen, 
+    isDharmaCoreModalOpen, 
+    closeDharmaCore, 
+    dharmaCoreInitialText 
+  } = useTaskContext();
 
   const handleOpenCreateTask = (statusId: string = 'por_hacer') => {
     setEditingTask(null);
@@ -95,6 +103,12 @@ const MainLayout: React.FC = () => {
         onSubmit={handleSaveTask}
         initialTask={editingTask}
         defaultStatusId={defaultStatusForNew}
+      />
+
+      <DharmaCoreModal
+        isOpen={isDharmaCoreModalOpen}
+        onClose={closeDharmaCore}
+        initialText={dharmaCoreInitialText}
       />
     </AppShell>
   );

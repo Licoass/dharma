@@ -9,6 +9,7 @@ import {
   Bookmark,
   BookOpen,
   Radio,
+  Sparkles,
   ArrowRight
 } from 'lucide-react';
 import { Card } from '../ui/Card';
@@ -22,7 +23,7 @@ export interface MoreViewProps {
 }
 
 export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
-  const { tasks, resetToDefaults, categories } = useTaskContext();
+  const { tasks, resetToDefaults, categories, openDharmaCore } = useTaskContext();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExportJSON = () => {
@@ -136,7 +137,7 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
       phase: 'FASE 7',
       title: 'Transmisiones (Inbox)',
       status: 'completada',
-      badge: 'ACTUAL',
+      badge: 'VERIFICADO',
       items: [
         'Módulo Inbox para material crudo con tipos: Texto, Audio, Enlace e Imagen',
         'Opciones funcionales para Texto y Enlace; interfaz preparada para Audio con visualizador de ondas',
@@ -146,7 +147,19 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
       ],
     },
     {
-      phase: 'FASE 8+',
+      phase: 'FASE 8',
+      title: 'Dharma Core (Integración Gemini)',
+      status: 'completada',
+      badge: 'ACTUAL',
+      items: [
+        'Motor de extracción semántica para convertir texto libre en tareas y protocolos',
+        'Detección inteligente de tareas múltiples, categorías (Ocupamor, etc.) y fechas relativas (mañana, etc.)',
+        'Pantalla de confirmación obligatoria previa al guardado: [Aceptar todo], [Editar] y [Descartar]',
+        'Llamada segura a Gemini mediante Supabase Edge Functions sin exponer API keys en el frontend',
+      ],
+    },
+    {
+      phase: 'FASE 9+',
       title: 'Sincronización en la Nube & Google Calendar',
       status: 'pendiente',
       badge: 'SIGUIENTES FASES',
@@ -160,6 +173,44 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
 
   return (
     <div className="space-y-7 pb-12 max-w-5xl mx-auto select-none">
+      {/* BANNER DHARMA CORE IA */}
+      <Card
+        padding="md"
+        className="bg-gradient-to-r from-[#E8F6F4] via-white to-[#FEF6EC] border border-[#177468]/15 cursor-pointer hover:shadow-[0_8px_24px_rgba(23,116,104,0.12)] transition-all"
+        onClick={() => openDharmaCore()}
+      >
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <DharmaCore mood="celebrate" size="sm" />
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-mono font-bold text-[#177468] uppercase bg-[#E8F6F4] px-2 py-0.5 rounded-full">
+                  DHARMA CORE ONLINE
+                </span>
+                <span className="text-[10px] font-mono text-[#D48B38]">GEMINI 1.5 FLASH</span>
+              </div>
+              <h3 className="text-sm sm:text-base font-bold text-[#24292F] mt-0.5">
+                Asistente de Extracción Semántica
+              </h3>
+              <p className="text-xs text-[#697282] line-clamp-1">
+                Escribe en lenguaje libre y confirma la extracción estructurada antes de guardar.
+              </p>
+            </div>
+          </div>
+
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              openDharmaCore();
+            }}
+            icon={<Sparkles className="w-3.5 h-3.5" />}
+          >
+            Abrir Core
+          </Button>
+        </div>
+      </Card>
       {/* 0. ACCESO RÁPIDO A MÓDULOS ACTIVOS */}
       {onNavigateTab && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
