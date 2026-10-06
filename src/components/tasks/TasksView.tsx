@@ -15,6 +15,7 @@ import { Button } from '../ui/Button';
 import { EmptyState } from '../ui/EmptyState';
 import { Modal } from '../ui/Modal';
 import { Input } from '../ui/Input';
+import { GmailModal } from '../gmail/GmailModal';
 
 export interface TasksViewProps {
   onOpenCreateTask: (defaultStatusId?: string) => void;
@@ -44,6 +45,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
     deleteStatus,
   } = useTaskContext();
 
+  const [isGmailModalOpen, setIsGmailModalOpen] = useState(false);
   const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
   const [configTab, setConfigTab] = useState<'categorias' | 'estados'>('categorias');
   const [newCatName, setNewCatName] = useState('');
@@ -147,6 +149,23 @@ export const TasksView: React.FC<TasksViewProps> = ({
               <span>Kanban</span>
             </button>
           </div>
+
+          <Button
+            variant="pastel"
+            pastelColor="coral"
+            size="md"
+            onClick={() => setIsGmailModalOpen(true)}
+            icon={
+              <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M1.5 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h3.75v-8.25L1.5 8.25z" />
+                <path fill="#34A853" d="M22.5 5.25v13.5a1.5 1.5 0 0 1-1.5 1.5h-3.75v-8.25l5.25-3.75z" />
+                <path fill="#EA4335" d="M17.25 12V3.75L12 7.5 6.75 3.75V12z" />
+                <path fill="#FBBC04" d="M1.5 5.25l10.5 7.5 10.5-7.5V4.5a1.5 1.5 0 0 0-2.4-1.2L12 8.55 3.9 3.3a1.5 1.5 0 0 0-2.4 1.2z" />
+              </svg>
+            }
+          >
+            Gmail
+          </Button>
 
           <Button
             variant="primary"
@@ -494,6 +513,12 @@ export const TasksView: React.FC<TasksViewProps> = ({
           </div>
         </div>
       </Modal>
+
+      {/* MODAL DE GMAIL (FASE 12) */}
+      <GmailModal
+        isOpen={isGmailModalOpen}
+        onClose={() => setIsGmailModalOpen(false)}
+      />
     </div>
   );
 };

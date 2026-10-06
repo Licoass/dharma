@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { 
   Download, 
   Upload, 
@@ -17,6 +17,7 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { useTaskContext } from '../../context/TaskContext';
 import { DharmaCore } from '../common/DharmaCore';
+import { GmailModal } from '../gmail/GmailModal';
 import type { NavTab } from '../../types';
 
 export interface MoreViewProps {
@@ -34,6 +35,7 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
     googleEvents,
     googleUser
   } = useTaskContext();
+  const [isGmailModalOpen, setIsGmailModalOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExportJSON = () => {
@@ -211,7 +213,20 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
       ],
     },
     {
-      phase: 'FASE 12+',
+      phase: 'FASE 12',
+      title: 'Gmail (Fuente de Información)',
+      status: 'completada',
+      badge: 'VERIFICADO',
+      items: [
+        'Integración con Gmail API v3 y Google OAuth 2.0',
+        'Buscador y explorador de correos por asunto, remitente y contenido en tiempo real',
+        'Visualización limpia de información básica (remitente, fecha, extracto y mensaje)',
+        'Conversión fluida de correos en tareas DHARMA con categoría y prioridad sugeridas',
+        'Límites respetados: DHARMA no reemplaza al cliente de correo, lo utiliza como fuente de información',
+      ],
+    },
+    {
+      phase: 'FASE 13+',
       title: 'Sincronización en la Nube & Automatizaciones',
       status: 'pendiente',
       badge: 'SIGUIENTES FASES',
@@ -226,8 +241,8 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
 
   return (
     <div className="space-y-7 pb-12 max-w-5xl mx-auto select-none">
-      {/* BANNERS PRINCIPALES: DHARMA CORE, GOOGLE CALENDAR & GOOGLE DRIVE */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+      {/* BANNERS PRINCIPALES: DHARMA CORE, CALENDAR, DRIVE & GMAIL */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
         {/* BANNER DHARMA CORE IA */}
         <Card
           padding="md"
@@ -365,6 +380,52 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
               icon={<ArrowRight className="w-3.5 h-3.5 text-[#D97706]" />}
             >
               Explorar
+            </Button>
+          </div>
+        </Card>
+
+        {/* BANNER GMAIL */}
+        <Card
+          padding="md"
+          className="bg-gradient-to-r from-[#FCE8E6] via-white to-[#F8F9FA] border border-[#EA4335]/20 cursor-pointer hover:shadow-[0_8px_24px_rgba(234,67,53,0.12)] transition-all"
+          onClick={() => setIsGmailModalOpen(true)}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-[#FCE8E6] flex items-center justify-center shrink-0 border border-[#FAD2CF]">
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M1.5 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h3.75v-8.25L1.5 8.25z" />
+                  <path fill="#34A853" d="M22.5 5.25v13.5a1.5 1.5 0 0 1-1.5 1.5h-3.75v-8.25l5.25-3.75z" />
+                  <path fill="#EA4335" d="M17.25 12V3.75L12 7.5 6.75 3.75V12z" />
+                  <path fill="#FBBC04" d="M1.5 5.25l10.5 7.5 10.5-7.5V4.5a1.5 1.5 0 0 0-2.4-1.2L12 8.55 3.9 3.3a1.5 1.5 0 0 0-2.4 1.2z" />
+                </svg>
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#FCE8E6] text-[#D93025]">
+                    GMAIL
+                  </span>
+                  <span className="text-[10px] font-mono text-[#D93025]">TAREAS</span>
+                </div>
+                <h3 className="text-sm font-bold text-[#24292F] mt-0.5">
+                  Correos Gmail
+                </h3>
+                <p className="text-[11px] text-[#697282] line-clamp-1">
+                  Convierte correos en tareas estructuradas.
+                </p>
+              </div>
+            </div>
+
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsGmailModalOpen(true);
+              }}
+              icon={<ArrowRight className="w-3.5 h-3.5 text-[#D93025]" />}
+            >
+              Consultar
             </Button>
           </div>
         </Card>
@@ -592,6 +653,12 @@ export const MoreView: React.FC<MoreViewProps> = ({ onNavigateTab }) => {
           </Button>
         </div>
       </Card>
+
+      {/* MODAL DE GMAIL (FASE 12) */}
+      <GmailModal
+        isOpen={isGmailModalOpen}
+        onClose={() => setIsGmailModalOpen(false)}
+      />
     </div>
   );
 };

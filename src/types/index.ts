@@ -125,6 +125,7 @@ export interface ArchiveItem {
 }
 
 export * from './googleDrive';
+export * from './gmail';
 
 export type BookStatus = 'quiero_leer' | 'leyendo' | 'terminado' | 'abandonado';
 
